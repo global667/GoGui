@@ -61,7 +61,6 @@ public class GoGuiToolBar
     private JButton addButton(AbstractAction action)
     {
         JButton button = new JButton(action);
-        //button.putClientProperty("Quaqua.Button.style", "toolbar");
         setAction(button, action);
         addButton(button);
         return button;
