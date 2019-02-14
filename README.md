@@ -13,6 +13,7 @@ Clone the GoGui package from this site and uncompress it. Then type
 
     cd /path/of/the/goguipackage
     ant
+    java -jar ./lib/gogui.jar
 
 on the console.
 
