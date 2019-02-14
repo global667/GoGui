@@ -16,8 +16,9 @@ import net.sf.gogui.util.FileUtil;
 /** Untility functions for managing the thumbnail directory. */
 public final class ThumbnailUtil
 {
-    /** Expire all thumbnails older than a certain age.
-        NOTE: This function is still experimental, it may not work yet */
+    /** *  Expire all thumbnails older than a certain age.NOTE: This function is still experimental, it may not work yet
+     * @param seconds
+     * @param checkOnly */
     public static void expire(int seconds, boolean checkOnly)
     {
         if (! ThumbnailPlatform.checkThumbnailSupport())
@@ -33,8 +34,11 @@ public final class ThumbnailUtil
             expire(file, currentTimeSeconds, seconds, checkOnly);
     }
 
-    /** Expire thumbnails if older than a certain age.
-        NOTE: This function is still experimental, it may not work yet */
+    /** *  Expire thumbnails if older than a certain age.NOTE: This function is still experimental, it may not work yet
+     * @param file
+     * @param currentTimeSeconds
+     * @param seconds
+     * @param checkOnly */
     public static void expire(File file, long currentTimeSeconds,
                               long seconds, boolean checkOnly)
     {

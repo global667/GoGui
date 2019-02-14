@@ -6,7 +6,8 @@ import static net.sf.gogui.go.GoColor.BLACK;
 import static net.sf.gogui.go.GoColor.WHITE;
 import net.sf.gogui.util.ObjectUtil;
 
-/** A set containing one element for Black and one for White. */
+/** A set containing one element for Black and one for White.
+ * @param <T> */
 public class BlackWhiteSet<T>
 {
     public BlackWhiteSet()
@@ -19,6 +20,7 @@ public class BlackWhiteSet<T>
         m_elementWhite = elementWhite;
     }
 
+    @Override
     public boolean equals(Object object)
     {
         if (object == null || object.getClass() != getClass())
@@ -39,6 +41,7 @@ public class BlackWhiteSet<T>
         }
     }
 
+    @Override
     public int hashCode()
     {
         int hashCode = 0;

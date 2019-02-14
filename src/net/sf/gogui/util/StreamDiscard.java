@@ -2,6 +2,7 @@
 
 package net.sf.gogui.util;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 /** Thread discarding an output stream. */
@@ -15,6 +16,7 @@ public class StreamDiscard
 
     /** Run method.
         Exceptions caught are written to stderr. */
+    @Override
     public void run()
     {
         try
@@ -29,11 +31,10 @@ public class StreamDiscard
                 {
                     // Not sure if this is necessary.
                     sleep(100);
-                    continue;
                 }
             }
         }
-        catch (Throwable e)
+        catch (IOException | InterruptedException e)
         {
             StringUtil.printException(e);
         }

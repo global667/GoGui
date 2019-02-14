@@ -14,6 +14,7 @@ public class GameFileFilter
     /** Accept function.
         @param file The file to check.
         @return true if file has extension .sgf or .SGF or is a directory */
+    @Override
     public boolean accept(File file)
     {
         if (file.isDirectory())
@@ -24,6 +25,7 @@ public class GameFileFilter
                 || FileUtil.hasExtension(file, "XML"));
     }
 
+    @Override
     public String getDescription()
     {
         return i18n("LB_GOGAME");

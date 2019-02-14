@@ -48,9 +48,10 @@ public final class ThumbnailCreator
         m_painter = new BoardPainter();
     }
 
-    /** Create thumbnail at standard location.
-        Does not create the thumnbail if an up-to-date thumbnail already
-        exists. */
+    /** *  Create thumbnail at standard location.Does not create the thumnbail if an up-to-date thumbnail already
+        exists.
+     * @param input
+     * @throws net.sf.gogui.util.ErrorMessage */
     public void create(File input) throws ErrorMessage
     {
         File file = getThumbnailFileNormalSize(input);
@@ -82,7 +83,8 @@ public final class ThumbnailCreator
         .thumbnails/normal
         @param thumbnailSize The image size of the thumbnail.
         @param scale If true thumbnailSize will be scaled down for boards
-        smaller than 19. */
+        smaller than 19.
+     * @throws net.sf.gogui.util.ErrorMessage */
     public void create(File input, File output, int thumbnailSize,
                        boolean scale) throws ErrorMessage
     {
@@ -131,7 +133,7 @@ public final class ThumbnailCreator
             if (output == null)
                 output = getThumbnailFileNormalSize(input);
             long lastModified = getLastModified(input);
-            Map<String,String> metaData = new TreeMap<String,String>();
+            Map<String,String> metaData = new TreeMap<>();
             metaData.put("Thumb::URI", uri.toASCIIString());
             metaData.put("Thumb::MTime", Long.toString(lastModified));
             switch (m_gameFile.m_format)
@@ -161,11 +163,7 @@ public final class ThumbnailCreator
         {
             throw new Error("File not found: " + input);
         }
-        catch (IOException e)
-        {
-            throw new Error(e.getMessage());
-        }
-        catch (SgfError e)
+        catch (IOException | SgfError e)
         {
             throw new Error(e.getMessage());
         }

@@ -49,6 +49,7 @@ class GameTreeNode
         return m_node;
     }
 
+    @Override
     public void paintComponent(Graphics graphics)
     {
         int size = m_gameTreePanel.getNodeSize();

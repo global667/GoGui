@@ -57,9 +57,10 @@ public class GuiUtil
         @see #runProgress */
     public interface ProgressRunnable
     {
-        /** Function to run.
-            The function is expected to call ProgressShow.showProgress
-            regularly to indicate progress made. */
+        /** *  Function to run.The function is expected to call ProgressShow.showProgress
+            regularly to indicate progress made.
+         * @param progressShow
+         * @throws java.lang.Throwable */
         void run(ProgressShow progressShow) throws Throwable;
     }
 
@@ -84,26 +85,25 @@ public class GuiUtil
     {
         StringSelection selection = new StringSelection(text);
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        ClipboardOwner owner = new ClipboardOwner() {
-                public void lostOwnership(Clipboard clipboard,
-                                          Transferable contents)
-                {
-                }
-            };
+        ClipboardOwner owner = (Clipboard clipboard1, Transferable contents) -> {
+        };
         clipboard.setContents(selection, owner);
     }
 
-    /** Wrapper object for JComboBox items.
-        JComboBox can have focus and keyboard navigation problems if duplicate
-        String objects are added. See JDK 1.5 doc for JComboBox.addItem. */
+    /** *  Wrapper object for JComboBox items.JComboBox can have focus and keyboard navigation problems if duplicate
+        String objects are added.See JDK 1.5 doc for JComboBox.addItem.
+     * @param item
+     * @return  */
     public static Object createComboBoxItem(final String item)
     {
         return new Object() {
+                @Override
                 public String toString() {
                     return item; } };
     }
 
     /** Create empty border with normal padding.
+     * @return 
         @see #PAD */
     public static Border createEmptyBorder()
     {
@@ -111,6 +111,7 @@ public class GuiUtil
     }
 
     /** Create empty box with size of normal padding.
+     * @return 
         @see #PAD */
     public static Box.Filler createFiller()
     {
@@ -119,6 +120,7 @@ public class GuiUtil
     }
 
     /** Create empty border with small padding.
+     * @return 
         @see #SMALL_PAD */
     public static Border createSmallEmptyBorder()
     {
@@ -126,6 +128,7 @@ public class GuiUtil
     }
 
     /** Create empty box with size of small padding.
+     * @return 
         @see #SMALL_PAD */
     public static Box.Filler createSmallFiller()
     {
@@ -144,11 +147,7 @@ public class GuiUtil
         {
             return (String)content.getTransferData(DataFlavor.stringFlavor);
         }
-        catch (UnsupportedFlavorException e)
-        {
-            return null;
-        }
-        catch (IOException e)
+        catch (UnsupportedFlavorException | IOException e)
         {
             return null;
         }
@@ -172,8 +171,8 @@ public class GuiUtil
                 "</style></head>";
     }
 
-    /** Get size of default monspaced font.
-        Can be used for setting the initial size of some GUI elements. */
+    /** *  Get size of default monspaced font.Can be used for setting the initial size of some GUI elements.
+     * @return  */
     public static int getDefaultMonoFontSize()
     {
         return MONOSPACED_FONT.getSize();
@@ -186,12 +185,12 @@ public class GuiUtil
         return new ImageIcon(url, name);
     }
 
-    /** Init look and feel.
-        If parameter is empty string, no initialization will be done.
+    /** *  Init look and feel.If parameter is empty string, no initialization will be done.
         If parameter is null, try to use plasticxp (jwindows on Windows), but
         don't show an error message, if it fails.
         Otherwise use parameter as class name or shortcut as decoumented
-        in the GoGui reference, and show message on failure. */
+        in the GoGui reference, and show message on failure.
+     * @param laf */
     public static void initLookAndFeel(String laf)
     {
         if (laf == null
@@ -219,18 +218,28 @@ public class GuiUtil
             else
                 return;
         }
-        if ("cross".equals(laf))
-            laf = UIManager.getCrossPlatformLookAndFeelClassName();
-        else if ("gtk".equals(laf))
-            laf = "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
-        else if ("motif".equals(laf))
-            laf = "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
-        else if ("quaqua".equals(laf))
-            laf = "ch.randelshofer.quaqua.QuaquaLookAndFeel";
-        else if ("system".equals(laf))
-            laf = UIManager.getSystemLookAndFeelClassName();
-        else if ("windows".equals(laf))
-            laf = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+        switch (laf) {
+            case "cross":
+                laf = UIManager.getCrossPlatformLookAndFeelClassName();
+                break;
+            case "gtk":
+                laf = "com.sun.java.swing.plaf.gtk.GTKLookAndFeel";
+                break;
+            case "motif":
+                laf = "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
+                break;
+            case "quaqua":
+                laf = "ch.randelshofer.quaqua.QuaquaLookAndFeel";
+                break;
+            case "system":
+                laf = UIManager.getSystemLookAndFeelClassName();
+                break;
+            case "windows":
+                laf = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+                break;
+            default:
+                break;
+        }
         try
         {
             UIManager.setLookAndFeel(laf);
@@ -248,35 +257,22 @@ public class GuiUtil
                 UIManager.put("OptionPane.warningIcon", icon);
             }
         }
-        catch (ClassNotFoundException e)
-        {
-            handleLookAndFeelError(showError, laf);
-
-        }
-        catch (InstantiationException e)
-        {
-            handleLookAndFeelError(showError, laf);
-
-        }
-        catch (IllegalAccessException e)
-        {
-            handleLookAndFeelError(showError, laf);
-
-        }
-        catch (UnsupportedLookAndFeelException e)
+        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e)
         {
             handleLookAndFeelError(showError, laf);
 
         }
     }
 
-    /** Manually break message into multiple lines for multi-line labels.
-        Needed for multi-line messages in option panes, because pack() on
+    /** *  Manually break message into multiple lines for multi-line labels.Needed for multi-line messages in option panes, because pack() on
         JOptionPane does not compute the option pane size correctly, if a
         maximum width is set and the label text is automatically broken into
-        multiple lines. The workaround with calling invalidate() and pack() a
-        second time does not work either in this case. See also Sun Bug ID
-        4545951 (still in Linux JDK 1.5.0_04-b05 or Mac 1.4.2_12) */
+        multiple lines.The workaround with calling invalidate() and pack() a
+        second time does not work either in this case.
+        See also Sun Bug ID
+        4545951 (still in Linux JDK 1.5.0_04-b05 or Mac 1.4.2_12)
+     * @param message
+     * @return  */
     public static String insertLineBreaks(String message)
     {
         final int MAX_CHAR_PER_LINE = 72;
@@ -307,9 +303,9 @@ public class GuiUtil
         return buffer.toString();
     }
 
-    /** Call SwingUtilities.invokeAndWait.
-        Ignores possible exceptions (apart from printing a warning to
-        System.err */
+    /** *  Call SwingUtilities.invokeAndWait.Ignores possible exceptions (apart from printing a warning to
+        System.err
+     * @param runnable */
     public static void invokeAndWait(Runnable runnable)
     {
         try
@@ -333,9 +329,10 @@ public class GuiUtil
         return (manager.getActiveWindow() == window);
     }
 
-    /** Check window for normal state.
-        Checks if window is not maximized (in either or both directions) and
-        not iconified. */
+    /** *  Check window for normal state.Checks if window is not maximized (in either or both directions) and
+        not iconified.
+     * @param window
+     * @return  */
     public static boolean isNormalSizeMode(JFrame window)
     {
         int state = window.getExtendedState();
@@ -395,7 +392,8 @@ public class GuiUtil
             throw thread.getThrowable();
     }
 
-    /** Set antialias rendering hint if graphics is instance of Graphics2D. */
+    /** Set antialias rendering hint if graphics is instance of Graphics2D.
+     * @param graphics */
     public static void setAntiAlias(Graphics graphics)
     {
         if (graphics instanceof Graphics2D)
@@ -406,15 +404,16 @@ public class GuiUtil
         }
     }
 
-    /** Set text field non-editable.
-        Also sets it non-focusable. */
+    /** *  Set text field non-editable.Also sets it non-focusable.
+     * @param field */
     public static void setEditableFalse(JTextField field)
     {
         field.setEditable(false);
         field.setFocusable(false);
     }
 
-    /** Set Go icon on frame. */
+    /** Set Go icon on frame.
+     * @param frame */
     public static void setGoIcon(Frame frame)
     {
         URL url = s_iconURL;
@@ -423,7 +422,9 @@ public class GuiUtil
     }
 
     /** Parse text that has the mnemonic marked with a preceding'&amp;'
-        (like in Qt) and set the text and mnemonic of the button. */
+        (like in Qt) and set the text and mnemonic of the button.
+     * @param button
+     * @param text */
     public static void setTextAndMnemonic(AbstractButton button, String text)
     {
         int pos = text.indexOf('&');
@@ -439,8 +440,8 @@ public class GuiUtil
         }
     }
 
-    /** Set property to render button in bevel style on the Mac.
-        Only has an effect if Quaqua Look and Feel is used. */
+    /** *  Set property to render button in bevel style on the Mac.Only has an effect if Quaqua Look and Feel is used.
+     * @param button */
     public static void setMacBevelButton(JButton button)
     {
         button.putClientProperty("Quaqua.Button.style", "bevel");
@@ -523,6 +524,7 @@ public class GuiUtil
             return m_throwable;
         }
 
+        @Override
         public void run()
         {
             long startTime = System.currentTimeMillis();
@@ -547,25 +549,16 @@ public class GuiUtil
                     assert false;
                 }
             }
-            SwingUtilities.invokeLater(new Runnable()
-                {
-                    public void run()
-                    {
-                        m_dialog.dispose();
-                    }
-                });
+            SwingUtilities.invokeLater(m_dialog::dispose);
         }
 
+        @Override
         public void showProgress(int percent)
         {
             m_percent = percent;
-            SwingUtilities.invokeLater(new Runnable()
-                {
-                    public void run()
-                    {
-                        m_progressBar.setValue(m_percent);
-                    }
-                });
+            SwingUtilities.invokeLater(() -> {
+                m_progressBar.setValue(m_percent);
+            });
         }
 
         private int m_percent;
@@ -594,7 +587,7 @@ public class GuiUtil
     private static final Dimension SMALL_FILLER_DIMENSION =
         new Dimension(SMALL_PAD, SMALL_PAD);
 
-    private static URL s_iconURL;
+    private static final URL s_iconURL;
 
     private static void handleLookAndFeelError(boolean showError, String laf)
     {

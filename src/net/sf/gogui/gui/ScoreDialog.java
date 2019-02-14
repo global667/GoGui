@@ -44,12 +44,14 @@ public class ScoreDialog
     {
         super(owner, i18n("TIT_SCORE"));
         m_initialRules = initialRules;
-        WindowAdapter windowAdapter = new WindowAdapter() {
-                public void windowClosing(WindowEvent event) {
-                    listener.actionScoreDone(null);
-                    dispose();
-                }
-            };
+        WindowAdapter windowAdapter;
+        windowAdapter = new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent event) {
+                listener.actionScoreDone(null);
+                dispose();
+            }
+        };
         addWindowListener(windowAdapter);
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         setResizable(false);
@@ -85,15 +87,13 @@ public class ScoreDialog
                                "TT_SCORE_RESULT", labels, values);
 
         JButton okButton = new JButton(i18n("LB_OK"));
-        okButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    listener.actionScoreDone(m_score);
-            } });
+        okButton.addActionListener((ActionEvent e) -> {
+            listener.actionScoreDone(m_score);
+        });
         m_cancelButton = new JButton(i18n("LB_CANCEL"));
-        m_cancelButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    listener.actionScoreDone(null);
-            } });
+        m_cancelButton.addActionListener((ActionEvent e) -> {
+            listener.actionScoreDone(null);
+        });
         Object options[] = { okButton, m_cancelButton };
         JOptionPane optionPane = new JOptionPane(outerBox,
                                                  JOptionPane.PLAIN_MESSAGE,
@@ -228,29 +228,25 @@ public class ScoreDialog
 
         ButtonGroup group = new ButtonGroup();
         m_useArea = new JRadioButton(i18n("LB_SCORE_METHOD_AREA"));
-        m_useArea.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if (m_score != null)
-                    {
-                        m_score.updateRules(AREA);
-                        showScore();
-                    }
-                }
-            });
+        m_useArea.addActionListener((ActionEvent e) -> {
+            if (m_score != null)
+            {
+                m_score.updateRules(AREA);
+                showScore();
+            }
+        });
         m_useArea.setToolTipText(i18n("TT_SCORE_METHOD_AREA"));
         group.add(m_useArea);
         panel.add(m_useArea);
         panel.add(GuiUtil.createFiller());
         m_useTerritory = new JRadioButton(i18n("LB_SCORE_METHOD_TERRITORY"));
-        m_useTerritory.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if (m_score != null)
-                    {
-                        m_score.updateRules(TERRITORY);
-                        showScore();
-                    }
-                }
-            });
+        m_useTerritory.addActionListener((ActionEvent e) -> {
+            if (m_score != null)
+            {
+                m_score.updateRules(TERRITORY);
+                showScore();
+            }
+        });
         m_useTerritory.setToolTipText(i18n("TT_SCORE_METHOD_TERRITORY"));
         group.add(m_useTerritory);
         panel.add(m_useTerritory);

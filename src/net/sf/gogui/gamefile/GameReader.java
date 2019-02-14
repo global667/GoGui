@@ -20,7 +20,9 @@ import net.sf.gogui.xml.XmlReader;
 public class GameReader
 {
     /** Construct reader and read a game.
-        @param progressShow Callback to show progress, can be null */
+     * @param file
+        @param progressShow Callback to show progress, can be null
+     * @throws net.sf.gogui.util.ErrorMessage */
     public GameReader(File file, ProgressShow progressShow) throws ErrorMessage
     {
         m_gameFile = new GameFile();

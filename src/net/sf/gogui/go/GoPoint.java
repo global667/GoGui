@@ -26,8 +26,9 @@ public final class GoPoint
         @see #getIndex */
     public static final int NUMBER_INDEXES = MAX_SIZE * MAX_SIZE;
 
-    /** Compare two points.
-        The order of the points is: A1, B1, ..., A2, B2, ... */
+    /** *  Compare two points.The order of the points is: A1, B1, ..., A2, B2, ...
+     * @param p */
+    @Override
     public int compareTo(GoPoint p)
     {
         if (m_index < p.m_index)
@@ -42,12 +43,16 @@ public final class GoPoint
         Since point instances are unique, this function does the same as
         Object.equals and is only added explicitely to avoid warnings about
         classes with a compareTo, but no equals-function. */
+    @Override
     public boolean equals(Object obj)
     {
         return (this == obj);
     }
 
-    /** Compare, including the case that the points can be null. */
+    /** Compare, including the case that the points can be null.
+     * @param point1
+     * @param point2
+     * @return  */
     public static boolean equals(GoPoint point1, GoPoint point2)
     {
         return (point1 == point2);
@@ -68,21 +73,25 @@ public final class GoPoint
         return point;
     }
 
-    /** Integer for using points as indices in an array.
-        The index of A1 is zero and the indices count upwards from left
+    /** *  Integer for using points as indices in an array.The index of A1 is zero and the indices count upwards from left
         to right and bottom to top over a board with the maximum size
-        GoPoint.MAX_SIZE. */
+        GoPoint.MAX_SIZE.
+     * @return  */
     public int getIndex()
     {
         return m_index;
     }
 
-    /** See getIndex(). */
+    /** See getIndex().
+     * @param x
+     * @param y
+     * @return  */
     public static int getIndex(int x, int y)
     {
         return y * MAX_SIZE + x;
     }
 
+    @Override
     public int hashCode()
     {
         return m_index;
@@ -98,13 +107,15 @@ public final class GoPoint
             return this;
     }
 
-    /** X-Coordinate. */
+    /** X-Coordinate.
+     * @return  */
     public int getX()
     {
         return m_x;
     }
 
-    /** Y-Coordinate. */
+    /** Y-Coordinate.
+     * @return  */
     public int getY()
     {
         return m_y;
@@ -127,10 +138,13 @@ public final class GoPoint
             return this;
     }
 
-    /** Parse point or null (PASS).
-        Parsing is case-insensitive, leading and trailing whitespace is
-        ignored. "PASS" returns null, invalid strings throw an
-        InvalidPointException. */
+    /** *  Parse point or null (PASS).Parsing is case-insensitive, leading and trailing whitespace is
+        ignored."PASS" returns null, invalid strings throw an
+        InvalidPointException.
+     * @param string
+     * @param boardSize
+     * @return
+     * @throws net.sf.gogui.go.InvalidPointException  */
     public static GoPoint parsePoint(String string, int boardSize)
         throws InvalidPointException
     {
@@ -181,6 +195,7 @@ public final class GoPoint
 
     /** Convert to a string.
         @return String representation of this point. */
+    @Override
     public String toString()
     {
         return m_string;
@@ -196,9 +211,9 @@ public final class GoPoint
         return point.toString();
     }
 
-    /** Convert a list of points to a string.
-        Points are separated by a single space.
-        If pointList is null, "(null)" is returned. */
+    /** *  Convert a list of points to a string.Points are separated by a single space.If pointList is null, "(null)" is returned.
+     * @param pointList
+     * @return  */
     public static String toString(ConstPointList pointList)
     {
         if (pointList == null)
@@ -226,7 +241,7 @@ public final class GoPoint
             return this;
     }
 
-    private static GoPoint[][] s_points;
+    private static final GoPoint[][] s_points;
 
     private final int m_x;
 

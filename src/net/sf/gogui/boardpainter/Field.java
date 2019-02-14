@@ -33,6 +33,7 @@ public class Field
         m_influence = 0;
     }
 
+    @Override
     public void draw(Graphics graphics, int size, int x, int y,
                      Image boardImage, int boardWidth)
     {
@@ -70,52 +71,87 @@ public class Field
         m_graphics = null;
     }
 
+    @Override
     public GoColor getColor()
     {
         return m_color;
     }
 
+    @Override
     public boolean getCursor()
     {
         return m_cursor;
     }
 
+    /**
+     *
+     * @return
+     */
+    @Override
     public boolean getCrossHair()
     {
         return m_crossHair;
     }
 
+    /**
+     *
+     * @return
+     */
+    @Override
     public Color getFieldBackground()
     {
         return m_fieldColor;
     }
 
+    /**
+     *
+     * @return
+     */
+    @Override
     public boolean getMark()
     {
         return m_mark;
     }
 
+    /**
+     *
+     * @return
+     */
+    @Override
     public boolean getMarkCircle()
     {
         return m_markCircle;
     }
 
+    @Override
     public boolean getMarkSquare()
     {
         return m_markSquare;
     }
 
+    /**
+     *
+     * @return
+     */
+    @Override
     public boolean getMarkTriangle()
     {
         return m_markTriangle;
     }
 
+    /**
+     *
+     * @return
+     */
+    @Override
     public boolean getSelect()
     {
         return m_select;
     }
 
-    /** @see #setGhostStone */
+    /**
+     * @return  *  @see #setGhostStone */
+    @Override
     public GoColor getGhostStone()
     {
         return m_ghostStone;
@@ -126,16 +162,31 @@ public class Field
         return size / 17;
     }
 
+    /**
+     *
+     * @return
+     */
+    @Override
     public String getLabel()
     {
         return m_label;
     }
 
+    /**
+     *
+     * @return
+     */
+    @Override
     public GoColor getTerritory()
     {
         return m_territory;
     }
 
+    /**
+     *
+     * @return
+     */
+    @Override
     public boolean isInfluenceSet()
     {
         return m_influenceSet;

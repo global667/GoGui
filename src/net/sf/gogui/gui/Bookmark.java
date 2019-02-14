@@ -67,7 +67,7 @@ public final class Bookmark
 
     public static ArrayList<Bookmark> load()
     {
-        ArrayList<Bookmark> bookmarks = new ArrayList<Bookmark>();
+        ArrayList<Bookmark> bookmarks = new ArrayList<>();
         Preferences prefs = PrefUtil.getNode("net/sf/gogui/gui/bookmark");
         if (prefs == null)
             return bookmarks;

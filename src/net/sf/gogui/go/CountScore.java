@@ -56,8 +56,9 @@ public class CountScore
             m_board.getStones(p, c, stones);
         }
         boolean isDead = ! isDead(p);
-        for (GoPoint stone : stones)
+        stones.forEach((stone) -> {
             setDead(stone, isDead);
+        });
         return stones;
     }
 
@@ -118,7 +119,8 @@ public class CountScore
 
     /** Get the score.
         @param komi The komi.
-        @param rules The scoring method */
+        @param rules The scoring method
+     * @return  */
     public Score getScore(Komi komi, ScoringMethod rules)
     {
         Score s = new Score();

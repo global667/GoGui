@@ -50,7 +50,7 @@ public final class Main
             display.mainLoop(System.in, System.out);
             display.close();
         }
-        catch (Throwable t)
+        catch (Exception t)
         {
             StringUtil.printException(t);
             System.exit(1);

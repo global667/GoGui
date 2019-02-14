@@ -50,7 +50,8 @@ public class GtpSynchronizer
         m_timeSettings = null;
     }
 
-    /** Did the last GtpSynchronizer.synchronize() fail? */
+    /** Did the last GtpSynchronizer.synchronize() fail?
+     * @return  */
     public boolean isOutOfSync()
     {
         return m_isOutOfSync;
@@ -69,7 +70,7 @@ public class GtpSynchronizer
         sendGameInfo(komi, timeSettings);
         ConstBoard targetState = computeTargetState(board);
         setup(targetState);
-        ArrayList<Move> moves = new ArrayList<Move>();
+        ArrayList<Move> moves = new ArrayList<>();
         for (int i = 0; i < targetState.getNumberMoves(); ++i)
             moves.add(targetState.getMove(i));
         play(moves);
@@ -88,7 +89,7 @@ public class GtpSynchronizer
             return;
         }
         m_isOutOfSync = true;
-        ArrayList<Move> moves = new ArrayList<Move>();
+        ArrayList<Move> moves = new ArrayList<>();
         int numberUndo = computeToPlay(moves, targetState);
         if (numberUndo == 0 || m_isSupportedUndo || m_isSupportedGGUndo)
         {
@@ -114,10 +115,12 @@ public class GtpSynchronizer
             init(board, komi, timeSettings);
     }
 
-    /** Send human move to engine.
-        The move is not played on the board yet. This function is useful,
+    /** *  Send human move to engine.The move is not played on the board yet.This function is useful,
         if it should be first tested, if the engine accepts a move, before
-        playing it on the board, e.g. after a new human move was entered. */
+        playing it on the board, e.g.after a new human move was entered.
+     * @param board
+     * @param move
+     * @throws net.sf.gogui.gtp.GtpError */
     public void updateHumanMove(ConstBoard board, Move move) throws GtpError
     {
         ConstBoard targetState = computeTargetState(board);
@@ -133,11 +136,12 @@ public class GtpSynchronizer
         play(move);
     }
 
-    /** Update internal state after genmove.
-        Needs to be called after each genmove (or kgs-genmove_cleanup)
-        command. The computer move is expected to be already played on the
+    /** *  Update internal state after genmove.Needs to be called after each genmove (or kgs-genmove_cleanup)
+        command.
+        The computer move is expected to be already played on the
         board, but does not need to be transmitted to the program anymore,
-        because genmove already executes the move at the program's side. */
+        because genmove already executes the move at the program's side.
+     * @param board */
     public void updateAfterGenmove(ConstBoard board)
     {
         Move move = board.getLastMove();
@@ -272,10 +276,7 @@ public class GtpSynchronizer
         if (! ObjectUtil.equals(m_engineState.getSetupPlayer(),
                                 targetState.getSetupPlayer()))
             return true;
-        for (GoColor c : BLACK_WHITE)
-            if (! m_engineState.getSetup(c).equals(targetState.getSetup(c)))
-                return true;
-        return false;
+        return BLACK_WHITE.stream().anyMatch((c) -> (! m_engineState.getSetup(c).equals(targetState.getSetup(c))));
     }
 
     private void initSupportedCommands()
@@ -381,14 +382,13 @@ public class GtpSynchronizer
         {
             StringBuilder command = new StringBuilder(128);
             command.append("gogui-setup");
-            for (GoColor c : BLACK_WHITE)
-            {
+            BLACK_WHITE.forEach((c) -> {
                 for (GoPoint p : targetState.getSetup(c))
                 {
                     command.append(' ');
                     command.append(Move.get(c, p));
                 }
-            }
+            });
             m_gtp.send(command.toString());
             m_engineState.setup(setupBlack, setupWhite, setupPlayer);
             if (setupPlayer != null && m_isSupportedSetupPlayer)

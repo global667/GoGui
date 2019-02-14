@@ -114,8 +114,8 @@ public final class Compare
     public static void compare(ArrayList<String> filenames) throws Exception
     {
         Board board = null;
-        Map<Integer, ArrayList<Placement>> games =
-            new TreeMap<Integer, ArrayList<Placement>>();
+        Map<Integer, ArrayList<Placement>> games;
+        games = new TreeMap<>();
         for (int gameNumber = 0; gameNumber < filenames.size(); ++gameNumber)
         {
             String filename = filenames.get(gameNumber);
@@ -140,15 +140,16 @@ public final class Compare
 
     public static ArrayList<Placement> getPlacements(ConstNode node)
     {
-        ArrayList<Placement> result = new ArrayList<Placement>(512);
+        ArrayList<Placement> result = new ArrayList<>(512);
         while (node != null)
         {
             for (GoColor c : BLACK_WHITE_EMPTY)
             {
                 PointList list = new PointList(node.getSetup(c));
                 Collections.sort(list);
-                for (GoPoint p : list)
+                list.forEach((p) -> {
                     result.add(new Placement(true, c, p));
+                });
             }
             Move move = node.getMove();
             if (move != null)

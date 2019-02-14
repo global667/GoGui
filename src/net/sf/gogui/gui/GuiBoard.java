@@ -155,27 +155,33 @@ public final class GuiBoard
         repaint(point);
     }
 
-    /** Trigger the context menu callback at the listener. */
+    /** Trigger the context menu callback at the listener.
+     * @param point */
     public void contextMenu(GoPoint point)
     {
         m_panel.contextMenu(point);
     }
 
-    /** Get current board size. */
+    /** Get current board size.
+     * @return  */
+    @Override
     public int getBoardSize()
     {
         return m_size;
     }
 
-    /** Return a field.
-        Returns only a const interface to the field, the field state should
+    /** *  Return a field.Returns only a const interface to the field, the field state should
         be modified using GuiBoard functions to guarantee the UI repaint after
-        field changes. */
+        field changes.
+     * @param p
+     * @return  */
+    @Override
     public ConstField getFieldConst(GoPoint p)
     {
         return getField(p);
     }
 
+    @Override
     public Dimension getFieldSize()
     {
         int size = m_painter.getFieldSize();
@@ -185,6 +191,7 @@ public final class GuiBoard
     /** Get label.
         @param point The point.
         @return Label or null if point has no label. */
+    @Override
     public String getLabel(GoPoint point)
     {
         return getField(point).getLabel();
@@ -193,6 +200,7 @@ public final class GuiBoard
     /** Get location on screen for a point.
         @param point The point.
         @return Location on screen of center of point. */
+    @Override
     public Point getLocationOnScreen(GoPoint point)
     {
         Point center = m_painter.getCenter(point.getX(), point.getY());
@@ -206,6 +214,7 @@ public final class GuiBoard
         This unspecified mark uses a diagonal cross.
         @param point The point.
         @return true, if point is marked. */
+    @Override
     public boolean getMark(GoPoint point)
     {
         return getField(point).getMark();
@@ -214,6 +223,7 @@ public final class GuiBoard
     /** Check if point is marked with a circle.
         @param point The point.
         @return true, if point is marked with a circle. */
+    @Override
     public boolean getMarkCircle(GoPoint point)
     {
         return getField(point).getMarkCircle();
@@ -222,6 +232,7 @@ public final class GuiBoard
     /** Check if point is marked with a square.
         @param point The point.
         @return true, if point is marked with a square. */
+    @Override
     public boolean getMarkSquare(GoPoint point)
     {
         return getField(point).getMarkSquare();
@@ -230,6 +241,7 @@ public final class GuiBoard
     /** Check if point is marked with a triangle.
         @param point The point.
         @return true, if point is marked with a triangle. */
+    @Override
     public boolean getMarkTriangle(GoPoint point)
     {
         return getField(point).getMarkTriangle();
@@ -248,6 +260,7 @@ public final class GuiBoard
     /** Check if point is selected.
         @param point The point.
         @return true, if point is selected. */
+    @Override
     public boolean getSelect(GoPoint point)
     {
         return getField(point).getSelect();
@@ -255,11 +268,13 @@ public final class GuiBoard
 
     /** Check if cursor is shown.
         @return true, if cursor is shown. */
+    @Override
     public boolean getShowCursor()
     {
         return m_showCursor;
     }
 
+    @Override
     public boolean getShowGrid()
     {
         return m_showGrid;
@@ -278,17 +293,20 @@ public final class GuiBoard
         setLayout(new SquareLayout());
         m_panel = new BoardPanel();
         m_panel.addFocusListener(new FocusAdapter() {
+                @Override
                 public void focusGained(FocusEvent event) {
                     if (getShowCursor())
                         setCursor(m_cursor, true);
                 }
 
+                @Override
                 public void focusLost(FocusEvent event) {
                     if (getShowCursor())
                         setCursor(m_cursor, false);
                 }
             });
         addFocusListener(new FocusAdapter() {
+                @Override
                 public void focusGained(FocusEvent event) {
                     m_panel.requestFocusInWindow();
                 }
@@ -296,11 +314,13 @@ public final class GuiBoard
         add(m_panel);
         m_panel.requestFocusInWindow();
         m_panel.addKeyListener(new KeyAdapter() {
+                @Override
                 public void keyPressed(KeyEvent event) {
                     GuiBoard.this.keyPressed(event);
                 }
             });
         m_panel.addMouseListener(new MouseAdapter() {
+                @Override
                 public void mousePressed(MouseEvent e) {
                     GoPoint point = m_panel.getPoint(e);
                     if (point == null)
@@ -328,6 +348,7 @@ public final class GuiBoard
                     }
                 }
 
+                @Override
                 public void mouseReleased(MouseEvent e) {
                     GoPoint point = m_panel.getPoint(e);
                     if (point == null)
@@ -335,11 +356,11 @@ public final class GuiBoard
                     if (e.isPopupTrigger())
                     {
                         contextMenu(point);
-                        return;
                     }
                 }
             });
         m_panel.addMouseMotionListener(new MouseMotionAdapter() {
+                @Override
                 public void mouseMoved(MouseEvent e) {
                     m_panel.setToolTipText(null);
                     GoPoint point = m_panel.getPoint(e);
@@ -360,8 +381,8 @@ public final class GuiBoard
         repaint();
     }
 
-    /** Mark point of last move on the board.
-        The last move marker will be removed, if the parameter is null. */
+    /** *  Mark point of last move on the board.The last move marker will be removed, if the parameter is null.
+     * @param point */
     public void markLastMove(GoPoint point)
     {
         clearLastMove();
@@ -380,6 +401,7 @@ public final class GuiBoard
         m_panel.paintImmediately(point);
     }
 
+    @Override
     public int print(Graphics g, PageFormat format, int page)
         throws PrinterException
     {
@@ -635,6 +657,7 @@ public final class GuiBoard
             return m_painter.getPoint(event.getPoint());
         }
 
+        @Override
         public void paintComponent(Graphics graphics)
         {
             if (DEBUG_REPAINT)
@@ -822,33 +845,33 @@ public final class GuiBoard
             return;
         boolean shiftModifier = ((modifiers & ActionEvent.SHIFT_MASK) != 0);
         GoPoint point = m_cursor;
-        if (code == KeyEvent.VK_DOWN)
-        {
-            point = point.down();
-            if (shiftModifier)
-                while (! isHandicapLineOrEdge(point.getY()))
-                    point = point.down();
-        }
-        else if (code == KeyEvent.VK_UP)
-        {
-            point = point.up(m_size);
-            if (shiftModifier)
-                while (! isHandicapLineOrEdge(point.getY()))
-                    point = point.up(m_size);
-        }
-        else if (code == KeyEvent.VK_LEFT)
-        {
-            point = point.left();
-            if (shiftModifier)
-                while (! isHandicapLineOrEdge(point.getX()))
-                    point = point.left();
-        }
-        else if (code == KeyEvent.VK_RIGHT)
-        {
-            point = point.right(m_size);
-            if (shiftModifier)
-                while (! isHandicapLineOrEdge(point.getX()))
-                    point = point.right(m_size);
+        switch (code) {
+            case KeyEvent.VK_DOWN:
+                point = point.down();
+                if (shiftModifier)
+                    while (! isHandicapLineOrEdge(point.getY()))
+                        point = point.down();
+                break;
+            case KeyEvent.VK_UP:
+                point = point.up(m_size);
+                if (shiftModifier)
+                    while (! isHandicapLineOrEdge(point.getY()))
+                        point = point.up(m_size);
+                break;
+            case KeyEvent.VK_LEFT:
+                point = point.left();
+                if (shiftModifier)
+                    while (! isHandicapLineOrEdge(point.getX()))
+                        point = point.left();
+                break;
+            case KeyEvent.VK_RIGHT:
+                point = point.right(m_size);
+                if (shiftModifier)
+                    while (! isHandicapLineOrEdge(point.getX()))
+                        point = point.right(m_size);
+                break;
+            default:
+                break;
         }
         setCursor(point);
     }

@@ -12,6 +12,9 @@ import static net.sf.gogui.gui.I18n.i18n;
 public final class BoardSizeDialog
 {
     /** Run dialog.
+     * @param parent
+     * @param size
+     * @param messageDialogs
         @return Board size or -1 if aborted. */
     public static int show(Component parent, int size,
                            MessageDialogs messageDialogs)

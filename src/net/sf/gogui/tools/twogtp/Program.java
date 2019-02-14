@@ -61,7 +61,8 @@ public class Program
     }
 
     /** Get cputime since program start or last invocation of this
-        function. */
+        function.
+     * @return  */
     public double getAndClearCpuTime()
     {
         double cpuTime;
@@ -81,8 +82,8 @@ public class Program
         return result;
     }
 
-    /** Get unique label.
-        Call setLabel() first. */
+    /** *  Get unique label.Call setLabel() first.
+     * @return  */
     public String getLabel()
     {
         return m_label;

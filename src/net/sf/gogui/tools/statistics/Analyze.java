@@ -49,84 +49,79 @@ public class Analyze
             || ! m_table.getColumnTitle(0).equals("File")
             || ! m_table.getColumnTitle(1).equals("Move"))
             throw new ErrorMessage("Invalid table format");
-        m_commands = new ArrayList<String>();
+        m_commands = new ArrayList<>();
         for (int i = 2; i < m_table.getNumberColumns(); ++i)
             m_commands.add(m_table.getColumnTitle(i));
         m_commandStatistics =
-            new ArrayList<CommandStatistics>(m_commands.size());
+            new ArrayList<>(m_commands.size());
         File file = new File(m_output + ".html");
         initGameData();
         findGameGlobalCommands();
-        PrintStream out = new PrintStream(file);
-        startHtml(out, "Statistics Summary");
-        startInfo(out, "Statistics Summary");
-        writeInfo(out);
-        endInfo(out);
-        out.print("<table border=\"0\">\n" +
-                  "<tr><td>\n");
-        writePlot(out, "<small>positions</small>",
-                  getCountFile().getName(),
-                  "<a href=\"" + getCountDataFile().getName()
-                  + "\"><small>data</small></a>");
-        out.print("</td></tr>\n");
-        for (int i = 0; i < m_commands.size(); ++i)
-        {
-            CommandStatistics commandStatistics = computeCommandStatistics(i);
-            m_commandStatistics.add(commandStatistics);
-            if (commandStatistics.getCount() > 0
-                && ! commandStatistics.m_isBeginCommand)
+        try (PrintStream out = new PrintStream(file)) {
+            startHtml(out, "Statistics Summary");
+            startInfo(out, "Statistics Summary");
+            writeInfo(out);
+            endInfo(out);
+            out.print("<table border=\"0\">\n" +
+                    "<tr><td>\n");
+            writePlot(out, "<small>positions</small>",
+                    getCountFile().getName(),
+                    "<a href=\"" + getCountDataFile().getName()
+                            + "\"><small>data</small></a>");
+            out.print("</td></tr>\n");
+            for (int i = 0; i < m_commands.size(); ++i)
             {
-                String command = getCommand(i);
-                Table table = commandStatistics.m_tableAtMove;
-                Plot plot = generatePlotMove(getImgWidth(m_maxMove),
-                                             getColor(command));
-                plot.setFormatY(commandStatistics.m_format);
-                File pngFile = getAvgPlotFile(i);
-                File dataFile = getAvgDataFile(i);
-                plot.setPlotStyleNoLines();
-                plot.plot(pngFile, table, "Move", "Mean", "Error");
-                FileWriter writer = new FileWriter(dataFile);
-                try
+                CommandStatistics commandStatistics = computeCommandStatistics(i);
+                m_commandStatistics.add(commandStatistics);
+                if (commandStatistics.getCount() > 0
+                        && ! commandStatistics.m_isBeginCommand)
                 {
-                    table.save(writer, false);
+                    String command = getCommand(i);
+                    Table table = commandStatistics.m_tableAtMove;
+                    Plot plot = generatePlotMove(getImgWidth(m_maxMove),
+                            getColor(command));
+                    plot.setFormatY(commandStatistics.m_format);
+                    File pngFile = getAvgPlotFile(i);
+                    File dataFile = getAvgDataFile(i);
+                    plot.setPlotStyleNoLines();
+                    plot.plot(pngFile, table, "Move", "Mean", "Error");
+                    try
+                    (FileWriter writer = new FileWriter(dataFile)) {
+                        table.save(writer, false);
+                    }
+                    out.print("<tr><td>\n");
+                    writePlot(out, getCommandLink(i), pngFile.getName(),
+                            "<a href=\"" + dataFile.getName()
+                                    + "\"><small>data</small></a>");
+                    out.print("</td></tr>\n");
                 }
-                finally
-                {
-                    writer.close();
-                }
-                out.print("<tr><td>\n");
-                writePlot(out, getCommandLink(i), pngFile.getName(),
-                          "<a href=\"" + dataFile.getName()
-                          + "\"><small>data</small></a>");
-                out.print("</td></tr>\n");
             }
+            out.print("</table>\n" +
+                    "<hr>\n" +
+                    "<table border=\"0\" cellpadding=\"0\">\n" +
+                    "<tr>\n");
+            int n = 0;
+            for (int i = 0; i < m_commands.size(); ++i)
+            {
+                CommandStatistics commandStatistics = getCommandStatistics(i);
+                if (commandStatistics.getCount() == 0)
+                    continue;
+                out.print("<td valign=\"bottom\" bgcolor=\"" + COLOR_HEADER
+                        + "\">\n");
+                writePlot(out, getCommandLink(i), getHistoFile(i).getName(), "");
+                out.print("</td>\n");
+                ++n;
+                if (n % 5 == 0)
+                    out.print("</tr><tr>\n");
+            }
+            out.print("</tr>\n" +
+                    "</table>\n" +
+                    "<hr>\n");
+            writeCommandsTable(out);
+            out.print("<hr>\n");
+            writeGameTable(out);
+            finishHtml(out);
         }
-        out.print("</table>\n" +
-                  "<hr>\n" +
-                  "<table border=\"0\" cellpadding=\"0\">\n" +
-                  "<tr>\n");
-        int n = 0;
-        for (int i = 0; i < m_commands.size(); ++i)
-        {
-            CommandStatistics commandStatistics = getCommandStatistics(i);
-            if (commandStatistics.getCount() == 0)
-                continue;
-            out.print("<td valign=\"bottom\" bgcolor=\"" + COLOR_HEADER
-                      + "\">\n");
-            writePlot(out, getCommandLink(i), getHistoFile(i).getName(), "");
-            out.print("</td>\n");
-            ++n;
-            if (n % 5 == 0)
-                out.print("</tr><tr>\n");
-        }
-        out.print("</tr>\n" +
-                  "</table>\n" +
-                  "<hr>\n");
-        writeCommandsTable(out);
-        out.print("<hr>\n");
-        writeGameTable(out);
-        finishHtml(out);
-        out.close();
     }
 
     private static final Color[] PLOT_COLOR = {
@@ -229,12 +224,12 @@ public class Analyze
 
     private void findGameGlobalCommands() throws Table.InvalidLocation
     {
-        m_gameGlobalCommands = new ArrayList<GameGlobalCommand>();
+        m_gameGlobalCommands = new ArrayList<>();
         for (int i = 0; i < m_commands.size(); ++i)
         {
             String command = getCommand(i);
             boolean isGameGlobal = true;
-            ArrayList<String> gameResult = new ArrayList<String>();
+            ArrayList<String> gameResult = new ArrayList<>();
             for (int j = 0; j < m_gameData.size(); ++j)
             {
                 GameData data = m_gameData.get(j);
@@ -404,7 +399,7 @@ public class Analyze
 
     private void initGameData() throws Table.InvalidLocation, IOException
     {
-        m_gameData = new ArrayList<GameData>();
+        m_gameData = new ArrayList<>();
         String last = null;
         GameData data = null;
         m_maxMove = 0;
@@ -453,7 +448,7 @@ public class Analyze
                                         finalPosition);
             TableUtil.appendRow(m_tableFinal, m_table, row);
         }
-        ArrayList<String> columnTitles = new ArrayList<String>();
+        ArrayList<String> columnTitles = new ArrayList<>();
         columnTitles.add("Move");
         columnTitles.add("Count");
         Table table = new Table(columnTitles);
@@ -468,14 +463,9 @@ public class Analyze
         Plot plot = generatePlotMove(getImgWidth(m_maxMove), Color.DARK_GRAY);
         plot.setNoPlotYZero();
         plot.plot(getCountFile(), table, "Move", "Count", null);
-        FileWriter writer = new FileWriter(getCountDataFile());
         try
-        {
+        (FileWriter writer = new FileWriter(getCountDataFile())) {
             table.save(writer, false);
-        }
-        finally
-        {
-            writer.close();
         }
     }
 
@@ -533,57 +523,57 @@ public class Analyze
         CommandStatistics commandStatistics
             = getCommandStatistics(commandIndex);
         File file = getCommandFile(commandIndex);
-        PrintStream out = new PrintStream(file);
-        startHtml(out, command);
-        startInfo(out, command);
-        writeInfoBasics(out);
-        writeHtmlRow(out, "Command Index", commandIndex);
-        endInfo(out);
-        if (! commandStatistics.m_isBeginCommand)
-            out.print("<p><img src=\""
-                      + getAvgPlotFile(commandIndex).getName()
-                      + "\"></p>\n");
-        writeCommandStatistics(out, commandIndex);
-        out.print("<hr>\n");
-        out.print("<table border=\"0\" cellspacing=\"0\""
-                  + " cellpadding=\"5\">\n");
-        out.print("<tr><td>"
-                  + "<small>All</small><br>"
-                  + "<img src=\"" + getHistoFile(commandIndex).getName()
-                  + "\"></td>\n");
-
-        if (commandStatistics.m_statisticsFinal.getCount() > 0)
-            out.print("<td>"
-                      + "<small>Final</small><br>"
-                      + "<img src=\""
-                      + getHistoFinalFile(commandIndex).getName()
-                      + "\"></td>");
-        out.print("</tr>\n" +
-                  "</table>\n");
-        for (int i = 0; i < m_maxMove; i += m_movePrintInterval)
-        {
-            Histogram histogram
-                = commandStatistics.getStatistics(i).m_histogram;
-            if (commandStatistics.getStatistics(i).getCount() == 0)
-                continue;
-            Table histoTable
-                = TableUtil.fromHistogram(histogram, command);
-            File histoFile = getHistoFile(commandIndex, i);
-            Color color = getColor(command);
-            Plot plot = new Plot(180, 135, color, m_precision);
-            commandStatistics.setHistogramProperties(plot);
-            plot.plot(histoFile, histoTable, command, "Count", null);
-            out.print("<table align=\"left\" border=\"0\">" +
-                      "<tr><td align=\"center\"><small>" + i
-                      + "</small><br><img src=\""
-                      + getHistoFile(commandIndex, i).getName()
-                      + "\"></td></tr></table>\n");
+        try (PrintStream out = new PrintStream(file)) {
+            startHtml(out, command);
+            startInfo(out, command);
+            writeInfoBasics(out);
+            writeHtmlRow(out, "Command Index", commandIndex);
+            endInfo(out);
+            if (! commandStatistics.m_isBeginCommand)
+                out.print("<p><img src=\""
+                        + getAvgPlotFile(commandIndex).getName()
+                        + "\"></p>\n");
+            writeCommandStatistics(out, commandIndex);
+            out.print("<hr>\n");
+            out.print("<table border=\"0\" cellspacing=\"0\""
+                    + " cellpadding=\"5\">\n");
+            out.print("<tr><td>"
+                    + "<small>All</small><br>"
+                    + "<img src=\"" + getHistoFile(commandIndex).getName()
+                    + "\"></td>\n");
+            
+            if (commandStatistics.m_statisticsFinal.getCount() > 0)
+                out.print("<td>"
+                        + "<small>Final</small><br>"
+                        + "<img src=\""
+                        + getHistoFinalFile(commandIndex).getName()
+                        + "\"></td>");
+            out.print("</tr>\n" +
+                    "</table>\n");
+            for (int i = 0; i < m_maxMove; i += m_movePrintInterval)
+            {
+                Histogram histogram
+                        = commandStatistics.getStatistics(i).m_histogram;
+                if (commandStatistics.getStatistics(i).getCount() == 0)
+                    continue;
+                Table histoTable
+                        = TableUtil.fromHistogram(histogram, command);
+                File histoFile = getHistoFile(commandIndex, i);
+                Color color = getColor(command);
+                Plot plot = new Plot(180, 135, color, m_precision);
+                commandStatistics.setHistogramProperties(plot);
+                plot.plot(histoFile, histoTable, command, "Count", null);
+                out.print("<table align=\"left\" border=\"0\">" +
+                        "<tr><td align=\"center\"><small>" + i
+                        + "</small><br><img src=\""
+                        + getHistoFile(commandIndex, i).getName()
+                        + "\"></td></tr></table>\n");
+            }
+            out.print("<br clear=\"left\">\n" +
+                    "<hr>\n");
+            writeGamePlots(out, commandIndex);
+            finishHtml(out);
         }
-        out.print("<br clear=\"left\">\n" +
-                  "<hr>\n");
-        writeGamePlots(out, commandIndex);
-        finishHtml(out);
-        out.close();
     }
 
     private void writeCommandStatistics(PrintStream out, int commandIndex)
@@ -651,82 +641,83 @@ public class Analyze
         throws Exception
     {
         File file = getGameFile(gameNumber);
-        PrintStream out = new PrintStream(file);
-        String title = "Game " + (gameNumber + 1) + " (" + name + ")";
-        startHtml(out, title);
-        startInfo(out, title);
-        writeInfoBasics(out);
-        writeHtmlRow(out, "Game Index", gameNumber);
-        writeHtmlRow(out, "File", getGameLink(file, gameNumber, false));
         try
-        {
-            InputStream in = new FileInputStream(new File(game));
-            SgfReader reader = new SgfReader(in, new File(game), null, 0);
-            GameTree tree = reader.getTree();
-            GameInfo info = tree.getGameInfo(tree.getRoot());
-            String playerBlack = info.get(StringInfoColor.NAME, BLACK);
-            if (playerBlack == null)
-                playerBlack = "?";
-            String playerWhite = info.get(StringInfoColor.NAME, WHITE);
-            if (playerWhite == null)
-                playerWhite = "?";
-            String result = info.get(StringInfo.RESULT);
-            if (result == null)
-                result = "?";
-            writeHtmlRow(out, "Black", playerBlack);
-            writeHtmlRow(out, "White", playerWhite);
-            writeHtmlRow(out, "Result", result);
-            in.close();
-        }
-        catch (Exception e)
-        {
-            StringUtil.printException(e);
-        }
-        endInfo(out);
-        out.print("<table border=\"0\">\n");
-        for (int i = 0; i < m_commands.size(); ++i)
-        {
-            CommandStatistics commandStatistics = getCommandStatistics(i);
-            if (commandStatistics.getCount() > 0
-                && ! commandStatistics.m_isBeginCommand)
+        (PrintStream out = new PrintStream(file)) {
+            String title = "Game " + (gameNumber + 1) + " (" + name + ")";
+            startHtml(out, title);
+            startInfo(out, title);
+            writeInfoBasics(out);
+            writeHtmlRow(out, "Game Index", gameNumber);
+            writeHtmlRow(out, "File", getGameLink(file, gameNumber, false));
+            try
             {
-                generatePlot(i, commandStatistics.m_format, gameNumber, game);
-                out.print("<tr><td align=\"center\">" + getCommandLink(i)
-                          + "<br><img src=\""
-                          + getPlotFile(gameNumber, i).getName()
-                          + "\"></td></tr>\n");
+                InputStream in = new FileInputStream(new File(game));
+                SgfReader reader = new SgfReader(in, new File(game), null, 0);
+                GameTree tree = reader.getTree();
+                GameInfo info = tree.getGameInfo(tree.getRoot());
+                String playerBlack = info.get(StringInfoColor.NAME, BLACK);
+                if (playerBlack == null)
+                    playerBlack = "?";
+                String playerWhite = info.get(StringInfoColor.NAME, WHITE);
+                if (playerWhite == null)
+                    playerWhite = "?";
+                String result = info.get(StringInfo.RESULT);
+                if (result == null)
+                    result = "?";
+                writeHtmlRow(out, "Black", playerBlack);
+                writeHtmlRow(out, "White", playerWhite);
+                writeHtmlRow(out, "Result", result);
+                in.close();
             }
-        }
-        out.print("</table>\n" +
-                  "<hr>\n");
-        Table table = TableUtil.select(m_table, "File", game);
-        out.print("<table class=\"smalltable\">\n" +
-                  "<thead><tr>");
-        for (int i = 1; i < table.getNumberColumns(); ++i)
-        {
-            String command = table.getColumnTitle(i);
-            if (! TableUtil.allEmpty(table, command))
-                out.print("<th>" + command + "</th>");
-        }
-        out.print("</tr></thead>\n");
-        for (int i = 0; i < table.getNumberRows(); ++i)
-        {
-            out.print("<tr>");
-            for (int j = 1; j < table.getNumberColumns(); ++j)
+            catch (Exception e)
             {
-                String command = table.getColumnTitle(j);
-                if (TableUtil.allEmpty(table, command))
-                    continue;
-                String value = table.get(command, i);
-                if (value == null)
-                    value = "";
-                out.print("<td>" + value + "</td>");
+                StringUtil.printException(e);
             }
-            out.print("</tr>\n");
+            endInfo(out);
+            out.print("<table border=\"0\">\n");
+            for (int i = 0; i < m_commands.size(); ++i)
+            {
+                CommandStatistics commandStatistics = getCommandStatistics(i);
+                if (commandStatistics.getCount() > 0
+                        && ! commandStatistics.m_isBeginCommand)
+                {
+                    generatePlot(i, commandStatistics.m_format, gameNumber, game);
+                    out.print("<tr><td align=\"center\">" + getCommandLink(i)
+                            + "<br><img src=\""
+                            + getPlotFile(gameNumber, i).getName()
+                            + "\"></td></tr>\n");
+                }
+            }
+            out.print("</table>\n" +
+                    "<hr>\n");
+            Table table = TableUtil.select(m_table, "File", game);
+            out.print("<table class=\"smalltable\">\n" +
+                    "<thead><tr>");
+            for (int i = 1; i < table.getNumberColumns(); ++i)
+            {
+                String command = table.getColumnTitle(i);
+                if (! TableUtil.allEmpty(table, command))
+                    out.print("<th>" + command + "</th>");
+            }
+            out.print("</tr></thead>\n");
+            for (int i = 0; i < table.getNumberRows(); ++i)
+            {
+                out.print("<tr>");
+                for (int j = 1; j < table.getNumberColumns(); ++j)
+                {
+                    String command = table.getColumnTitle(j);
+                    if (TableUtil.allEmpty(table, command))
+                        continue;
+                    String value = table.get(command, i);
+                    if (value == null)
+                        value = "";
+                    out.print("<td>" + value + "</td>");
+                }
+                out.print("</tr>\n");
+            }
+            out.print("</table>\n");
+            finishHtml(out);
         }
-        out.print("</table>\n");
-        finishHtml(out);
-        out.close();
     }
 
     private void writeGamePlots(PrintStream out, int commandIndex)

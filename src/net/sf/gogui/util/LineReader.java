@@ -5,13 +5,15 @@ package net.sf.gogui.util;
 /** Allows to read lines from a buffer without blocking. */
 public class LineReader
 {
-    /** Add text to buffer. */
+    /** Add text to buffer.
+     * @param s */
     public void add(String s)
     {
         m_buffer.append(s);
     }
 
-    /** Check if the buffer contains at least one line. */
+    /** Check if the buffer contains at least one line.
+     * @return  */
     public boolean hasLines()
     {
         return m_buffer.toString().contains("\n");

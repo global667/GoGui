@@ -24,6 +24,7 @@ class ExitWaiter
         }
     }
 
+    @Override
     public void run()
     {
         try
@@ -66,7 +67,10 @@ public class ProcessUtil
         }
     }
 
-    /** Run a process and return its standard output as a string. */
+    /** Run a process and return its standard output as a string.
+     * @param cmdArray
+     * @return 
+     * @throws java.io.IOException */
     public static String runCommand(String[] cmdArray) throws IOException
     {
         Runtime runtime = Runtime.getRuntime();
@@ -74,9 +78,8 @@ public class ProcessUtil
         Thread discardErr = new StreamDiscard(process.getErrorStream());
         discardErr.start();
         InputStream in = process.getInputStream();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         try
-        {
+        (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
             StringBuilder result = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null)
@@ -95,15 +98,12 @@ public class ProcessUtil
             }
             return result.toString();
         }
-        finally
-        {
-            reader.close();
-        }
     }
 
-    /** Run a process.
-        Forwards the stdout/stderr of the child process to stderr of the
-        calling process. */
+    /** *  Run a process.Forwards the stdout/stderr of the child process to stderr of the
+        calling process.
+     * @param cmdArray
+     * @throws java.io.IOException */
     public static void runProcess(String[] cmdArray) throws IOException
     {
         Runtime runtime = Runtime.getRuntime();

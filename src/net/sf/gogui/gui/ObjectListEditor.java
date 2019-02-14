@@ -20,10 +20,12 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import static net.sf.gogui.gui.I18n.i18n;
 
-/** Dialog for displaying and editing a list of objects. */
+/** Dialog for displaying and editing a list of objects.
+ * @param <OBJECT> */
 public class ObjectListEditor<OBJECT>
 {
-    /** Edit properties of object. */
+    /** Edit properties of object.
+     * @param <OBJECT> */
     public interface ItemEditor<OBJECT>
     {
         OBJECT editItem(Component parent, OBJECT object,
@@ -41,28 +43,31 @@ public class ObjectListEditor<OBJECT>
     {
         m_messageDialogs = messageDialogs;
         m_editor = editor;
-        m_actionListener = new ActionListener() {
-                public void actionPerformed(ActionEvent event) {
-                    String command = event.getActionCommand();
-                    if (command.equals("edit"))
-                        cbEdit();
-                    else if (command.equals("move-up"))
-                        cbMoveUp();
-                    else if (command.equals("move-down"))
-                        cbMoveDown();
-                    else if (command.equals("remove"))
-                        cbRemove();
-                    else
-                        assert false;
-                }
-            };
+        m_actionListener = (ActionEvent event) -> {
+            String command = event.getActionCommand();
+            switch (command) {
+                case "edit":
+                    cbEdit();
+                    break;
+                case "move-up":
+                    cbMoveUp();
+                    break;
+                case "move-down":
+                    cbMoveDown();
+                    break;
+                case "remove":
+                    cbRemove();
+                    break;
+                default:
+                    assert false;
+                    break;
+            }
+        };
         JPanel panel = new JPanel(new BorderLayout(GuiUtil.PAD, 0));
         m_list = new JList();
-        m_list.addListSelectionListener(new ListSelectionListener() {
-                public void valueChanged(ListSelectionEvent e) {
-                    selectionChanged();
-                }
-            });
+        m_list.addListSelectionListener((ListSelectionEvent e) -> {
+            selectionChanged();
+        });
         m_list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         int rows = Math.min(Math.max(objects.size(), 8), 15);
         m_list.setVisibleRowCount(rows);
@@ -72,7 +77,7 @@ public class ObjectListEditor<OBJECT>
         JOptionPane optionPane = new JOptionPane(panel,
                                                  JOptionPane.PLAIN_MESSAGE,
                                                  JOptionPane.OK_CANCEL_OPTION);
-        m_objects = new ArrayList<OBJECT>();
+        m_objects = new ArrayList<>();
         copyObjects(objects, m_objects);
         updateList(m_objects.isEmpty() ? -1 : 0);
         m_dialog = optionPane.createDialog(parent, title);
@@ -80,7 +85,7 @@ public class ObjectListEditor<OBJECT>
         Object value = optionPane.getValue();
         boolean result = true;
         if (! (value instanceof Integer)
-            || ((Integer)value).intValue() != JOptionPane.OK_OPTION)
+            || ((Integer)value) != JOptionPane.OK_OPTION)
             result = false;
         m_dialog.dispose();
         if (result)
@@ -223,7 +228,7 @@ public class ObjectListEditor<OBJECT>
     @SuppressWarnings("unchecked")
     private void updateList(int selectedIndex)
     {
-        ArrayList<String> data = new ArrayList<String>();
+        ArrayList<String> data = new ArrayList<>();
         for (int i = 0; i < m_objects.size(); ++i)
         {
             String name = m_editor.getItemLabel(getObject(i));

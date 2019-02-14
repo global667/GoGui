@@ -37,8 +37,12 @@ public final class RecentFileStorage
         add(uri, mimetype, null, false);
     }
 
-    /** @todo create empty document, if read document is invalid (e.g.
-        no RecentFiles element)? */
+    /**
+     * @param uri *  @todo create empty document, if read document is invalid (e.g.
+        no RecentFiles element)?
+     * @param mimetype
+     * @param group
+     * @param isPrivate */
     public static void add(URI uri, String mimetype, String group,
                            boolean isPrivate)
     {
@@ -68,7 +72,7 @@ public final class RecentFileStorage
     public static ArrayList<String> getAllMimeType(String mimeType)
     {
         updateFromFile();
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         NodeList nodeList = s_document.getElementsByTagName("RecentItem");
         for (int i = 0; i < nodeList.getLength(); ++i)
         {
@@ -85,7 +89,9 @@ public final class RecentFileStorage
         return result;
     }
 
-    /** @todo Implement */
+    /**
+     * @param group *  @todo Implement
+     * @return  */
     public static URI[] getAllGroup(String group)
     {
         return new URI[0];
@@ -105,6 +111,7 @@ public final class RecentFileStorage
     }
 
     /** For temporary testing.
+     * @param args
         @todo Remove later */
     public static void main(String[] args)
     {
@@ -135,7 +142,6 @@ public final class RecentFileStorage
         catch (ParserConfigurationException e)
         {
             System.err.println(e.getMessage());
-            e.printStackTrace();
         }
     }
 
@@ -166,12 +172,10 @@ public final class RecentFileStorage
             Exception e = saxe;
             if (saxe.getException() != null)
                 e = saxe.getException();
-            e.printStackTrace();
         }
         catch (IOException e)
         {
             System.err.println(e.getMessage());
-            e.printStackTrace();
         }
         createEmptyDocument();
     }
@@ -200,12 +204,10 @@ public final class RecentFileStorage
         catch (TransformerConfigurationException e)
         {
             System.err.println(e.getMessage());
-            e.printStackTrace();
         }
         catch (TransformerException e)
         {
             System.err.println(e.getMessage());
-            e.printStackTrace();
         }
     }
 }

@@ -65,7 +65,9 @@ public class Statistics
         @param backward true, if games should be iterated backwards (counting
         the moves starting with one at the last move)
         @param random true, if only one random position should be selected
-        from each game */
+        from each game
+     * @throws net.sf.gogui.util.ErrorMessage
+     * @throws java.io.IOException */
     public void run(GtpClientBase gtp, String program,
                     ArrayList<String> sgfFiles, int size,
                     ArrayList<String> commands,
@@ -80,7 +82,7 @@ public class Statistics
         m_backward = backward;
         m_random = random;
         initCommands(commands, beginCommands, finalCommands);
-        ArrayList<String> columnHeaders = new ArrayList<String>();
+        ArrayList<String> columnHeaders = new ArrayList<>();
         columnHeaders.add("File");
         columnHeaders.add("Move");
         for (int i = 0; i < m_commands.size(); ++i)
@@ -108,38 +110,35 @@ public class Statistics
         m_table.setProperty("Random", random ? "yes" : "no");
     }
 
-    /** Set maximum move number for positions to run the commands on.
-        Default is Integer.MAX_VALUE. */
+    /** *  Set maximum move number for positions to run the commands on.Default is Integer.MAX_VALUE.
+     * @param max */
     public void setMax(int max)
     {
         m_max = max;
     }
 
-    /** Set minimum move number for positions to run the commands on.
-        Default is zero. */
+    /** *  Set minimum move number for positions to run the commands on.Default is zero.
+     * @param min */
     public void setMin(int min)
     {
         m_min = min;
     }
 
-    /** Don't write information about progress.
-        Default is false. */
+    /** *  Don't write information about progress.Default is false.
+     * @param enable */
     public void setQuiet(boolean enable)
     {
         m_quiet = enable;
     }
 
-    /** Save result table of last run. */
+    /** Save result table of last run.
+     * @param output
+     * @throws java.io.IOException */
     public void saveTable(File output) throws IOException
     {
-        FileWriter writer = new FileWriter(output);
         try
-        {
+        (FileWriter writer = new FileWriter(output)) {
             m_table.save(writer);
-        }
-        finally
-        {
-            writer.close();
         }
     }
 
@@ -266,44 +265,40 @@ public class Statistics
     private String convertResponse(String command, String response,
                                    GoColor toMove, Move move) throws GtpError
     {
-        if (command.equals("cputime"))
-        {
-            try
-            {
-                double cpuTime = Double.parseDouble(response);
-                double diff = cpuTime - m_lastCpuTime;
-                m_lastCpuTime = cpuTime;
-                return FORMAT2.format(diff);
-            }
-            catch (NumberFormatException e)
-            {
-                return response;
-            }
-        }
-        else if (command.equals("estimate_score"))
-        {
-            String arg[] = StringUtil.splitArguments(response);
-            if (arg.length == 0)
-                return response;
-            return convertScore(arg[0]);
-        }
-        else if (command.equals("final_score"))
-        {
-            return convertScore(response);
-        }
-        else if (command.equals("reg_genmove"))
-        {
-            if (move == null)
-                return "";
-            try
-            {
-                GoPoint point = GoPoint.parsePoint(response, m_size);
-                return Move.get(toMove, point) == move ? "1" : "0";
-            }
-            catch (InvalidPointException e)
-            {
-                throw new GtpError("Program sent invalid move: " + response);
-            }
+        switch (command) {
+            case "cputime":
+                try
+                {
+                    double cpuTime = Double.parseDouble(response);
+                    double diff = cpuTime - m_lastCpuTime;
+                    m_lastCpuTime = cpuTime;
+                    return FORMAT2.format(diff);
+                }
+                catch (NumberFormatException e)
+                {
+                    return response;
+                }
+            case "estimate_score":
+                String arg[] = StringUtil.splitArguments(response);
+                if (arg.length == 0)
+                    return response;
+                return convertScore(arg[0]);
+            case "final_score":
+                return convertScore(response);
+            case "reg_genmove":
+                if (move == null)
+                    return "";
+                try
+                {
+                    GoPoint point = GoPoint.parsePoint(response, m_size);
+                    return Move.get(toMove, point) == move ? "1" : "0";
+                }
+                catch (InvalidPointException e)
+                {
+                    throw new GtpError("Program sent invalid move: " + response);
+                }
+            default:
+                break;
         }
         return response;
     }
@@ -336,7 +331,7 @@ public class Statistics
                               ArrayList<String> finalCommands)
         throws ErrorMessage
     {
-        m_commands = new ArrayList<Command>();
+        m_commands = new ArrayList<>();
         if (beginCommands != null)
             addCommands(beginCommands, true, false);
         if (commands != null)

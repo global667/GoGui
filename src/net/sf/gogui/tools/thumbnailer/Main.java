@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import net.sf.gogui.thumbnail.ThumbnailCreator;
+import net.sf.gogui.util.ErrorMessage;
 import net.sf.gogui.util.Options;
 import net.sf.gogui.util.StringUtil;
 import net.sf.gogui.version.Version;
@@ -13,7 +14,8 @@ import net.sf.gogui.version.Version;
 /** GoGuiThumbnailer main function. */
 public final class Main
 {
-    /** GoGuiThumbnailer main function. */
+    /** GoGuiThumbnailer main function.
+     * @param args */
     public static void main(String[] args)
     {
         try
@@ -76,7 +78,7 @@ public final class Main
                 System.exit(1);
             }
         }
-        catch (Throwable t)
+        catch (ErrorMessage t)
         {
             StringUtil.printException(t);
             System.exit(1);

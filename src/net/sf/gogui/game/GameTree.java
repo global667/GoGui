@@ -48,7 +48,9 @@ public class GameTree
         }
     }
 
-    /** Probably only needed by SgfReader. */
+    /** Probably only needed by SgfReader.
+     * @param boardSize
+     * @param root */
     public GameTree(int boardSize, Node root)
     {
         m_boardSize = boardSize;
@@ -56,12 +58,14 @@ public class GameTree
         m_root = root;
     }
 
+    @Override
     public int getBoardSize()
     {
         return m_boardSize;
     }
 
     /** Find the game information valid for this node.
+     * @param node
         @return The game information from the nearest ancestor node,
         which has a game information (the root node is always guaranteed
         to have one). */
@@ -72,6 +76,7 @@ public class GameTree
     }
 
     /** Find the node with game information valid for this node.
+     * @param node
         @return The nearest ancestor node which has a game information
         (the root node is always guaranteed to have one). */
     public Node getGameInfoNode(ConstNode node)
@@ -82,14 +87,18 @@ public class GameTree
         return (Node)node;
     }
 
-    /** @see #getGameInfo */
+    /**
+     * @param node *  @see #getGameInfo
+     * @return  */
+    @Override
     public ConstGameInfo getGameInfoConst(ConstNode node)
     {
         return getGameInfo((Node)node);
     }
 
-    /** Get a non-const reference to a const node.
-        Requires: node is part of this game tree. */
+    /** *  Get a non-const reference to a const node.Requires: node is part of this game tree.
+     * @param node
+     * @return  */
     public Node getNode(ConstNode node)
     {
         assert NodeUtil.getRoot(node) == getRoot();
@@ -101,11 +110,13 @@ public class GameTree
         return m_root;
     }
 
+    @Override
     public ConstNode getRootConst()
     {
         return m_root;
     }
 
+    @Override
     public boolean hasVariations()
     {
         ConstNode node = m_root;

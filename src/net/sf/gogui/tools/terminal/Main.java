@@ -12,7 +12,8 @@ import net.sf.gogui.version.Version;
 /** Terminal main function. */
 public final class Main
 {
-    /** Terminal main function. */
+    /** Terminal main function.
+     * @param args */
     public static void main(String[] args)
     {
         try
@@ -52,7 +53,7 @@ public final class Main
             terminal.mainLoop();
             terminal.close();
         }
-        catch (Throwable t)
+        catch (Exception t)
         {
             StringUtil.printException(t);
             System.exit(1);

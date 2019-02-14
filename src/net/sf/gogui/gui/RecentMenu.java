@@ -39,23 +39,20 @@ public final class RecentMenu
         m_path = path;
         m_listener = listener;
         m_menu = new GuiMenu(text);
-        m_actionListener = new ActionListener()
-            {
-                public void actionPerformed(ActionEvent event)
-                {
-                    RecentMenuItem item = (RecentMenuItem)event.getSource();
-                    String label = item.getRecentMenuLabel();
-                    String value = item.getRecentMenuValue();
-                    m_listener.itemSelected(label, value);
-                }
-            };
+        m_actionListener = (ActionEvent event) -> {
+            RecentMenuItem item = (RecentMenuItem)event.getSource();
+            String label = item.getRecentMenuLabel();
+            String value = item.getRecentMenuValue();
+            m_listener.itemSelected(label, value);
+        };
         get();
         updateEnabled();
     }
 
-    /** Add a new item at the top.
-        If the new number of items is greater than MAX_ITEM, the oldest item
-        is removed. */
+    /** *  Add a new item at the top.If the new number of items is greater than MAX_ITEM, the oldest item
+        is removed.
+     * @param label
+     * @param value */
     public void add(String label, String value)
     {
         addNewItem(label, value);
@@ -67,7 +64,8 @@ public final class RecentMenu
         return m_menu.getMenuComponentCount();
     }
 
-    /** Don't modify the items in this menu! */
+    /** Don't modify the items in this menu!
+     * @return  */
     public GuiMenu getMenu()
     {
         return m_menu;
@@ -180,7 +178,7 @@ public final class RecentMenu
     }
 }
 
-class RecentMenuItem
+final class RecentMenuItem
     extends JMenuItem
 {
     public RecentMenuItem(String label, String value, ActionListener listener)

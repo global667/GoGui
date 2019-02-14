@@ -45,19 +45,22 @@ public final class TimeLeftDialog
             dialog.setVisible(true);
             Object value = timeLeftDialog.getValue();
             if (! (value instanceof Integer)
-                || ((Integer)value).intValue() != JOptionPane.OK_OPTION)
+                || ((Integer)value) != JOptionPane.OK_OPTION)
                 return;
             done = timeLeftDialog.validate(parent, messageDialogs);
         }
-        for (GoColor c : BLACK_WHITE)
-        {
+        BLACK_WHITE.stream().map((c) -> {
             long timeLeft = timeLeftDialog.getTimeLeft(c);
             game.setTimeLeft(node, c, timeLeft / 1000L);
+            return c;
+        }).map((c) -> {
             int movesLeft = timeLeftDialog.getMovesLeft(c);
             if (movesLeft >= 0)
                 game.setMovesLeft(node, c, movesLeft);
+            return c;
+        }).forEachOrdered((_item) -> {
             game.restoreClock();
-        }
+        });
         dialog.dispose();
     }
 

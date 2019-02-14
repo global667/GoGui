@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 import net.sf.gogui.game.ConstNode;
 import net.sf.gogui.game.BoardUpdater;
-import net.sf.gogui.game.GameInfo;
 import net.sf.gogui.game.GameTree;
 import net.sf.gogui.game.TimeSettings;
 import net.sf.gogui.gamefile.GameReader;
@@ -56,7 +55,8 @@ public class Adapter
         @param fillPasses Fill moves of non-alternating colors with pass
         moves.
         @param lowerCase Translate move commands to the engine to lower-case.
-        @param size Board size at startup. */
+        @param size Board size at startup.
+     * @throws java.lang.Exception */
     public Adapter(String program, PrintStream log, String gtpFile,
                    boolean verbose, boolean noScore, boolean version1,
                    boolean fillPasses, boolean lowerCase, int size)
@@ -74,8 +74,14 @@ public class Adapter
         init(noScore, version1, size);
     }
 
-    /** Construct with existing GtpClientBase.
-        For testing this class. */
+    /** *  Construct with existing GtpClientBase.For testing this class.
+     * @param gtp
+     * @param log
+     * @param noScore
+     * @param version1
+     * @param lowerCase
+     * @param size
+     * @throws net.sf.gogui.gtp.GtpError */
     public Adapter(GtpClientBase gtp, PrintStream log, boolean noScore,
                    boolean version1, boolean lowerCase, int size)
         throws GtpError
@@ -275,6 +281,7 @@ public class Adapter
         cmd.setResponse("1");
     }
 
+    @Override
     public void cmdQuit(GtpCommand cmd) throws GtpError
     {
         send("quit");
@@ -318,6 +325,7 @@ public class Adapter
         play(WHITE, getPointArg(cmd, 0));
     }
 
+    @Override
     public void interruptCommand()
     {
         try
@@ -331,6 +339,7 @@ public class Adapter
         }
     }
 
+    @Override
     public void setName(String name)
     {
         if (name == null)
@@ -350,19 +359,13 @@ public class Adapter
             super.setName(name.substring(0, index));
             super.setVersion(name.substring(index + 1));
         }
-        register("name", new GtpCallback() {
-                public void run(GtpCommand cmd) throws GtpError {
-                    cmdName(cmd); } });
-        register("version", new GtpCallback() {
-                public void run(GtpCommand cmd) throws GtpError {
-                    cmdVersion(cmd); } });
+        register("name", this::cmdName);
+        register("version", this::cmdVersion);
     }
 
     private Board m_board;
 
-    private final GtpCallback m_callbackForward = new GtpCallback() {
-            public void run(GtpCommand cmd) throws GtpError {
-                cmdForward(cmd); } };
+    private final GtpCallback m_callbackForward = this::cmdForward;
 
     private final GtpClientBase m_gtp;
 
@@ -426,41 +429,19 @@ public class Adapter
                 register(command, m_callbackForward);
         }
         if (m_gtp.isSupported("kgs-genmove_cleanup"))
-            register("kgs-genmove_cleanup", new GtpCallback() {
-                    public void run(GtpCommand cmd) throws GtpError {
-                        cmdGenmoveCleanup(cmd); } });
-        register("boardsize", new GtpCallback() {
-                public void run(GtpCommand cmd) throws GtpError {
-                    cmdBoardsize(cmd); } });
-        register("gogui-analyze_commands", new GtpCallback() {
-                public void run(GtpCommand cmd) throws GtpError {
-                    cmdGoGuiAnalyzeCommands(cmd); } });
-        register("gogui-adapter-showboard", new GtpCallback() {
-                public void run(GtpCommand cmd) throws GtpError {
-                    cmdAdapterShowBoard(cmd); } });
-        register("komi", new GtpCallback() {
-                public void run(GtpCommand cmd) throws GtpError {
-                    cmdKomi(cmd); } });
-        register("loadsgf", new GtpCallback() {
-                public void run(GtpCommand cmd) throws GtpError {
-                    cmdLoad(cmd); } });
-        register("loadxml", new GtpCallback() {
-                public void run(GtpCommand cmd) throws GtpError {
-                    cmdLoad(cmd); } });
+            register("kgs-genmove_cleanup", this::cmdGenmoveCleanup);
+        register("boardsize", this::cmdBoardsize);
+        register("gogui-analyze_commands", this::cmdGoGuiAnalyzeCommands);
+        register("gogui-adapter-showboard", this::cmdAdapterShowBoard);
+        register("komi", this::cmdKomi);
+        register("loadsgf", this::cmdLoad);
+        register("loadxml", this::cmdLoad);
         setName(null);
-        register("place_free_handicap", new GtpCallback() {
-                public void run(GtpCommand cmd) throws GtpError {
-                    cmdPlaceFreeHandicap(cmd); } });
+        register("place_free_handicap", this::cmdPlaceFreeHandicap);
         if (version1)
-            register("protocol_version", new GtpCallback() {
-                    public void run(GtpCommand cmd) throws GtpError {
-                        cmdProtocolVersion1(cmd); } });
-        register("set_free_handicap", new GtpCallback() {
-                public void run(GtpCommand cmd) throws GtpError {
-                    cmdSetFreeHandicap(cmd); } });
-        register("time_settings", new GtpCallback() {
-                public void run(GtpCommand cmd) throws GtpError {
-                    cmdTimeSettings(cmd); } });
+            register("protocol_version", this::cmdProtocolVersion1);
+        register("set_free_handicap", this::cmdSetFreeHandicap);
+        register("time_settings", this::cmdTimeSettings);
         if (noScore)
         {
             unregister("final_score");
@@ -468,48 +449,24 @@ public class Adapter
         }
         if (version1)
         {
-            register("black", new GtpCallback() {
-                    public void run(GtpCommand cmd) throws GtpError {
-                        cmdBlack(cmd); } });
-            register("genmove_black", new GtpCallback() {
-                    public void run(GtpCommand cmd) throws GtpError {
-                        cmdGenmoveBlack(cmd); } });
-            register("genmove_white", new GtpCallback() {
-                    public void run(GtpCommand cmd) throws GtpError {
-                        cmdGenmoveWhite(cmd); } });
-            register("help", new GtpCallback() {
-                    public void run(GtpCommand cmd) throws GtpError {
-                        cmdListCommands(cmd); } });
+            register("black", this::cmdBlack);
+            register("genmove_black", this::cmdGenmoveBlack);
+            register("genmove_white", this::cmdGenmoveWhite);
+            register("help", this::cmdListCommands);
             unregister("list_commands");
-            register("white", new GtpCallback() {
-                    public void run(GtpCommand cmd) throws GtpError {
-                        cmdWhite(cmd); } });
+            register("white", this::cmdWhite);
         }
         else
         {
-            register("clear_board", new GtpCallback() {
-                    public void run(GtpCommand cmd) throws GtpError {
-                        cmdClearBoard(cmd); } });
-            register("genmove", new GtpCallback() {
-                    public void run(GtpCommand cmd) throws GtpError {
-                        cmdGenmove(cmd); } });
+            register("clear_board", this::cmdClearBoard);
+            register("genmove", this::cmdGenmove);
             unregister("help");
-            register("known_command", new GtpCallback() {
-                    public void run(GtpCommand cmd) throws GtpError {
-                        cmdKnownCommand(cmd); } });
-            register("list_commands", new GtpCallback() {
-                    public void run(GtpCommand cmd) throws GtpError {
-                        cmdListCommands(cmd); } });
-            register("play", new GtpCallback() {
-                    public void run(GtpCommand cmd) throws GtpError {
-                        cmdPlay(cmd); } });
+            register("known_command", this::cmdKnownCommand);
+            register("list_commands", this::cmdListCommands);
+            register("play", this::cmdPlay);
         }
-        register("undo", new GtpCallback() {
-                public void run(GtpCommand cmd) throws GtpError {
-                    cmdUndo(cmd); } });
-        register("gg-undo", new GtpCallback() {
-                public void run(GtpCommand cmd) throws GtpError {
-                    cmdGGUndo(cmd); } });
+        register("undo", this::cmdUndo);
+        register("gg-undo", this::cmdGGUndo);
     }
 
     private String send(String cmd) throws GtpError
