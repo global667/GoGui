@@ -3,7 +3,7 @@ A graphical user interface for the asien boardgame of Go. Follow the instruction
 
 ## Presettings
 First make sure you have installed:
-* Java 11: https://www.oracle.com/technetwork/java/javase/downloads/jdk11-downloads-5066655.html
+* Java 8: https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 * Ant 1.9: https://ant.apache.org/bindownload.cgi
 
 The developing works with Netbeans 10 and Java 8 on a macOS system.
