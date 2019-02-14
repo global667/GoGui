@@ -9,8 +9,8 @@ First make sure you have installed:
 ## Build
 Clone the GoGui package from this site and uncompress it. Then type 
 
-- cd /path/of/the/goguipackage
-- ant
+    cd /path/of/the/goguipackage
+    ant
 
 on the console.
 
