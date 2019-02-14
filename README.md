@@ -18,4 +18,4 @@ Clone the GoGui package from this site and uncompress it. Then type
 on the console.
 
 That's it.
-If you got problems, send a mail.
+If you got problems, send a mail. This project is licensed under the terms of the gpl-3.0 license.
