@@ -14,7 +14,7 @@ public final class Version
     */
     public static String get()
     {
-        return "1.5preAlpha";
+        return "1.5.0alpha";
     }
 
     /** Make constructor unavailable; class is for namespace only. */
