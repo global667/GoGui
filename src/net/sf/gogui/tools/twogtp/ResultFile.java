@@ -35,7 +35,6 @@ public class ResultFile
                       String filePrefix, Openings openings, boolean alternate,
                       boolean useXml, int numberThreads) throws ErrorMessage
     {
-        this.m_games = new TreeMap<>();
         m_filePrefix = filePrefix;
         m_alternate = alternate;
         m_numberGames = numberGames;
@@ -183,7 +182,7 @@ public class ResultFile
 
     private final boolean m_useXml;
 
-    private final TreeSet<Integer> m_gameExists = new TreeSet<>();
+    private final TreeSet<Integer> m_gameExists = new TreeSet<Integer>();
 
     private int m_nextGameIndex;
 
@@ -201,7 +200,8 @@ public class ResultFile
 
     private final Table m_table;
 
-    private final TreeMap<Integer, ArrayList<Compare.Placement>> m_games;
+    private final TreeMap<Integer, ArrayList<Compare.Placement>> m_games
+        = new TreeMap<Integer, ArrayList<Compare.Placement>>();
 
     private void acquireLock() throws ErrorMessage
     {
@@ -226,7 +226,7 @@ public class ResultFile
     private Table createTable(Program black, Program white, Program referee,
                               int size, Komi komi, Openings openings)
     {
-        ArrayList<String> columns = new ArrayList<>();
+        ArrayList<String> columns = new ArrayList<String>();
         columns.add("GAME");
         columns.add("RES_B");
         columns.add("RES_W");
@@ -293,7 +293,7 @@ public class ResultFile
                 System.err.println("Error reading " + file + ": " +
                                    e.getMessage());
             }
-            catch (FileNotFoundException e)
+            catch (Exception e)
             {
                 System.err.println("Error reading " + file + ": " +
                                    e.getMessage());

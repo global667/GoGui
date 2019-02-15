@@ -14,9 +14,7 @@ import java.util.ArrayList;
 /** Static utility functions related to strings. */
 public final class StringUtil
 {
-    /** Capitalize the first word and trim whitespaces.
-     * @param message
-     * @return  */
+    /** Capitalize the first word and trim whitespaces. */
     public static String capitalize(String message)
     {
         message = message.trim();
@@ -29,9 +27,7 @@ public final class StringUtil
         return buffer.toString();
     }
 
-    /** Format elapsed time as [[h+]:[mm]]:ss.
-     * @param seconds
-     * @return  */
+    /** Format elapsed time as [[h+]:[mm]]:ss. */
     public static String formatTime(long seconds)
     {
         StringBuilder buffer = new StringBuilder(8);
@@ -72,9 +68,9 @@ public final class StringUtil
         return buffer.toString();
     }
 
-    /** *  Return the current time and date as a string using a long format.The time and date is formatted using DateFormat.LONG and
-        Locale.ENGLISH.
-     * @return  */
+    /** Return the current time and date as a string using a long format.
+        The time and date is formatted using DateFormat.LONG and
+        Locale.ENGLISH. */
     public static String getDate()
     {
         DateFormat format = DateFormat.getDateTimeInstance(DateFormat.LONG,
@@ -84,9 +80,9 @@ public final class StringUtil
         return format.format(date);
     }
 
-    /** *  Return the current time and date as a string using a short format.The time and date is formatted using DateFormat.SHORT and
-        Locale.ENGLISH.
-     * @return  */
+    /** Return the current time and date as a string using a short format.
+        The time and date is formatted using DateFormat.SHORT and
+        Locale.ENGLISH. */
     public static String getDateShort()
     {
         DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT,
@@ -96,8 +92,7 @@ public final class StringUtil
         return format.format(date);
     }
 
-    /** Get default encoding.
-     * @return  */
+    /** Get default encoding. */
     public static String getDefaultEncoding()
     {
         String encoding = System.getProperty("file.encoding");
@@ -110,11 +105,10 @@ public final class StringUtil
         return out.getEncoding();
     }
 
-    /** *  Return a printable error message for an exception.Returns the error message is for instances of ErrorMessage or
+    /** Return a printable error message for an exception.
+        Returns the error message is for instances of ErrorMessage or
         for other exceptions the class name with the exception message
-        appended, if not empty.
-     * @param e
-     * @return  */
+        appended, if not empty. */
     public static String getErrorMessage(Throwable e)
     {
         String message = e.getMessage();
@@ -131,9 +125,7 @@ public final class StringUtil
     }
 
     /** Return a number formatter with maximum fraction digits,
-        no grouping, locale ENGLISH.
-     * @param maximumFractionDigits
-     * @return  */
+        no grouping, locale ENGLISH. */
     public static NumberFormat getNumberFormat(int maximumFractionDigits)
     {
         NumberFormat format = NumberFormat.getInstance(Locale.ENGLISH);
@@ -142,9 +134,7 @@ public final class StringUtil
         return format;
     }
 
-    /** Check if string is null, empty, or contains only whitespaces.
-     * @param s
-     * @return  */
+    /** Check if string is null, empty, or contains only whitespaces. */
     public static boolean isEmpty(String s)
     {
         if (s == null)
@@ -155,10 +145,10 @@ public final class StringUtil
         return true;
     }
 
-    /** *  Print exception to standard error.Prints the class name and message to standard error.
+    /** Print exception to standard error.
+        Prints the class name and message to standard error.
         For exceptions of type Error or RuntimeException, a stack trace
         is printed in addition.
-     * @param exception
         @return A slightly differently formatted error message
         for display in an error dialog. */
     public static String printException(Throwable exception)
@@ -167,15 +157,12 @@ public final class StringUtil
         System.err.println(result);
         boolean isSevere = (exception instanceof RuntimeException
                             || exception instanceof Error);
-        if (isSevere) {
-        }
+        if (isSevere)
+            exception.printStackTrace();
         return result;
     }
 
-    /** Split string into tokens.
-     * @param s
-     * @param separator
-     * @return  */
+    /** Split string into tokens. */
     public static String[] split(String s, char separator)
     {
         int count = 1;
@@ -196,13 +183,12 @@ public final class StringUtil
         return result;
     }
 
-    /** *  Split command line into arguments.Allows " for words containing whitespaces.
-     * @param string
-     * @return  */
+    /** Split command line into arguments.
+        Allows " for words containing whitespaces. */
     public static String[] splitArguments(String string)
     {
         assert string != null;
-        ArrayList<String> result = new ArrayList<>();
+        ArrayList<String> result = new ArrayList<String>();
         boolean escape = false;
         boolean inString = false;
         StringBuilder token = new StringBuilder();
@@ -235,9 +221,7 @@ public final class StringUtil
         return result.toArray(new String[result.size()]);
     }
 
-    /** Trim trailing whitespaces.
-     * @param s
-     * @return  */
+    /** Trim trailing whitespaces. */
     public static String trimTrailing(String s)
     {
         int i;

@@ -40,7 +40,7 @@ public final class GameInfoDialog
             dialog.setVisible(true);
             Object value = gameInfo.getValue();
             if (! (value instanceof Integer)
-                || ((Integer)value) != JOptionPane.OK_OPTION)
+                || ((Integer)value).intValue() != JOptionPane.OK_OPTION)
                 return;
             done = gameInfo.validate(parent, messageDialogs);
         }

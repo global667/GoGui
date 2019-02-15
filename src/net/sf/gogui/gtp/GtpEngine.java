@@ -21,14 +21,25 @@ public class GtpEngine
 {
     public GtpEngine(PrintStream log)
     {
-        this.m_commands = new TreeMap<>();
         m_log = log;
-        register("known_command", this::cmdKnownCommand);
-        register("list_commands", this::cmdListCommands);
-        register("name", this::cmdName);
-        register("protocol_version", this::cmdProtocolVersion);
-        register("quit", this::cmdQuit);
-        register("version", this::cmdVersion);
+        register("known_command", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdKnownCommand(cmd); } });
+        register("list_commands", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdListCommands(cmd); } });
+        register("name", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdName(cmd); } });
+        register("protocol_version", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdProtocolVersion(cmd); } });
+        register("quit", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdQuit(cmd); } });
+        register("version", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdVersion(cmd); } });
     }
 
     public void cmdKnownCommand(GtpCommand cmd) throws GtpError
@@ -87,10 +98,9 @@ public class GtpEngine
         m_interrupted = true;
     }
 
-    /** *  Handle command.The default implementation looks up the command within the registered
-        commands and calls the registered callback.
-     * @param cmd
-     * @throws net.sf.gogui.gtp.GtpError */
+    /** Handle command.
+        The default implementation looks up the command within the registered
+        commands and calls the registered callback. */
     public void handleCommand(GtpCommand cmd) throws GtpError
     {
         m_interrupted = false;
@@ -113,11 +123,9 @@ public class GtpEngine
         m_log.println(line);
     }
 
-    /** *  Main command loop.Reads commands and calls GtpEngine.handleCommand until the end of
-        the input stream or the quit command is reached.
-     * @param in
-     * @param out
-     * @throws java.io.IOException */
+    /** Main command loop.
+        Reads commands and calls GtpEngine.handleCommand until the end of
+        the input stream or the quit command is reached. */
     public void mainLoop(InputStream in, OutputStream out) throws IOException
     {
         m_out = new PrintStream(out);
@@ -153,8 +161,7 @@ public class GtpEngine
     /** Utility function for parsing a point argument.
         @param cmdArray Command line split into words.
         @param boardSize Board size is needed for parsing the point
-        @return GoPoint argument
-     * @throws net.sf.gogui.gtp.GtpError */
+        @return GoPoint argument */
     public static GoPoint parsePointArgument(String[] cmdArray, int boardSize)
         throws GtpError
     {
@@ -173,8 +180,7 @@ public class GtpEngine
     /** Utility function for parsing an point list argument.
         @param cmdArray Command line split into words.
         @param boardSize Board size is needed for parsing the points
-        @return Point list argument
-     * @throws net.sf.gogui.gtp.GtpError */
+        @return Point list argument */
     public static PointList parsePointListArgument(String[] cmdArray,
                                                    int boardSize)
         throws GtpError
@@ -207,10 +213,9 @@ public class GtpEngine
         m_out.print(text);
     }
 
-    /** *  Register new command.If a command was already registered with the same name,
-        it will be replaced by the new command.
-     * @param command
-     * @param callback */
+    /** Register new command.
+        If a command was already registered with the same name,
+        it will be replaced by the new command. */
     public final void register(String command, GtpCallback callback)
     {
         unregister(command);
@@ -243,15 +248,13 @@ public class GtpEngine
         m_quit = true;
     }
 
-    /** Set name for name command.
-     * @param name */
+    /** Set name for name command. */
     public void setName(String name)
     {
         m_name = name;
     }
 
-    /** Set version for version command.
-     * @param version */
+    /** Set version for version command. */
     public void setVersion(String version)
     {
         m_version = version;
@@ -278,8 +281,10 @@ public class GtpEngine
         The GTP standard says to return empty string, if no meaningful reponse
         is available. */
     private String m_version;
+
     /** Mapping from command to callback. */
-    private final Map<String,GtpCallback> m_commands;
+    private final Map<String,GtpCallback> m_commands
+        = new TreeMap<String,GtpCallback>();
 
     private InputStream m_in;
 
@@ -329,7 +334,6 @@ class ReadThread
         }
     }
 
-    @Override
     public void run()
     {
         try
@@ -373,7 +377,7 @@ class ReadThread
                 }
             }
         }
-        catch (IOException | InterruptedException e)
+        catch (Throwable e)
         {
             StringUtil.printException(e);
         }

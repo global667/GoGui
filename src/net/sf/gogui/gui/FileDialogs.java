@@ -65,10 +65,7 @@ public final class FileDialogs
                                    messageDialogs);
     }
 
-    /** File selection, unknown whether for load or save.
-     * @param parent
-     * @param title
-     * @return  */
+    /** File selection, unknown whether for load or save. */
     public static File showSelectFile(Component parent, String title)
     {
         return showFileChooser(parent, Type.FILE_SELECT, s_lastFile, false,
@@ -294,24 +291,25 @@ class SgfPreview
         add(buttonPanel, BorderLayout.SOUTH);
         m_auto = new JCheckBox(i18n("LB_AUTOMATIC_PREVIEW"));
         m_auto.setSelected(m_prefs.getBoolean("auto-preview", false));
-        m_auto.addChangeListener((ChangeEvent e) -> {
-            boolean isSelected = m_auto.isSelected();
-            m_prefs.putBoolean("auto-preview", isSelected);
-            if (isSelected)
-                preview();
-        });
+        m_auto.addChangeListener(new ChangeListener() {
+                public void stateChanged(ChangeEvent e) {
+                    boolean isSelected = m_auto.isSelected();
+                    m_prefs.putBoolean("auto-preview", isSelected);
+                    if (isSelected)
+                        preview();
+                } });
         buttonPanel.add(m_auto);
         m_preview = new JButton(i18n("LB_PREVIEW"));
         m_preview.setActionCommand("preview");
-        m_preview.addActionListener((ActionEvent event) -> {
-            if (event.getActionCommand().equals("preview"))
-                preview();
-        });
+        m_preview.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    if (event.getActionCommand().equals("preview"))
+                        preview();
+                } });
         m_preview.setEnabled(false);
         buttonPanel.add(m_preview);
     }
 
-    @Override
     public void propertyChange(PropertyChangeEvent event)
     {
         String propertyName = event.getPropertyName();
@@ -349,7 +347,6 @@ class SgfPreview
             setMaximumSize(dimension);
         }
 
-        @Override
         public void paintComponent(Graphics graphics)
         {
             graphics.setColor(getBackground());

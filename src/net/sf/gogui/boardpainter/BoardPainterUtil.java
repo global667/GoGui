@@ -26,12 +26,8 @@ public final class BoardPainterUtil
         return new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
     }
 
-    /** *  Use a painter to paint the board in a buffered image.The image can be written to a file with writeImage().
-     * @param painter
-     * @param field
-     * @param width
-     * @param height
-     * @return  */
+    /** Use a painter to paint the board in a buffered image.
+        The image can be written to a file with writeImage(). */
     public static BufferedImage getImage(BoardPainter painter,
                                          ConstField[][] field, int width,
                                          int height)
@@ -44,10 +40,7 @@ public final class BoardPainterUtil
     }
 
     /** Write an image in PNG format to a file.
-     * @param image
-     * @param file
-        @param metaData Optional PNG meta data (or null)
-     * @throws java.io.IOException */
+        @param metaData Optional PNG meta data (or null) */
     public static void writeImage(BufferedImage image, File file,
                                   Map<String,String> metaData)
         throws IOException
@@ -61,11 +54,12 @@ public final class BoardPainterUtil
             meta = writer.getDefaultImageMetadata(specifier, null);
             String formatName = "javax_imageio_1.0";
             org.w3c.dom.Node node = meta.getAsTree(formatName);
-            metaData.entrySet().forEach((entry) -> {
+            for (Map.Entry<String,String> entry : metaData.entrySet())
+            {
                 String key = entry.getKey();
                 String value = entry.getValue();
                 addMeta(node, key, value);
-            });
+            }
             try
             {
                 meta.mergeTree(formatName, node);

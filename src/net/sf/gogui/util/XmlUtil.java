@@ -5,10 +5,9 @@ package net.sf.gogui.util;
 /** Static utility functions related to XML. */
 public final class XmlUtil
 {
-    /** *  Escape XML special characters for attribute values.This assumes that the attribute will be quotes with ", it does
-        not escape '.Also strips invalid XML characters.
-     * @param text
-     * @return  */
+    /** Escape XML special characters for attribute values.
+        This assumes that the attribute will be quotes with ", it does
+        not escape '. Also strips invalid XML characters. */
     public static String escapeAttr(String text)
     {
         int len = text.length();
@@ -39,9 +38,8 @@ public final class XmlUtil
         return result.toString();
     }
 
-    /** *  Escape XML special characters for text content.Also strips invalid XML characters.
-     * @param text
-     * @return  */
+    /** Escape XML special characters for text content.
+        Also strips invalid XML characters. */
     public static String escapeText(String text)
     {
         int len = text.length();

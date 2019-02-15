@@ -5,10 +5,8 @@ package net.sf.gogui.game;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumMap;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.function.Consumer;
 import net.sf.gogui.go.BlackWhiteSet;
 import net.sf.gogui.go.BlackWhiteEmptySet;
 import net.sf.gogui.go.ConstPointList;
@@ -37,7 +35,7 @@ final class ExtraInfo
 
     public boolean isEmpty()
     {
-        return ((m_marked == null || m_marked.isEmpty())
+        return ((m_marked == null || m_marked.size() == 0)
                 && Float.isNaN(m_value)
                 && (m_moreExtraInfo == null || m_moreExtraInfo.isEmpty()));
     }
@@ -59,44 +57,39 @@ final class MoreExtraInfo
 
     public boolean isEmpty()
     {
-        return ((m_timeInfo == null || m_timeInfo.isEmpty())
+        return ((m_setupInfo == null || m_setupInfo.isEmpty())
+                && (m_timeInfo == null || m_timeInfo.isEmpty())
                 && (m_sgfProperties == null || m_sgfProperties.isEmpty())
-                && (m_info == null || m_info.isEmpty())
-                && (m_label == null || m_label.isEmpty())
-                && (m_setupInfo == null || m_setupInfo.isEmpty()));
+                && (m_label == null || m_label.size() == 0)
+                && (m_info == null || m_info.isEmpty()));
     }
 }
 
 final class SetupInfo
 {
     public GoColor m_player;
-    /** Stones added or removed.
-    The array is indexed by Black, White, Empty. */
-    public BlackWhiteEmptySet<PointList> m_stones;
 
-    SetupInfo() {
-        this.m_stones = new BlackWhiteEmptySet<>(new PointList(), new PointList(),
-                new PointList());
-    }
+    /** Stones added or removed.
+        The array is indexed by Black, White, Empty. */
+    public BlackWhiteEmptySet<PointList> m_stones
+        = new BlackWhiteEmptySet<PointList>(new PointList(), new PointList(),
+                                            new PointList());
 
     public boolean isEmpty()
     {
-        return (m_player == null && m_stones.get(BLACK).isEmpty()
-                 && m_stones.get(WHITE).isEmpty()
-                && m_stones.get(EMPTY).isEmpty());
+        return (m_player == null && m_stones.get(BLACK).size() == 0
+                 && m_stones.get(WHITE).size() == 0
+                && m_stones.get(EMPTY).size() == 0);
     }
 }
 
 final class TimeInfo
 {
-    public BlackWhiteSet<Integer> m_movesLeft;
+    public BlackWhiteSet<Integer> m_movesLeft
+        = new BlackWhiteSet<Integer>(-1, -1);
 
-    public BlackWhiteSet<Double> m_timeLeft;
-
-    TimeInfo() {
-        this.m_timeLeft = new BlackWhiteSet<>(Double.NaN, Double.NaN);
-        this.m_movesLeft = new BlackWhiteSet<>(-1, -1);
-    }
+    public BlackWhiteSet<Double> m_timeLeft
+        = new BlackWhiteSet<Double>(Double.NaN, Double.NaN);
 
     public boolean isEmpty()
     {
@@ -139,7 +132,7 @@ public final class Node
         {
             if (m_children instanceof Node)
             {
-                ArrayList<Node> list = new ArrayList<>(2);
+                ArrayList<Node> list = new ArrayList<Node>(2);
                 list.add((Node)m_children);
                 list.add(node);
                 m_children = list;
@@ -213,8 +206,7 @@ public final class Node
         createSetupInfo().m_stones.get(c).addAllFromConst(list);
     }
 
-    /** Create game information or return it if already existing.
-     * @return  */
+    /** Create game information or return it if already existing. */
     public GameInfo createGameInfo()
     {
         MoreExtraInfo moreExtraInfo = createMoreExtraInfo();
@@ -234,7 +226,6 @@ public final class Node
 
     /** Child of main variation or null if no child (const).
         @return Node with index 0 or null, if no children. */
-    @Override
     public ConstNode getChildConst()
     {
         return getChild();
@@ -253,7 +244,6 @@ public final class Node
     /** Get child node (const).
         @param i Index of the child in [0...getNumberChildren() - 1]
         @return The child node */
-    @Override
     public ConstNode getChildConst(int i)
     {
         return getChild(i);
@@ -262,7 +252,6 @@ public final class Node
     /** Get index of child node.
         @param child The child.
         @return Index of child or -1, if node is not a child of this node. */
-    @Override
     public int getChildIndex(ConstNode child)
     {
         for (int i = 0; i < getNumberChildren(); ++i)
@@ -274,7 +263,6 @@ public final class Node
     /** Get comment.
         @return Comment stored in this node or null, if node contains no
         comment. */
-    @Override
     public String getComment()
     {
         if (m_comment == null)
@@ -298,7 +286,6 @@ public final class Node
 
     /** Get father node (const).
         @return Father node of this node or null, if no father. */
-    @Override
     public ConstNode getFatherConst()
     {
         return m_father;
@@ -311,7 +298,6 @@ public final class Node
         return m_extraInfo.m_moreExtraInfo.m_info;
     }
 
-    @Override
     public ConstGameInfo getGameInfoConst()
     {
         return getGameInfo();
@@ -320,7 +306,6 @@ public final class Node
     /** Get label for a location on the board.
         @param point The location.
         @return Label at location or null, if no label. */
-    @Override
     public String getLabel(GoPoint point)
     {
         Map<GoPoint,String> map = getLabels();
@@ -339,7 +324,6 @@ public final class Node
     }
 
     /** Get all labels on the board (unmodifiable). */
-    @Override
     public Map<GoPoint,String> getLabelsUnmodifiable()
     {
         Map<GoPoint,String> labels = getLabels();
@@ -361,7 +345,6 @@ public final class Node
     /** Get all markups of a type (const).
         @param type Markup type from Node.MARK_TYPES.
         @return Map containing (Point,String) pairs. */
-    @Override
     public ConstPointList getMarkedConst(MarkType type)
     {
         return getMarked(type);
@@ -369,7 +352,6 @@ public final class Node
 
     /** Get move contained in this node.
         @return Move or null, if no move. */
-    @Override
     public Move getMove()
     {
         return m_move;
@@ -379,7 +361,6 @@ public final class Node
         @param c The color.
         @return Moves left in byoyomi for that color or -1 if not in byoyomi or
         unknown. */
-    @Override
     public int getMovesLeft(GoColor c)
     {
         assert c.isBlackWhite();
@@ -391,7 +372,6 @@ public final class Node
 
     /** Get number of children.
         @return Number of children. */
-    @Override
     public int getNumberChildren()
     {
         if (m_children == null)
@@ -404,7 +384,6 @@ public final class Node
     /** Color to play if explicitely set.
         @see #getToMove for getting the color to play.
         @return Color to play or null if color is not explicitely set. */
-    @Override
     public GoColor getPlayer()
     {
         SetupInfo setupInfo = getSetupInfo();
@@ -416,7 +395,6 @@ public final class Node
     /** Get setup stones.
         @param c Color of the stones; EMPTY for removed stones.
         @return The added or removed stones. */
-    @Override
     public ConstPointList getSetup(GoColor c)
     {
         SetupInfo setupInfo = getSetupInfo();
@@ -440,7 +418,6 @@ public final class Node
         @return The map with other SGF properties mapping String label
         to String value
         @see #addSgfProperty */
-    @Override
     public ConstSgfProperties getSgfPropertiesConst()
     {
         return getSgfProperties();
@@ -449,7 +426,6 @@ public final class Node
     /** Time left for color after move was made.
         @param c The color
         @return Time left in seconds for this color or Double.NaN if unknown */
-    @Override
     public double getTimeLeft(GoColor c)
     {
         assert c.isBlackWhite();
@@ -464,7 +440,6 @@ public final class Node
         node contains a move, the color of the move is returned.
         @return The color to move or null if nothing is known about
         the color to move */
-    @Override
     public GoColor getToMove()
     {
         GoColor player = getPlayer();
@@ -478,7 +453,6 @@ public final class Node
     /** Return a value for the node.
         The meaning of a value is according to the SGF property V[]
         @return The value, or Float.NaN, if node contains no value */
-    @Override
     public float getValue()
     {
         if (m_extraInfo == null)
@@ -486,7 +460,6 @@ public final class Node
         return m_extraInfo.m_value;
     }
 
-    @Override
     public boolean hasChildren()
     {
         return (getNumberChildren() > 0);
@@ -496,13 +469,11 @@ public final class Node
         More efficient than #getComment(), because getComment decodes the
         comment into a String, if it exists.
         @return true if node contains a comment */
-    @Override
     public boolean hasComment()
     {
         return (m_comment != null);
     }
 
-    @Override
     public boolean hasFather()
     {
         return (getFatherConst() != null);
@@ -510,10 +481,12 @@ public final class Node
 
     /** Check if node has setup or delete stones.
         @return true, if node has setup or delete stones. */
-    @Override
     public boolean hasSetup()
     {
-        return BLACK_WHITE_EMPTY.stream().anyMatch((c) -> (getSetup(c).size() > 0));
+        for (GoColor c : BLACK_WHITE_EMPTY)
+            if (getSetup(c).size() > 0)
+                return true;
+        return false;
     }
 
     /** Check if node is child of this node.
@@ -524,9 +497,7 @@ public final class Node
         return (node.getChildIndex(this) != -1);
     }
 
-    /** Return true, if node stores no information.
-     * @return  */
-    @Override
+    /** Return true, if node stores no information. */
     public boolean isEmpty()
     {
         return (m_comment == null && m_move == null
@@ -581,16 +552,14 @@ public final class Node
     /** Remove setup at point.
         Remove any setup that was added with #addStone at a point.
         @param p Location of the setup. */
-    @SuppressWarnings("empty-statement")
     public void removeSetup(GoPoint p)
     {
         assert p != null;
         SetupInfo setupInfo = getSetupInfo();
         if (setupInfo == null)
             return;
-        BLACK_WHITE_EMPTY.forEach((GoColor c) -> {
+        for (GoColor c : BLACK_WHITE_EMPTY)
             while (setupInfo.m_stones.get(c).remove(p));
-        });
     }
 
     /** Remove all children but the first. */
@@ -695,15 +664,14 @@ public final class Node
         two nodes have the same lists. */
     public void sortSetup()
     {
-        BLACK_WHITE_EMPTY.stream().filter((c) -> (getSetup(c).size() > 0)).forEachOrdered((c) -> {
-            Collections.sort(getSetupInfo().m_stones.get(c));
-        });
+        for (GoColor c : BLACK_WHITE_EMPTY)
+            if (getSetup(c).size() > 0)
+                Collections.sort(getSetupInfo().m_stones.get(c));
     }
 
     /** Return next child after a given child.
         @param child The child
         @return The next child or null, if there is no next child */
-    @Override
     public ConstNode variationAfter(ConstNode child)
     {
         int numberChildren = getNumberChildren();
@@ -721,7 +689,6 @@ public final class Node
     /** Return previous child before a given child.
         @param child The child
         @return The previous child or null, if there is no previous child */
-    @Override
     public ConstNode variationBefore(ConstNode child)
     {
         int numberChildren = getNumberChildren();
@@ -768,7 +735,7 @@ public final class Node
     {
         MoreExtraInfo moreExtraInfo = createMoreExtraInfo();
         if (moreExtraInfo.m_label == null)
-            moreExtraInfo.m_label = new TreeMap<>();
+            moreExtraInfo.m_label = new TreeMap<GoPoint,String>();
         return moreExtraInfo.m_label;
     }
 
@@ -776,7 +743,7 @@ public final class Node
     {
         createExtraInfo();
         if (m_extraInfo.m_marked == null)
-            m_extraInfo.m_marked = new EnumMap<>(MarkType.class);
+            m_extraInfo.m_marked = new TreeMap<MarkType,PointList>();
         return m_extraInfo.m_marked;
     }
 

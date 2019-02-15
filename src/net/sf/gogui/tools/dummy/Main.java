@@ -11,8 +11,7 @@ import net.sf.gogui.version.Version;
 /** Dummy main function. */
 public final class Main
 {
-    /** Dummy main function.
-     * @param args */
+    /** Dummy main function. */
     public static void main(String[] args)
     {
         try
@@ -64,7 +63,7 @@ public final class Main
             if (log != null)
                 log.close();
         }
-        catch (Exception t)
+        catch (Throwable t)
         {
             StringUtil.printException(t);
             System.exit(1);

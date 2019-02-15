@@ -90,12 +90,6 @@ public final class MessageDialogs
     }
 
     /** Show a question with two options and cancel.
-     * @param disableKey
-     * @param parent
-     * @param mainMessage
-     * @param optionalMessage
-     * @param destructiveOption
-     * @param nonDestructiveOption
         @return 0 for the destructive option; 1 for the non-destructive
         option; 2 for cancel */
     public int showYesNoCancelQuestion(String disableKey, Component parent,
@@ -181,13 +175,6 @@ public final class MessageDialogs
     }
 
     /** Show warning message to confirm destructive actions.
-     * @param disableKey
-     * @param parent
-     * @param mainMessage
-     * @param optionalMessage
-     * @param affirmativeOption
-     * @param cancelOption
-     * @param isCritical
         @return true, if destructive was chosen; false if cancel was
         chosen. */
     public boolean showQuestion(String disableKey, Component parent,
@@ -245,13 +232,6 @@ public final class MessageDialogs
     }
 
     /** Show warning message to confirm destructive actions.
-     * @param disableKey
-     * @param parent
-     * @param mainMessage
-     * @param optionalMessage
-     * @param destructiveOption
-     * @param nonDestructiveOption
-     * @param isCritical
         @return true, if destructive was chosen; false if cancel was chosen. */
     public boolean showWarningQuestion(String disableKey, Component parent,
                                        String mainMessage,
@@ -285,7 +265,7 @@ public final class MessageDialogs
         return (result == destructiveOption);
     }
 
-    private final Set<String> m_disabled = new TreeSet<>();
+    private final Set<String> m_disabled = new TreeSet<String>();
 
     private static void addFiller(JComponent component)
     {
@@ -333,19 +313,14 @@ public final class MessageDialogs
         JCheckBox disableCheckBox = null;
         if (disableKey != null)
         {
-            switch (messageType) {
-                case JOptionPane.QUESTION_MESSAGE:
-                    disableCheckBox = new JCheckBox(i18n("LB_DO_NOT_ASK_AGAIN"));
-                    break;
-                case JOptionPane.WARNING_MESSAGE:
-                    disableCheckBox =
-                            new JCheckBox(i18n("LB_DO_NOT_WARN_AGAIN"));
-                    break;
-                default:
-                    disableCheckBox =
-                            new JCheckBox(i18n("LB_DO_NOT_SHOW_AGAIN"));
-                    break;
-            }
+            if (messageType == JOptionPane.QUESTION_MESSAGE)
+                disableCheckBox = new JCheckBox(i18n("LB_DO_NOT_ASK_AGAIN"));
+            else if (messageType == JOptionPane.WARNING_MESSAGE)
+                disableCheckBox =
+                    new JCheckBox(i18n("LB_DO_NOT_WARN_AGAIN"));
+            else
+                disableCheckBox =
+                    new JCheckBox(i18n("LB_DO_NOT_SHOW_AGAIN"));
             disableCheckBox.setToolTipText(i18n("TT_DO_NOT_SHOW_AGAIN"));
             disableCheckBox.setAlignmentX(Component.LEFT_ALIGNMENT);
             box.add(disableCheckBox);
@@ -360,7 +335,8 @@ public final class MessageDialogs
         if (destructiveIndex >= 0)
         {
             String key = "Quaqua.OptionPane.destructiveOption";
-            optionPane.putClientProperty(key, destructiveIndex);
+            optionPane.putClientProperty(key,
+                                         Integer.valueOf(destructiveIndex));
         }
         if (isMac && parent.isVisible())
             // Dialogs don't have titles on the Mac

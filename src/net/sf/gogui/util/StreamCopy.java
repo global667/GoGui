@@ -26,7 +26,6 @@ public class StreamCopy
 
     /** Run method.
         Exceptions caught are written to stderr. */
-    @Override
     public void run()
     {
         try
@@ -43,7 +42,7 @@ public class StreamCopy
                 m_dest.flush();
             }
         }
-        catch (IOException e)
+        catch (Throwable e)
         {
             StringUtil.printException(e);
         }

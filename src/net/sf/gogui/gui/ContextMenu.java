@@ -30,39 +30,48 @@ public class ContextMenu
     {
         m_point = point;
         m_listener = listener;
-        m_actionListener = (ActionEvent event) -> {
-            Listener listener1 = ContextMenu.this.m_listener;
-            if (listener1 == null) {
-                return;
-            }
-            String actionCommand = event.getActionCommand();
-            switch (actionCommand) {
-                case "cancel":
-                    ContextMenu.this.setVisible(false);
-                    break;
-                case "mark":
-                    boolean mark1 = ContextMenu.this.m_mark.isSelected();
-                    listener1.actionMark(m_point, MarkType.MARK, mark1);
-                    break;
-                case "mark-circle":
-                    boolean mark2 = ContextMenu.this.m_markCircle.isSelected();
-                    listener1.actionMark(m_point, MarkType.CIRCLE, mark2);
-                    break;
-                case "mark-square":
-                    boolean mark3 = ContextMenu.this.m_markSquare.isSelected();
-                    listener1.actionMark(m_point, MarkType.SQUARE, mark3);
-                    break;
-                case "mark-triangle":
-                    boolean mark4 = ContextMenu.this.m_markTriangle.isSelected();
-                    listener1.actionMark(m_point, MarkType.TRIANGLE, mark4);
-                    break;
-                case "edit-label":
-                    listener1.actionEditLabel(m_point);
-                    break;
-                default:
-                    break;
-            }
-        };
+        m_actionListener = new ActionListener()
+            {
+                public void actionPerformed(ActionEvent event)
+                {
+                    Listener listener = ContextMenu.this.m_listener;
+                    if (listener == null)
+                        return;
+                    String actionCommand = event.getActionCommand();
+                    if (actionCommand.equals("cancel"))
+                    {
+                        ContextMenu.this.setVisible(false);
+                    }
+                    else if (actionCommand.equals("mark"))
+                    {
+                        boolean mark
+                            = ContextMenu.this.m_mark.isSelected();
+                        listener.actionMark(m_point, MarkType.MARK, mark);
+                    }
+                    else if (actionCommand.equals("mark-circle"))
+                    {
+                        boolean mark
+                            = ContextMenu.this.m_markCircle.isSelected();
+                        listener.actionMark(m_point, MarkType.CIRCLE, mark);
+                    }
+                    else if (actionCommand.equals("mark-square"))
+                    {
+                        boolean mark
+                            = ContextMenu.this.m_markSquare.isSelected();
+                        listener.actionMark(m_point, MarkType.SQUARE, mark);
+                    }
+                    else if (actionCommand.equals("mark-triangle"))
+                    {
+                        boolean mark
+                            = ContextMenu.this.m_markTriangle.isSelected();
+                        listener.actionMark(m_point, MarkType.TRIANGLE, mark);
+                    }
+                    else if (actionCommand.equals("edit-label"))
+                    {
+                        listener.actionEditLabel(m_point);
+                    }
+                }
+            };
         setLabel(MessageFormat.format(i18n("LB_CONTEXTMENU_POINT"), point));
         m_mark = createCheckBox("MN_CONTEXTMENU_MARK", "mark");
         m_mark.setSelected(mark);

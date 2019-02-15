@@ -85,5 +85,5 @@ public class Marker
 
     private final int m_size;
 
-    private final boolean m_mark[];
+    private boolean m_mark[];
 }

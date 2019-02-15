@@ -9,6 +9,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URL;
@@ -34,8 +35,7 @@ import net.sf.gogui.version.Version;
 /** GoGui main function. */
 public final class Main
 {
-    /** GoGui main function.
-     * @param args */
+    /** GoGui main function. */
     public static void main(String[] args)
     {
         GoGuiSettings settings;
@@ -56,8 +56,9 @@ public final class Main
         catch (ErrorMessage e)
         {
             System.err.println(e.getMessage());
+            return;
         }
-        catch (ClassNotFoundException t)
+        catch (Throwable t)
         {
             showError("Unexpected failure", StringUtil.printException(t));
             System.exit(1);
@@ -78,6 +79,7 @@ public final class Main
         catch (ErrorMessage e)
         {
             System.err.println(e.getMessage());
+            return;
         }
         catch (Throwable t)
         {
@@ -109,55 +111,55 @@ public final class Main
     {
         assert ! settings.m_noStartup;
         // Create thread group to catch errors from Swing event thread
-        ThreadGroup group;
-        group = new ThreadGroup("catch-runtime-exceptions") {
-            @Override
-            public void uncaughtException(Thread t, Throwable e) {
-                if (s_duringShowCrashDialog)
-                    return;
-                StringUtil.printException(e);
-                if (e instanceof RuntimeException
+        ThreadGroup group = new ThreadGroup("catch-runtime-exceptions") {
+                public void uncaughtException(Thread t, Throwable e) {
+                    if (s_duringShowCrashDialog)
+                        return;
+                    StringUtil.printException(e);
+                    if (e instanceof RuntimeException
                         || e instanceof AssertionError)
-                    showCrashDialog(e);
-                System.exit(1);
-            }
-        };
-        Runnable runnable;
-        runnable = () -> {
-            // Fix wrong taskbar title in Gnome 3. See
-            // http://elliotth.blogspot.com/2007/02/fixing-wmclass-for-your-java.html
-            // and http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6528430
-            try
-            {
-                Toolkit toolkit = Toolkit.getDefaultToolkit();
-                java.lang.reflect.Field field =
-                        toolkit.getClass()
-                                .getDeclaredField("awtAppClassName");
-                field.setAccessible(true);
-                field.set(toolkit, "GoGui");
-            }
-            catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException e)
-            {
-            }
-            
-            GuiUtil.initLookAndFeel(settings.m_lookAndFeel);
-            try
-            {
-                GoGui goGui = new GoGui(settings.m_program, settings.m_file,
-                        settings.m_move, settings.m_time,
-                        settings.m_verbose,
-                        settings.m_initComputerColor,
-                        settings.m_computerBlack,
-                        settings.m_computerWhite, settings.m_auto,
-                        settings.m_register, settings.m_gtpFile,
-                        settings.m_gtpCommand,
-                        settings.m_analyzeCommands);
-            }
-            catch (ErrorMessage e)
-            {
-                System.err.println(e.getMessage());
-            }
-        };
+                        showCrashDialog(e);
+                    System.exit(1);
+                }
+            };
+        Runnable runnable = new Runnable() {
+                public void run() {
+                    // Fix wrong taskbar title in Gnome 3. See
+      // http://elliotth.blogspot.com/2007/02/fixing-wmclass-for-your-java.html
+              // and http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6528430
+                    try
+                    {
+                        Toolkit toolkit = Toolkit.getDefaultToolkit();
+                        java.lang.reflect.Field field =
+                            toolkit.getClass()
+                            .getDeclaredField("awtAppClassName");
+                        field.setAccessible(true);
+                        field.set(toolkit, "GoGui");
+                    }
+                    catch (Exception e)
+                    {
+                    }
+
+                    GuiUtil.initLookAndFeel(settings.m_lookAndFeel);
+                    try
+                    {
+                        new GoGui(settings.m_program, settings.m_file,
+                                  settings.m_move, settings.m_time,
+                                  settings.m_verbose,
+                                  settings.m_initComputerColor,
+                                  settings.m_computerBlack,
+                                  settings.m_computerWhite, settings.m_auto,
+                                  settings.m_register, settings.m_gtpFile,
+                                  settings.m_gtpCommand,
+                                  settings.m_analyzeCommands);
+                    }
+                    catch (ErrorMessage e)
+                    {
+                        System.err.println(e.getMessage());
+                        return;
+                    }
+                }
+            };
         Thread thread = new Thread(group, runnable);
         thread.start();
     }
@@ -179,7 +181,7 @@ public final class Main
         addFiller(box);
 
         String optionalMessage;
-        if (Version.get().contains("GIT"))
+        if (Version.get().indexOf("GIT") >= 0)
             optionalMessage =
                 "You are running an unreleased version of GoGui. Please don't report this bug to\n" +
                 "the GoGui bug tracker, but email the author of GoGui directly instead.\n";
@@ -212,27 +214,31 @@ public final class Main
         final StringWriter stackTrace = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stackTrace);
         e.printStackTrace(printWriter);
-        copyButton.addActionListener((ActionEvent e1) -> {
-            GuiUtil.copyToClipboard(goguiVersion + "\n" +
-                    javaVersion  + "\n" +
-                    osVersion + "\n\n" +
-                    stackTrace);
-        });
+        copyButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    GuiUtil.copyToClipboard(goguiVersion + "\n" +
+                                            javaVersion  + "\n" +
+                                            osVersion + "\n\n" +
+                                            stackTrace);
+                }
+            });
 
         JButton urlButton = new JButton("Go to Bug Tracker");
-        urlButton.addActionListener((ActionEvent e1) -> {
-            try
-            {
-                URL url =
-                        new URL("http://sf.net/tracker/?group_id=59117&atid=489964");
-                if (! Platform.openInExternalBrowser(url))
-                    showError("Could not open URL in external browser",
-                            "");
-            }
-            catch (MalformedURLException e2)
-            {
-            }
-        });
+        urlButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    try
+                    {
+                        URL url =
+                            new URL("http://sf.net/tracker/?group_id=59117&atid=489964");
+                        if (! Platform.openInExternalBrowser(url))
+                            showError("Could not open URL in external browser",
+                                      "");
+                    }
+                    catch (MalformedURLException e2)
+                    {
+                    }
+                }
+            });
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.add(urlButton);
         buttonPanel.add(copyButton);

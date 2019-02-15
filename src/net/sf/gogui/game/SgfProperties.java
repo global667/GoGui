@@ -16,7 +16,7 @@ public final class SgfProperties
 {
     public SgfProperties()
     {
-        m_properties = new TreeMap<>();
+        m_properties = new TreeMap<String,ArrayList<String>>();
     }
 
     public SgfProperties(ConstSgfProperties props)
@@ -24,40 +24,32 @@ public final class SgfProperties
         this();
         if (props == null)
             return;
-        ((SgfProperties)props).m_properties.entrySet().forEach((entry) -> {
+        for (Map.Entry<String,ArrayList<String>> entry :
+                 ((SgfProperties)props).m_properties.entrySet())
             add(entry.getKey(), entry.getValue());
-        });
     }
 
     public void add(String key, ArrayList<String> values)
     {
-        ArrayList<String> put = m_properties.put(key, new ArrayList<>(values));
+        m_properties.put(key, new ArrayList<String>(values));
     }
 
-    /**
-     *
-     * @param key
-     * @param value
-     */
     public void add(String key, String value)
     {
-        ArrayList<String> values = new ArrayList<>();
+        ArrayList<String> values = new ArrayList<String>();
         values.add(value);
         m_properties.put(key, values);
     }
 
-    /** *  Get a list of all keys.This list is a copy of the keys at the time of the function call.
-     * @return  */
-    @Override
+    /** Get a list of all keys.
+        This list is a copy of the keys at the time of the function call. */
     public ArrayList<String> getKeys()
     {
-        return new ArrayList<>(m_properties.keySet());
+        return new ArrayList<String>(m_properties.keySet());
     }
 
     /** Return number of values for a key.
-     * @param key
         @return Number of values or -1, if key does not exist. */
-    @Override
     public int getNumberValues(String key)
     {
         ArrayList<String> values = m_properties.get(key);
@@ -66,22 +58,19 @@ public final class SgfProperties
         return values.size();
     }
 
-    @Override
     public String getValue(String key, int index)
     {
         return m_properties.get(key).get(index);
     }
 
-    @Override
     public boolean hasKey(String key)
     {
         return (getNumberValues(key) >= 0);
     }
 
-    @Override
     public boolean isEmpty()
     {
-        return (m_properties.isEmpty());
+        return (m_properties.size() == 0);
     }
 
     public void remove(String key)

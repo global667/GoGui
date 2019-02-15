@@ -42,7 +42,6 @@ public class RadialGradientPaint
             m_transparency = TRANSLUCENT;
     }
 
-    @Override
     public PaintContext createContext(ColorModel colorModel,
                                       Rectangle deviceBounds,
                                       Rectangle2D userBounds,
@@ -67,7 +66,6 @@ public class RadialGradientPaint
         return m_cachedContext;
     }
 
-    @Override
     public int getTransparency()
     {
         return m_transparency;

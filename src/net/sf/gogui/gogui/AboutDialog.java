@@ -16,6 +16,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.LookAndFeel;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.text.EditorKit;
 import static net.sf.gogui.gogui.I18n.i18n;
 import net.sf.gogui.gui.GuiUtil;
@@ -114,24 +115,28 @@ public final class AboutDialog
             JEditorPane.createEditorKitForContentType("text/html");
         editorPane.setEditorKit(editorKit);
         editorPane.setText(text);
-        editorPane.addHyperlinkListener((HyperlinkEvent event) -> {
-            HyperlinkEvent.EventType type = event.getEventType();
-            if (type == HyperlinkEvent.EventType.ACTIVATED)
+        editorPane.addHyperlinkListener(new HyperlinkListener()
             {
-                URL url = event.getURL();
-                if (! Platform.openInExternalBrowser(url))
-                    m_messageDialogs.showError(null,
-                            i18n("MSG_ABOUT_OPEN_URL_FAIL"),
-                            "", false);
-            }
-        });
+                public void hyperlinkUpdate(HyperlinkEvent event)
+                {
+                    HyperlinkEvent.EventType type = event.getEventType();
+                    if (type == HyperlinkEvent.EventType.ACTIVATED)
+                    {
+                        URL url = event.getURL();
+                        if (! Platform.openInExternalBrowser(url))
+                            m_messageDialogs.showError(null,
+                                                       i18n("MSG_ABOUT_OPEN_URL_FAIL"),
+                                                       "", false);
+                    }
+                }
+            });
         return panel;
     }
 
     private JPanel createPanelGoGui()
     {
         URL imageUrl = getImage("project-support.png");
-        String projectUrl = "https://github.com/global667/GoGui";
+        String projectUrl = "http://gogui.sf.net";
         String supportUrl =
             "https://www.paypal.com/cgi-bin/webscr?item_name=Donation+to+GoGui&cmd=_donations&business=enz%40users.sourceforge.net";
         return createPanel("<p align=\"center\"><img src=\""
@@ -160,7 +165,8 @@ public final class AboutDialog
     {
         StringBuilder buffer = new StringBuilder(256);
         String name = Platform.getJavaRuntimeName();
-        buffer.append("<p align=\"center\"><img src=\"").append(getImage("java.png")).append("\"></p>");
+        buffer.append("<p align=\"center\"><img src=\""
+                      + getImage("java.png") + "\"></p>");
         if (name == null)
         {
             buffer.append("<p align=\"center\">");

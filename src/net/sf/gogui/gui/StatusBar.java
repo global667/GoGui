@@ -60,7 +60,6 @@ public class StatusBar
 
         m_text = new JLabel() {
                 /** Use tool tip if text is truncated. */
-                @Override
                 protected void paintComponent(Graphics g)
                 {
                     super.paintComponent(g);
@@ -110,10 +109,9 @@ public class StatusBar
         GuiUtil.paintImmediately(m_text);
     }
 
-    /** *  Set text with move information.This text is displayed right and contains e.g.information about
-        the last move, current move number etc.
-     * @param text
-     * @param toolTip */
+    /** Set text with move information.
+        This text is displayed right and contains e.g. information about
+        the last move, current move number etc. */
     public void setMoveText(String text, String toolTip)
     {
         if (text.length() > 18)
@@ -148,7 +146,6 @@ public class StatusBar
     }
 
     /** Hide or show the text field for move information.
-     * @param show
         @see #setMoveText */
     public void showMoveText(boolean show)
     {

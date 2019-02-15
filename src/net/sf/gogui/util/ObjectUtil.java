@@ -5,10 +5,7 @@ package net.sf.gogui.util;
 /** Utils for using class java.lang.Object. */
 public final class ObjectUtil
 {
-    /** Compare including the case that arguments can be null.
-     * @param object1
-     * @param object2
-     * @return  */
+    /** Compare including the case that arguments can be null. */
     public static boolean equals(Object object1, Object object2)
     {
         if (object1 == null && object2 == null)

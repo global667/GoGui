@@ -113,7 +113,7 @@ public final class Main
                 statistics.saveTable(output);
             }
         }
-        catch (Exception t)
+        catch (Throwable t)
         {
             StringUtil.printException(t);
             System.exit(1);
@@ -133,7 +133,7 @@ public final class Main
         {
             String string = opt.get(option);
             String[] array = StringUtil.split(string, ',');
-            result = new ArrayList<>(array.length);
+            result = new ArrayList<String>(array.length);
             for (int i = 0; i < array.length; ++i)
                 result.add(array[i].trim());
         }

@@ -36,13 +36,13 @@ public final class NodeUtil
         return node;
     }
 
-    /** *  Remove SGF properties for information already contained in game info.This can be used for example, if a SGF reader cannot handle an unknown
+    /** Remove SGF properties for information already contained in game info.
+        This can be used for example, if a SGF reader cannot handle an unknown
         format of the TM property, puts it into the SGF properties of the node
         to preserve the information for future saving, but later a
         well-defined time settings was set in the game information of the node.
         Handles the following properties: TM (because FF3 allowed an arbitrary
         text in TM), OT (FF4 allows arbitrary text)
-     * @param node
         @return The cleaned properties, empty properties, if
         node.getSgfProperties() was null */
     public static SgfProperties cleanSgfProps(ConstNode node)
@@ -198,9 +198,7 @@ public final class NodeUtil
         return node;
     }
 
-    /** Find the last node that was still in the main variation.
-     * @param node
-     * @return  */
+    /** Find the last node that was still in the main variation. */
     public static ConstNode getBackToMainVariation(ConstNode node)
     {
         if (isInMainVariation(node))
@@ -211,7 +209,6 @@ public final class NodeUtil
     }
 
     /** Get all children moves.
-     * @param node
         @return Point list containing the move points, not including passes
         and independent of color. */
     public static PointList getChildrenMoves(ConstNode node)
@@ -227,8 +224,6 @@ public final class NodeUtil
     }
 
     /** Get child node containing a certain move.
-     * @param node
-     * @param move
         @return null if no such child exists. */
     public static ConstNode getChildWithMove(ConstNode node, Move move)
     {
@@ -243,9 +238,6 @@ public final class NodeUtil
     }
 
     /** Get comment, but no more than a maximum number of characters.
-     * @param node
-     * @param firstLineOnly
-     * @param maxChar
         @return Start of comment, with ellipses appended if trunceted;
         null, if node has no comment. */
     public static String getCommentStart(ConstNode node,
@@ -304,9 +296,7 @@ public final class NodeUtil
         return depth;
     }
 
-    /** Get last node in main variation.
-     * @param node
-     * @return  */
+    /** Get last node in main variation. */
     public static ConstNode getLast(ConstNode node)
     {
         while (node.hasChildren())
@@ -330,9 +320,7 @@ public final class NodeUtil
         return moveNumber;
     }
 
-    /** Moves left in main variation.
-     * @param node
-     * @return  */
+    /** Moves left in main variation. */
     public static int getMovesLeft(ConstNode node)
     {
         int movesLeft = 0;
@@ -346,9 +334,7 @@ public final class NodeUtil
         return movesLeft;
     }
 
-    /** Return next variation of this node.
-     * @param node
-     * @return  */
+    /** Return next variation of this node. */
     public static ConstNode getNextVariation(ConstNode node)
     {
         ConstNode father = node.getFatherConst();
@@ -357,9 +343,7 @@ public final class NodeUtil
         return father.variationAfter(node);
     }
 
-    /** Return next variation before this node.
-     * @param node
-     * @return  */
+    /** Return next variation before this node. */
     public static ConstNode getNextEarlierVariation(ConstNode node)
     {
         ConstNode child = node;
@@ -374,9 +358,7 @@ public final class NodeUtil
         return node.variationAfter(child);
     }
 
-    /** Nodes left in main variation.
-     * @param node
-     * @return  */
+    /** Nodes left in main variation. */
     public static int getNodesLeft(ConstNode node)
     {
         int nodesLeft = 0;
@@ -403,9 +385,7 @@ public final class NodeUtil
         }
     }
 
-    /** Return previous variation of this node.
-     * @param node
-     * @return  */
+    /** Return previous variation of this node. */
     public static ConstNode getPreviousVariation(ConstNode node)
     {
         ConstNode father = node.getFatherConst();
@@ -414,9 +394,7 @@ public final class NodeUtil
         return father.variationBefore(node);
     }
 
-    /** Return previous variation before this node.
-     * @param node
-     * @return  */
+    /** Return previous variation before this node. */
     public static ConstNode getPreviousEarlierVariation(ConstNode node)
     {
         ConstNode child = node;
@@ -446,14 +424,14 @@ public final class NodeUtil
         return node;
     }
 
-    /** *  Get a text representation of the variation to a certain node.The string contains the number of the child for each node with more
-        than one child in the path from the root node to this node.The childs are counted starting with 1 and the numbers are separated
-        by colons.
-     * @param node
-     * @return  */
+    /** Get a text representation of the variation to a certain node.
+        The string contains the number of the child for each node with more
+        than one child in the path from the root node to this node.
+        The childs are counted starting with 1 and the numbers are separated
+        by colons. */
     public static String getVariationString(ConstNode node)
     {
-        ArrayList<String> list = new ArrayList<>();
+        ArrayList<String> list = new ArrayList<String>();
         while (node != null)
         {
             ConstNode father = node.getFatherConst();
@@ -475,9 +453,7 @@ public final class NodeUtil
     }
 
     /** Check if a node contains a move and has sibling nodes containing other
-        moves.
-     * @param node
-     * @return  */
+        moves. */
     public static boolean hasSiblingMoves(ConstNode node)
     {
         ConstNode father = node.getFatherConst();
@@ -495,9 +471,7 @@ public final class NodeUtil
         return false;
     }
 
-    /** Subtree of node contains at least one node with 2 or more children.
-     * @param node
-     * @return  */
+    /** Subtree of node contains at least one node with 2 or more children. */
     public static boolean hasSubtree(ConstNode node)
     {
         while (node != null && node.getNumberChildren() < 2)
@@ -505,9 +479,8 @@ public final class NodeUtil
         return (node != null);
     }
 
-    /** *  Check if game is in cleanup stage.Cleanup stage is after two consecutive pass moves have been played.
-     * @param node
-     * @return  */
+    /** Check if game is in cleanup stage.
+        Cleanup stage is after two consecutive pass moves have been played. */
     public static boolean isInCleanup(ConstNode node)
     {
         boolean lastPass = false;
@@ -555,14 +528,12 @@ public final class NodeUtil
         return (! node.hasFather() && ! node.hasChildren());
     }
 
-    /** *  Check that the time left for a color at a node is known.Returns true, if the last node (including the given one) containing a
+    /** Check that the time left for a color at a node is known.
+        Returns true, if the last node (including the given one) containing a
         move of the given color also contains information about the time left
-        after the move for the color.If a previous node with a game info
+        after the move for the color. If a previous node with a game info
         containing time settings exists and no move of the given color was
-        played since then, the function also returns true.
-     * @param node
-     * @param color
-     * @return  */
+        played since then, the function also returns true. */
     public static boolean isTimeLeftKnown(ConstNode node, GoColor color)
     {
         while (node != null)
@@ -594,10 +565,7 @@ public final class NodeUtil
         }
     }
 
-    /** Create a game tree with the current board position as setup stones.
-     * @param info
-     * @param board
-     * @return  */
+    /** Create a game tree with the current board position as setup stones. */
     public static GameTree makeTreeFromPosition(ConstGameInfo info,
                                                 ConstBoard board)
     {
@@ -617,9 +585,7 @@ public final class NodeUtil
         return tree;
     }
 
-    /** Get next node for iteration through complete tree.
-     * @param node
-     * @return  */
+    /** Get next node for iteration through complete tree. */
     public static ConstNode nextNode(ConstNode node)
     {
         ConstNode child = node.getChildConst();
@@ -628,10 +594,7 @@ public final class NodeUtil
         return getNextEarlierVariation(node);
     }
 
-    /** Get next node for iteration through subtree.
-     * @param node
-     * @param depth
-     * @return  */
+    /** Get next node for iteration through subtree. */
     public static ConstNode nextNode(ConstNode node, int depth)
     {
         node = nextNode(node);
@@ -640,11 +603,10 @@ public final class NodeUtil
         return node;
     }
 
-    /** *  Return a string containing information about a node.The string contains a listing of the data stored in the node
+    /** Return a string containing information about a node.
+        The string contains a listing of the data stored in the node
         (like moves or setup stones) and properties of the node in the
-        tree (like depth or variation).
-     * @param node
-     * @return  */
+        tree (like depth or variation). */
     public static String nodeInfo(ConstNode node)
     {
         StringBuilder buffer = new StringBuilder(128);
@@ -677,12 +639,12 @@ public final class NodeUtil
         if (node.getMovesLeft(WHITE) >= 0)
             appendInfo(buffer, "MovesLeftWhite", node.getMovesLeft(WHITE));
         appendInfoComment(buffer, node);
-        EnumSet.allOf(MarkType.class).forEach((type) -> {
+        for (MarkType type : EnumSet.allOf(MarkType.class))
+        {
             ConstPointList marked = node.getMarkedConst(type);
-            if (marked != null && marked.size() > 0) {
+            if (marked != null && marked.size() > 0)
                 appendInfo(buffer, "Marked " + type, marked);
-            }
-        });
+        }
         Map<GoPoint,String> labels = node.getLabelsUnmodifiable();
         if (labels != null && ! labels.isEmpty())
         {
@@ -707,21 +669,21 @@ public final class NodeUtil
         if (info != null)
         {
             buffer.append("GameInfo:\n");
-            EnumSet.allOf(StringInfo.class).forEach((type) -> {
+            for (StringInfo type : EnumSet.allOf(StringInfo.class))
+            {
                 String s = info.get(type);
-                if (s != null) {
+                if (s != null)
                     appendInfo(buffer, type.toString(), s);
-                }
-            });
-            EnumSet.allOf(StringInfoColor.class).forEach((type) -> {
+            }
+            for (StringInfoColor type : EnumSet.allOf(StringInfoColor.class))
+            {
                 String s = info.get(type, BLACK);
                 if (s != null)
                     appendInfo(buffer, type.toString() + "[B]", s);
                 s = info.get(type, WHITE);
-                if (s != null) {
+                if (s != null)
                     appendInfo(buffer, type.toString() + "[W]", s);
-                }
-            });
+            }
             if (info.getHandicap() != 0)
                 appendInfo(buffer, "HANDICAP", info.getHandicap());
             if (info.getKomi() != null)
@@ -734,7 +696,8 @@ public final class NodeUtil
         if (sgfProperties != null)
         {
             buffer.append("SgfProperties:\n");
-            sgfProperties.getKeys().forEach((key) -> {
+            for (String key : sgfProperties.getKeys())
+            {
                 StringBuilder values = new StringBuilder();
                 for (int i = 0; i < sgfProperties.getNumberValues(key); ++i)
                 {
@@ -743,7 +706,7 @@ public final class NodeUtil
                     values.append(']');
                 }
                 appendInfo(buffer, key, values.toString());
-            });
+            }
         }
         return buffer.toString();
     }
@@ -756,7 +719,7 @@ public final class NodeUtil
     public static void restoreClock(ConstNode node, Clock clock)
     {
         clock.reset();
-        ArrayList<ConstNode> path = new ArrayList<>();
+        ArrayList<ConstNode> path = new ArrayList<ConstNode>();
         getPathToRoot(node, path);
         for (int i = path.size() - 1; i >= 0; --i)
         {
@@ -790,10 +753,7 @@ public final class NodeUtil
     }
 
     /** Check if the number of nodes in the subtree of a node is greater
-        than a given limit.
-     * @param node
-     * @param size
-     * @return  */
+        than a given limit. */
     public static boolean subtreeGreaterThan(ConstNode node, int size)
     {
         int n = 0;
@@ -825,9 +785,7 @@ public final class NodeUtil
     }
 
     /** Return a string containing information and statistics of the subtree
-        of a node.
-     * @param node
-     * @return  */
+        of a node. */
     public static String treeInfo(ConstNode node)
     {
         int numberNodes = 0;
@@ -879,8 +837,7 @@ public final class NodeUtil
         return buffer.toString();
     }
 
-    /** Remove all children.
-     * @param node */
+    /** Remove all children. */
     public static void truncateChildren(Node node)
     {
         while (true)
@@ -892,7 +849,7 @@ public final class NodeUtil
         }
     }
 
-    private static final Random s_random = new Random();
+    private static Random s_random = new Random();
 
     /** Make constructor unavailable; class is for namespace only. */
     private NodeUtil()

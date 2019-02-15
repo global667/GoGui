@@ -29,8 +29,8 @@ public class TextParser
     {
     }
 
-    /** *  Get board with parsed position.Only valid after calling parse.
-     * @return  */
+    /** Get board with parsed position.
+        Only valid after calling parse. */
     public Board getBoard()
     {
         return m_board;

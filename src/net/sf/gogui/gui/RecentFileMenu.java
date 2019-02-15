@@ -19,8 +19,12 @@ public class RecentFileMenu
     {
         assert listener != null;
         m_listener = listener;
-        RecentMenu.Listener recentListener = (String label1, String value) -> {
-            m_listener.fileSelected(label1, new File(value));
+        RecentMenu.Listener recentListener = new RecentMenu.Listener()
+        {
+            public void itemSelected(String label, String value)
+            {
+                m_listener.fileSelected(label, new File(value));
+            }
         };
         m_menu = new RecentMenu(label, path, recentListener);
         for (int i = 0; i < m_menu.getCount(); ++i)
@@ -64,8 +68,7 @@ public class RecentFileMenu
         }
     }
 
-    /** Don't modify the items in this menu!
-     * @return  */
+    /** Don't modify the items in this menu! */
     public GuiMenu getMenu()
     {
         return m_menu.getMenu();
@@ -81,7 +84,7 @@ public class RecentFileMenu
 
     private final RecentMenu m_menu;
 
-    private final ArrayList<String> m_sameName = new ArrayList<>();
+    private final ArrayList<String> m_sameName = new ArrayList<String>();
 
     private int getCount()
     {

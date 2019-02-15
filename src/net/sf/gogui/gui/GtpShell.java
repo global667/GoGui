@@ -49,8 +49,7 @@ public class GtpShell
         void actionSendCommand(String command, boolean isCritical,
                                boolean showError);
 
-        /** Callback if some text is selected.
-         * @param text */
+        /** Callback if some text is selected. */
         void textSelected(String text);
     }
 
@@ -66,21 +65,25 @@ public class GtpShell
         JPanel panel = new JPanel(new BorderLayout());
         getContentPane().add(panel, BorderLayout.CENTER);
         m_gtpShellText = new GtpShellText(m_historyMin, m_historyMax, false);
-        CaretListener caretListener = (CaretEvent event) -> {
-            if (m_listener == null)
-                return;
-            // Call the callback only if the selected text has changed.
-            // This avoids that the callback is called multiple times
-            // if the caret position changes, but the text selection
-            // was null before and after the change (see also bug
-            // #2964755)
-            String selectedText = m_gtpShellText.getSelectedText();
-            if (! ObjectUtil.equals(selectedText, m_selectedText))
+        CaretListener caretListener = new CaretListener()
             {
-                m_listener.textSelected(selectedText);
-                m_selectedText = selectedText;
-            }
-        };
+                public void caretUpdate(CaretEvent event)
+                {
+                    if (m_listener == null)
+                        return;
+                    // Call the callback only if the selected text has changed.
+                    // This avoids that the callback is called multiple times
+                    // if the caret position changes, but the text selection
+                    // was null before and after the change (see also bug
+                    // #2964755)
+                    String selectedText = m_gtpShellText.getSelectedText();
+                    if (! ObjectUtil.equals(selectedText, m_selectedText))
+                    {
+                        m_listener.textSelected(selectedText);
+                        m_selectedText = selectedText;
+                    }
+                }
+            };
         m_gtpShellText.addCaretListener(caretListener);
         m_scrollPane =
             new JScrollPane(m_gtpShellText,
@@ -95,7 +98,6 @@ public class GtpShell
         pack();
     }
 
-    @Override
     public void actionPerformed(ActionEvent event)
     {
         String command = event.getActionCommand();
@@ -105,8 +107,7 @@ public class GtpShell
             setVisible(false);
     }
 
-    /**
-     * @return  *  @see net.sf.gogui.gui.GtpShellText#isLastTextNonGTP */
+    /** @see net.sf.gogui.gui.GtpShellText#isLastTextNonGTP */
     public boolean isLastTextNonGTP()
     {
         return m_gtpShellText.isLastTextNonGTP();
@@ -119,9 +120,10 @@ public class GtpShell
             appendInvalidResponse(response);
         else
         {
-            Runnable r = () -> {
-                appendInvalidResponse(response);
-            };
+            Runnable r = new Runnable() {
+                    public void run() {
+                        appendInvalidResponse(response);
+                    } };
             if (invokeLater)
                 SwingUtilities.invokeLater(r);
             else
@@ -136,9 +138,10 @@ public class GtpShell
             appendResponse(error, response);
         else
         {
-            Runnable r = () -> {
-                appendResponse(error, response);
-            };
+            Runnable r = new Runnable() {
+                    public void run() {
+                        appendResponse(error, response);
+                    } };
             if (invokeLater)
                 SwingUtilities.invokeLater(r);
             else
@@ -154,9 +157,10 @@ public class GtpShell
             appendLog(s, isLiveGfx, isWarning);
         else
         {
-            Runnable r = () -> {
-                appendLog(s, isLiveGfx, isWarning);
-            };
+            Runnable r = new Runnable() {
+                    public void run() {
+                        appendLog(s, isLiveGfx, isWarning);
+                    } };
             if (invokeLater)
                 SwingUtilities.invokeLater(r);
             else
@@ -181,7 +185,7 @@ public class GtpShell
         int max = m_history.size();
         if (max > maxHistory)
             max = maxHistory;
-        ArrayList<String> list = new ArrayList<>(max);
+        ArrayList<String> list = new ArrayList<String>(max);
         for (int i = m_history.size() - max; i < m_history.size(); ++i)
             list.add(m_history.get(i));
         PrefUtil.putList("net/sf/gogui/gui/gtpshell/recentcommands", list);
@@ -207,9 +211,10 @@ public class GtpShell
         if (SwingUtilities.isEventDispatchThread())
             appendSentCommand(command);
         else
-            GuiUtil.invokeAndWait(() -> {
-                appendSentCommand(command);
-        });
+            GuiUtil.invokeAndWait(new Runnable() {
+                    public void run() {
+                        appendSentCommand(command);
+                    } });
     }
 
     public void setInitialCompletions(ArrayList<String> completions)
@@ -273,7 +278,7 @@ public class GtpShell
 
     private final StringBuilder m_commands = new StringBuilder(4096);
 
-    private final ArrayList<String> m_history = new ArrayList<>(128);
+    private final ArrayList<String> m_history = new ArrayList<String>(128);
 
     private String m_selectedText;
 
@@ -402,40 +407,37 @@ public class GtpShell
         m_editor = m_comboBox.getEditor();
         m_textField = (JTextField)m_editor.getEditorComponent();
         m_textField.setFocusTraversalKeysEnabled(false);
-        KeyAdapter keyAdapter;
-        keyAdapter = new KeyAdapter()
-        {
-            @Override
-            public void keyReleased(KeyEvent e)
+        KeyAdapter keyAdapter = new KeyAdapter()
             {
-                int c;
-                c = e.getKeyCode();
-                int mod = e.getModifiers();
-                if (c == KeyEvent.VK_ESCAPE) {
-                } else if (c == KeyEvent.VK_TAB)
+                public void keyReleased(KeyEvent e)
                 {
-                    findBestCompletion();
-                    popupCompletions();
+                    int c = e.getKeyCode();
+                    int mod = e.getModifiers();
+                    if (c == KeyEvent.VK_ESCAPE)
+                        return;
+                    else if (c == KeyEvent.VK_TAB)
+                    {
+                        findBestCompletion();
+                        popupCompletions();
+                    }
+                    else if (c == KeyEvent.VK_PAGE_UP
+                             && mod == ActionEvent.SHIFT_MASK)
+                        scrollPage(true);
+                    else if (c == KeyEvent.VK_PAGE_DOWN
+                             && mod == ActionEvent.SHIFT_MASK)
+                        scrollPage(false);
+                    else if (c == KeyEvent.VK_ENTER
+                             && ! m_comboBox.isPopupVisible())
+                        commandEntered();
+                    else if (e.getKeyChar() != KeyEvent.CHAR_UNDEFINED)
+                        popupCompletions();
                 }
-                else if (c == KeyEvent.VK_PAGE_UP
-                        && mod == ActionEvent.SHIFT_MASK)
-                    scrollPage(true);
-                else if (c == KeyEvent.VK_PAGE_DOWN
-                        && mod == ActionEvent.SHIFT_MASK)
-                    scrollPage(false);
-                else if (c == KeyEvent.VK_ENTER
-                        && ! m_comboBox.isPopupVisible())
-                    commandEntered();
-                else if (e.getKeyChar() != KeyEvent.CHAR_UNDEFINED)
-                    popupCompletions();
-            }
-        };
+            };
         m_textField.addKeyListener(keyAdapter);
         m_comboBox.setEditable(true);
         m_comboBox.setFont(m_gtpShellText.getFont());
         m_comboBox.addActionListener(this);
         addWindowListener(new WindowAdapter() {
-                @Override
                 public void windowActivated(WindowEvent e) {
                     m_comboBox.requestFocusInWindow();
                     m_textField.requestFocusInWindow();
@@ -506,7 +508,7 @@ public class GtpShell
     {
         String text = m_textField.getText();
         text = text.replaceAll("^ *", "");
-        ArrayList<String> completions = new ArrayList<>(128);
+        ArrayList<String> completions = new ArrayList<String>(128);
         for (int i = 0; i < m_history.size(); ++i)
         {
             String c = m_history.get(i);
@@ -531,13 +533,13 @@ public class GtpShell
             return;
         try
         {
-            try (PrintStream out = new PrintStream(file)) {
-                out.println("# Name: " + m_programName);
-                out.println("# Version: " + m_programVersion);
-                out.println("# Command: " + m_programCommand);
-                out.println("# Lines truncated: " + linesTruncated);
-                out.print(s);
-            }
+            PrintStream out = new PrintStream(file);
+            out.println("# Name: " + m_programName);
+            out.println("# Version: " + m_programVersion);
+            out.println("# Command: " + m_programCommand);
+            out.println("# Lines truncated: " + linesTruncated);
+            out.print(s);
+            out.close();
         }
         catch (FileNotFoundException e)
         {

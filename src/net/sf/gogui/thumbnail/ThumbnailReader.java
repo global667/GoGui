@@ -61,7 +61,7 @@ public final class ThumbnailReader
         {
             metadata = reader.getImageMetadata(0);
         }
-        catch (IOException t)
+        catch (Throwable t)
         {
             // Some PNGs generate a NegativeArraySizeException in
             // com.sun.imageio.plugins.png.PNGImageReader.readMetadata

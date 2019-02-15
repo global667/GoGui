@@ -60,7 +60,7 @@ public class Analyze
 
     private static final String COLOR_INFO = "#e0e0e0";
 
-    private final ArrayList<Entry> m_entries = new ArrayList<>(128);
+    private final ArrayList<Entry> m_entries = new ArrayList<Entry>(128);
 
     private final Statistics m_length = new Statistics();
 
@@ -217,134 +217,134 @@ public class Analyze
             String name = file.getName();
             gamePrefix = name.substring(0, name.length() - 5);
         }
-        try (PrintStream out = new PrintStream(file)) {
-            NumberFormat format = StringUtil.getNumberFormat(1);
-            String black;
-            if (m_table.hasProperty("BlackLabel"))
-                black = m_table.getProperty("BlackLabel");
-            else if (m_table.hasProperty("Black"))
-                // Older versions of TwoGtp do not have BlackLabel property
-                black = m_table.getProperty("Black");
-            else
-                black = "Black";
-            String white;
-            if (m_table.hasProperty("WhiteLabel"))
-                white = m_table.getProperty("WhiteLabel");
-            else if (m_table.hasProperty("White"))
-                // Older versions of TwoGtp do not have WhiteLabel property
-                white = m_table.getProperty("White");
-            else
-                white = "Black";
-            boolean useXml = (! m_table.getProperty("Xml", "0").equals("0"));
-            out.print("<html>\n" +
-                    "<head>\n" +
-                    "<title>" + black + " - " + white + "</title>\n" +
-                    HtmlUtil.getMeta("TwoGtp") +
-                    "<style type=\"text/css\">\n" +
-                            "<!--\n" +
-                            "body { margin:0; }\n" +
-                            "-->\n" +
-                            "</style>\n" +
-                            "</head>\n" +
-                            "<body bgcolor=\"white\" text=\"black\" link=\"#0000ee\"" +
-                            " vlink=\"#551a8b\">\n" +
-                            "<table border=\"0\" width=\"100%\" bgcolor=\""
-                    + COLOR_HEADER + "\">\n" +
-                            "<tr><td>\n" +
-                            "<h1>" + black + " - " + white
-                    + "</h1>\n" +
-                            "</td></tr>\n" +
-                            "</table>\n" +
-                            "<table width=\"100%\" bgcolor=\"" + COLOR_INFO
-                    + "\">\n");
-            String referee = m_table.getProperty("Referee", "");
-            if (referee.equals("-") || referee.equals(""))
-                referee = null;
-            writePropertyHtmlRow(out, "Black", "Black");
-            writePropertyHtmlRow(out, "White", "White");
-            writePropertyHtmlRow(out, "Size", "Size");
-            writePropertyHtmlRow(out, "Komi", "Komi");
-            if (m_table.hasProperty("Openings"))
-                writePropertyHtmlRow(out, "Openings", "Openings");
-            writePropertyHtmlRow(out, "Date", "Date");
-            writePropertyHtmlRow(out, "Host", "Host");
-            writePropertyHtmlRow(out, "Referee", "Referee");
-            writePropertyHtmlRow(out, "BlackVersion", "Black version");
-            writePropertyHtmlRow(out, "BlackCommand", "Black command");
-            writePropertyHtmlRow(out, "WhiteVersion", "White version");
-            writePropertyHtmlRow(out, "WhiteCommand", "White command");
-            if (referee != null)
-            {
-                writePropertyHtmlRow(out, "RefereeVersion", "Referee version");
-                writePropertyHtmlRow(out, "RefereeCommand", "Referee command");
-            }
-            writeHtmlRow(out, "Games", m_games);
-            writeHtmlRow(out, "Errors", m_errors);
-            writeHtmlRow(out, "Duplicates", m_duplicates);
-            writeHtmlRow(out, "Games used", m_gamesUsed);
-            writeHtmlRow(out, "Game length", m_length, format);
-            writeHtmlRow(out, "Time Black", m_timeBlack, format);
-            writeHtmlRow(out, "Time White", m_timeWhite, format);
-            writeHtmlRow(out, "CPU Time Black", m_cpuBlack, format);
-            writeHtmlRow(out, "CPU Time White", m_cpuWhite, format);
-            out.print("</table>\n" +
-                    "<hr>\n");
-            if (referee != null)
-            {
-                writeHtmlResults(out, referee, m_statisticsReferee);
-                out.println("<hr>");
-            }
-            writeHtmlResults(out, black, m_statisticsBlack);
-            out.println("<hr>");
-            writeHtmlResults(out, white, m_statisticsWhite);
-            out.println("<hr>");
-            out.print("<table border=\"0\" width=\"100%\" cellpadding=\"0\""
-                    + " cellspacing=\"1\">\n" +
-                    "<thead>\n" +
-                    "<tr bgcolor=\"" + COLOR_HEADER + "\">\n" +
-                            "<th>Game</th>\n");
-            if (referee != null)
-                out.print("<th>Result " + referee + "</th>\n");
-            out.print("<th>Result " + black + "</th>\n" +
-                    "<th>Result " + white + "</th>\n");
-            out.print("<th>Colors Exchanged</th>\n" +
-                    "<th>Duplicate</th>\n" +
-                    "<th>Length</th>\n" +
-                    "<th>Time " + black + "</th>\n" +
-                            "<th>Time " + white + "</th>\n" +
-                                    "<th>CPU Time " + black + "</th>\n" +
-                                            "<th>CPU Time " + white + "</th>\n" +
-                                                    "<th>Error</th>\n" +
-                                                    "<th>Error Message</th>\n" +
-                                                    "</tr>\n" +
-                                                    "</thead>\n");
-            String gameSuffix = (useXml ? ".xml" : ".sgf");
-            for (Entry e : m_entries)
-            {
-                String name = gamePrefix + "-" + e.m_gameIndex + gameSuffix;
-                out.print("<tr align=\"center\" bgcolor=\"" + COLOR_INFO
-                        + "\"><td><a href=\"" + name + "\">" + name
-                        + "</a></td>\n");
-                if (referee != null)
-                    out.print("<td>" + e.m_resultReferee + "</td>");
-                out.print("<td>" + e.m_resultBlack + "</td>" +
-                        "<td>" + e.m_resultWhite + "</td>");
-                out.print("<td>" + (e.m_alternated ? "1" : "0") + "</td>" +
-                        "<td>" + e.m_duplicate + "</td>" +
-                                "<td>" + e.m_length + "</td>" +
-                                        "<td>" + e.m_timeBlack + "</td>" +
-                                                "<td>" + e.m_timeWhite + "</td>" +
-                                                        "<td>" + e.m_cpuBlack + "</td>" +
-                                                                "<td>" + e.m_cpuWhite + "</td>" +
-                                                                        "<td>" + (e.m_error ? "1" : "") + "</td>" +
-                                                                                "<td>" + e.m_errorMessage + "</td>" +
-                                                                                        "</tr>\n");
-            }
-            out.print("</table>\n" +
-                    HtmlUtil.getFooter("TwoGtp") +
-                    "</body>\n" +
-                            "</html>\n");
+        PrintStream out = new PrintStream(file);
+        NumberFormat format = StringUtil.getNumberFormat(1);
+        String black;
+        if (m_table.hasProperty("BlackLabel"))
+            black = m_table.getProperty("BlackLabel");
+        else if (m_table.hasProperty("Black"))
+            // Older versions of TwoGtp do not have BlackLabel property
+            black = m_table.getProperty("Black");
+        else
+            black = "Black";
+        String white;
+        if (m_table.hasProperty("WhiteLabel"))
+            white = m_table.getProperty("WhiteLabel");
+        else if (m_table.hasProperty("White"))
+            // Older versions of TwoGtp do not have WhiteLabel property
+            white = m_table.getProperty("White");
+        else
+            white = "Black";
+        boolean useXml = (! m_table.getProperty("Xml", "0").equals("0"));
+        out.print("<html>\n" +
+                  "<head>\n" +
+                  "<title>" + black + " - " + white + "</title>\n" +
+                  HtmlUtil.getMeta("TwoGtp") +
+                  "<style type=\"text/css\">\n" +
+                  "<!--\n" +
+                  "body { margin:0; }\n" +
+                  "-->\n" +
+                  "</style>\n" +
+                  "</head>\n" +
+                  "<body bgcolor=\"white\" text=\"black\" link=\"#0000ee\"" +
+                  " vlink=\"#551a8b\">\n" +
+                  "<table border=\"0\" width=\"100%\" bgcolor=\""
+                  + COLOR_HEADER + "\">\n" +
+                  "<tr><td>\n" +
+                  "<h1>" + black + " - " + white
+                  + "</h1>\n" +
+                  "</td></tr>\n" +
+                  "</table>\n" +
+                  "<table width=\"100%\" bgcolor=\"" + COLOR_INFO
+                  + "\">\n");
+        String referee = m_table.getProperty("Referee", "");
+        if (referee.equals("-") || referee.equals(""))
+            referee = null;
+        writePropertyHtmlRow(out, "Black", "Black");
+        writePropertyHtmlRow(out, "White", "White");
+        writePropertyHtmlRow(out, "Size", "Size");
+        writePropertyHtmlRow(out, "Komi", "Komi");
+        if (m_table.hasProperty("Openings"))
+            writePropertyHtmlRow(out, "Openings", "Openings");
+        writePropertyHtmlRow(out, "Date", "Date");
+        writePropertyHtmlRow(out, "Host", "Host");
+        writePropertyHtmlRow(out, "Referee", "Referee");
+        writePropertyHtmlRow(out, "BlackVersion", "Black version");
+        writePropertyHtmlRow(out, "BlackCommand", "Black command");
+        writePropertyHtmlRow(out, "WhiteVersion", "White version");
+        writePropertyHtmlRow(out, "WhiteCommand", "White command");
+        if (referee != null)
+        {
+            writePropertyHtmlRow(out, "RefereeVersion", "Referee version");
+            writePropertyHtmlRow(out, "RefereeCommand", "Referee command");
         }
+        writeHtmlRow(out, "Games", m_games);
+        writeHtmlRow(out, "Errors", m_errors);
+        writeHtmlRow(out, "Duplicates", m_duplicates);
+        writeHtmlRow(out, "Games used", m_gamesUsed);
+        writeHtmlRow(out, "Game length", m_length, format);
+        writeHtmlRow(out, "Time Black", m_timeBlack, format);
+        writeHtmlRow(out, "Time White", m_timeWhite, format);
+        writeHtmlRow(out, "CPU Time Black", m_cpuBlack, format);
+        writeHtmlRow(out, "CPU Time White", m_cpuWhite, format);
+        out.print("</table>\n" +
+                  "<hr>\n");
+        if (referee != null)
+        {
+            writeHtmlResults(out, referee, m_statisticsReferee);
+            out.println("<hr>");
+        }
+        writeHtmlResults(out, black, m_statisticsBlack);
+        out.println("<hr>");
+        writeHtmlResults(out, white, m_statisticsWhite);
+        out.println("<hr>");
+        out.print("<table border=\"0\" width=\"100%\" cellpadding=\"0\""
+                  + " cellspacing=\"1\">\n" +
+                  "<thead>\n" +
+                  "<tr bgcolor=\"" + COLOR_HEADER + "\">\n" +
+                  "<th>Game</th>\n");
+        if (referee != null)
+            out.print("<th>Result " + referee + "</th>\n");
+        out.print("<th>Result " + black + "</th>\n" +
+                  "<th>Result " + white + "</th>\n");
+        out.print("<th>Colors Exchanged</th>\n" +
+                  "<th>Duplicate</th>\n" +
+                  "<th>Length</th>\n" +
+                  "<th>Time " + black + "</th>\n" +
+                  "<th>Time " + white + "</th>\n" +
+                  "<th>CPU Time " + black + "</th>\n" +
+                  "<th>CPU Time " + white + "</th>\n" +
+                  "<th>Error</th>\n" +
+                  "<th>Error Message</th>\n" +
+                  "</tr>\n" +
+                  "</thead>\n");
+        String gameSuffix = (useXml ? ".xml" : ".sgf");
+        for (Entry e : m_entries)
+        {
+            String name = gamePrefix + "-" + e.m_gameIndex + gameSuffix;
+            out.print("<tr align=\"center\" bgcolor=\"" + COLOR_INFO
+                      + "\"><td><a href=\"" + name + "\">" + name
+                      + "</a></td>\n");
+            if (referee != null)
+                out.print("<td>" + e.m_resultReferee + "</td>");
+            out.print("<td>" + e.m_resultBlack + "</td>" +
+                      "<td>" + e.m_resultWhite + "</td>");
+            out.print("<td>" + (e.m_alternated ? "1" : "0") + "</td>" +
+                      "<td>" + e.m_duplicate + "</td>" +
+                      "<td>" + e.m_length + "</td>" +
+                      "<td>" + e.m_timeBlack + "</td>" +
+                      "<td>" + e.m_timeWhite + "</td>" +
+                      "<td>" + e.m_cpuBlack + "</td>" +
+                      "<td>" + e.m_cpuWhite + "</td>" +
+                      "<td>" + (e.m_error ? "1" : "") + "</td>" +
+                      "<td>" + e.m_errorMessage + "</td>" +
+                      "</tr>\n");
+        }
+        out.print("</table>\n" +
+                  HtmlUtil.getFooter("TwoGtp") +
+                  "</body>\n" +
+                  "</html>\n");
+        out.close();
     }
 
     private void writeHtmlResults(PrintStream out, String name,
@@ -430,40 +430,40 @@ public class Analyze
 
     private void writeData(File file) throws Exception
     {
-        try (PrintStream out = new PrintStream(file)) {
-            NumberFormat format1 = StringUtil.getNumberFormat(1);
-            NumberFormat format2 = StringUtil.getNumberFormat(3);
-            Histogram histoBlack = m_statisticsBlack.m_histo;
-            Histogram histoWhite = m_statisticsWhite.m_histo;
-            Histogram histoReferee = m_statisticsReferee.m_histo;
-            Statistics winBlack = m_statisticsBlack.m_win;
-            Statistics winWhite = m_statisticsWhite.m_win;
-            Statistics winReferee = m_statisticsReferee.m_win;
-            Statistics unknownBlack = m_statisticsBlack.m_unknownScore;
-            Statistics unknownWhite = m_statisticsWhite.m_unknownScore;
-            Statistics unknownReferee = m_statisticsReferee.m_unknownScore;
-            out.print("#GAMES\tERR\tDUP\tUSED\tRES_B\tERR_B\tWIN_B\tERRW_B\t"
-                    + "UNKN_B\tRES_W\tERR_W\tWIN_W\tERRW_W\tUNKN_W\t"
-                    + "RES_R\tERR_R\tWIN_R\tERRW_R\tUNKN_R\n" +
-                    m_games + "\t" + m_errors + "\t" + m_duplicates + "\t"
-                    + m_gamesUsed
-                    + "\t" + format1.format(histoBlack.getMean())
-                    + "\t" + format1.format(histoBlack.getError())
-                    + "\t" + format2.format(winBlack.getMean())
-                    + "\t" + format2.format(winBlack.getError())
-                    + "\t" + format2.format(unknownBlack.getMean())
-                    + "\t" + format1.format(histoWhite.getMean())
-                    + "\t" + format1.format(histoWhite.getError())
-                    + "\t" + format2.format(winWhite.getMean())
-                    + "\t" + format2.format(winWhite.getError())
-                    + "\t" + format2.format(unknownWhite.getMean())
-                    + "\t" + format1.format(histoReferee.getMean())
-                    + "\t" + format1.format(histoReferee.getError())
-                    + "\t" + format2.format(winReferee.getMean())
-                    + "\t" + format2.format(winReferee.getError())
-                    + "\t" + format2.format(unknownReferee.getMean())
-                    + "\n");
-        }
+        PrintStream out = new PrintStream(file);
+        NumberFormat format1 = StringUtil.getNumberFormat(1);
+        NumberFormat format2 = StringUtil.getNumberFormat(3);
+        Histogram histoBlack = m_statisticsBlack.m_histo;
+        Histogram histoWhite = m_statisticsWhite.m_histo;
+        Histogram histoReferee = m_statisticsReferee.m_histo;
+        Statistics winBlack = m_statisticsBlack.m_win;
+        Statistics winWhite = m_statisticsWhite.m_win;
+        Statistics winReferee = m_statisticsReferee.m_win;
+        Statistics unknownBlack = m_statisticsBlack.m_unknownScore;
+        Statistics unknownWhite = m_statisticsWhite.m_unknownScore;
+        Statistics unknownReferee = m_statisticsReferee.m_unknownScore;
+        out.print("#GAMES\tERR\tDUP\tUSED\tRES_B\tERR_B\tWIN_B\tERRW_B\t"
+                  + "UNKN_B\tRES_W\tERR_W\tWIN_W\tERRW_W\tUNKN_W\t"
+                  + "RES_R\tERR_R\tWIN_R\tERRW_R\tUNKN_R\n" +
+                  m_games + "\t" + m_errors + "\t" + m_duplicates + "\t"
+                  + m_gamesUsed
+                  + "\t" + format1.format(histoBlack.getMean())
+                  + "\t" + format1.format(histoBlack.getError())
+                  + "\t" + format2.format(winBlack.getMean())
+                  + "\t" + format2.format(winBlack.getError())
+                  + "\t" + format2.format(unknownBlack.getMean())
+                  + "\t" + format1.format(histoWhite.getMean())
+                  + "\t" + format1.format(histoWhite.getError())
+                  + "\t" + format2.format(winWhite.getMean())
+                  + "\t" + format2.format(winWhite.getError())
+                  + "\t" + format2.format(unknownWhite.getMean())
+                  + "\t" + format1.format(histoReferee.getMean())
+                  + "\t" + format1.format(histoReferee.getError())
+                  + "\t" + format2.format(winReferee.getMean())
+                  + "\t" + format2.format(winReferee.getError())
+                  + "\t" + format2.format(unknownReferee.getMean())
+                  + "\n");
+        out.close();
     }
 }
 

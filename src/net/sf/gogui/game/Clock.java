@@ -27,7 +27,6 @@ public final class Clock
     public static final class SystemTimeSource
         implements TimeSource
     {
-        @Override
         public long currentTimeMillis()
         {
             return System.currentTimeMillis();
@@ -49,25 +48,20 @@ public final class Clock
 
     public Clock(TimeSource timeSource)
     {
-        this.m_timeRecord = new BlackWhiteSet<>(new TimeRecord(), new TimeRecord());
         m_timeSource = timeSource;
         reset();
     }
 
-    /** *  Get moves left.Requires: getUseByoyomi() and isInByoyomi(color)
-     * @param color
-     * @return  */
-    @Override
+    /** Get moves left.
+        Requires: getUseByoyomi() and isInByoyomi(color) */
     public int getMovesLeft(GoColor color)
     {
         assert getUseByoyomi() && isInByoyomi(color);
         return getRecord(color).m_movesLeft;
     }
 
-    /** *  Get time left.Requires: isInitialized()
-     * @param color
-     * @return  */
-    @Override
+    /** Get time left.
+        Requires: isInitialized() */
     public long getTimeLeft(GoColor color)
     {
         assert isInitialized();
@@ -79,22 +73,11 @@ public final class Clock
             return (getPreByoyomi() - time);
     }
 
-    /**
-     *
-     * @return
-     */
-    @Override
     public TimeSettings getTimeSettings()
     {
         return m_timeSettings;
     }
 
-    /**
-     *
-     * @param color
-     * @return
-     */
-    @Override
     public String getTimeString(GoColor color)
     {
         assert color.isBlackWhite();
@@ -119,12 +102,10 @@ public final class Clock
         return getTimeString((double)time, movesLeft);
     }
 
-    /** *  Format time left to a string.If movesLeft &lt; 0, only the time will be returned, otherwise
+    /** Format time left to a string.
+        If movesLeft &lt; 0, only the time will be returned, otherwise
         after the time string, a slash and the number of moves left will be
-        appended.
-     * @param timeLeft
-     * @param movesLeft
-     * @return  */
+        appended. */
     public static String getTimeString(double timeLeft, int movesLeft)
     {
         StringBuilder buffer = new StringBuilder(8);
@@ -137,19 +118,13 @@ public final class Clock
         return buffer.toString();
     }
 
-    /** *  Return color the clock is currently measuring the time for.Returns null, if clock is between a #stopMove and #startMove.
-     * @return  */
-    @Override
+    /** Return color the clock is currently measuring the time for.
+        Returns null, if clock is between a #stopMove and #startMove. */
     public GoColor getToMove()
     {
         return m_toMove;
     }
 
-    /**
-     *
-     * @return
-     */
-    @Override
     public boolean getUseByoyomi()
     {
         return m_timeSettings.getUseByoyomi();
@@ -169,43 +144,21 @@ public final class Clock
         stopTimer();
     }
 
-    /**
-     *
-     * @return
-     */
-    @Override
     public boolean isInitialized()
     {
         return (m_timeSettings != null);
     }
 
-    /**
-     *
-     * @param color
-     * @return
-     */
-    @Override
     public boolean isInByoyomi(GoColor color)
     {
         return getUseByoyomi() && getRecord(color).m_isInByoyomi;
     }
 
-    /**
-     *
-     * @return
-     */
-    @Override
     public boolean isRunning()
     {
         return m_isRunning;
     }
 
-    /**
-     *
-     * @param color
-     * @return
-     */
-    @Override
     public boolean lostOnTime(GoColor color)
     {
         if (! isInitialized())
@@ -218,8 +171,8 @@ public final class Clock
             return (time > getPreByoyomi());
     }
 
-    /** *  Parses a time string.The expected format is <tt>[[H:]MM:]SS</tt>.
-     * @param s
+    /** Parses a time string.
+        The expected format is <tt>[[H:]MM:]SS</tt>.
         @return The time in milliseconds or -1, if the time string is not
         valid. */
     public static long parseTimeString(String s)
@@ -232,20 +185,21 @@ public final class Clock
         int seconds = 0;
         try
         {
-            switch (a.length) {
-                case 3:
-                    hours = Integer.parseInt(a[0]);
-                    minutes = Integer.parseInt(a[1]);
-                    seconds = Integer.parseInt(a[2]);
-                    break;
-                case 2:
-                    minutes = Integer.parseInt(a[0]);
-                    seconds = Integer.parseInt(a[1]);
-                    break;
-                default:
-                    assert a.length == 1;
-                    seconds = Integer.parseInt(a[0]);
-                    break;
+            if (a.length == 3)
+            {
+                hours = Integer.parseInt(a[0]);
+                minutes = Integer.parseInt(a[1]);
+                seconds = Integer.parseInt(a[2]);
+            }
+            else if (a.length == 2)
+            {
+                minutes = Integer.parseInt(a[0]);
+                seconds = Integer.parseInt(a[1]);
+            }
+            else
+            {
+                assert a.length == 1;
+                seconds = Integer.parseInt(a[0]);
             }
         }
         catch (NumberFormatException e)
@@ -293,21 +247,20 @@ public final class Clock
         startTimer();
     }
 
-    /** *  Register listener for clock changes.Only one listener supported at the moment.
+    /** Register listener for clock changes.
+        Only one listener supported at the moment.
         If the clock has a listener, the clock should be stopped with halt()
         if it is no longer used, otherwise the timer thread can keep an
-        application from terminating.
-     * @param listener */
+        application from terminating. */
     public void setListener(Listener listener)
     {
         m_listener = listener;
     }
 
-    /** *  Set time settings.Changing the time settings does not change the current state of the
-        clock.
-        The time settings are only used when the clock is reset or
-        the next byoyomi period is initialized.
-     * @param settings */
+    /** Set time settings.
+        Changing the time settings does not change the current state of the
+        clock. The time settings are only used when the clock is reset or
+        the next byoyomi period is initialized. */
     public void setTimeSettings(TimeSettings settings)
     {
         m_timeSettings = settings;
@@ -349,9 +302,9 @@ public final class Clock
         updateListener();
     }
 
-    /** *  Start time for a move.If the clock was already running, the passed time for the current move
-        is discarded.
-     * @param color */
+    /** Start time for a move.
+        If the clock was already running, the passed time for the current move
+        is discarded. */
     public void startMove(GoColor color)
     {
         assert color.isBlackWhite();
@@ -418,7 +371,8 @@ public final class Clock
 
     private GoColor m_toMove;
 
-    private final BlackWhiteSet<TimeRecord> m_timeRecord;
+    private final BlackWhiteSet<TimeRecord> m_timeRecord
+        = new BlackWhiteSet<TimeRecord>(new TimeRecord(), new TimeRecord());
 
     private TimeSettings m_timeSettings;
 
@@ -458,13 +412,11 @@ public final class Clock
         if (m_timer == null && m_listener != null)
         {
             m_timer = new Timer();
-            TimerTask task;
-            task = new TimerTask() {
-                @Override
-                public void run() {
-                    updateListener();
-                }
-            };
+            TimerTask task = new TimerTask() {
+                    public void run() {
+                        updateListener();
+                    }
+                };
             m_timer.scheduleAtFixedRate(task, 1000, 1000);
         }
     }

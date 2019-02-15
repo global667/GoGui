@@ -96,7 +96,6 @@ public class ParameterDialog
         dialog.pack();
         dialog.setLocationByPlatform(true);
         dialog.addWindowListener(new WindowAdapter() {
-                @Override
                 public void  windowOpened(WindowEvent e) {
                     // JDK 1.5 docs require to invoke selectInitialValue after
                     // the window is made visible
@@ -164,7 +163,6 @@ public class ParameterDialog
             }
         }
 
-        @Override
         public String getNewValue()
         {
             if (m_checkBox.isSelected())
@@ -172,13 +170,11 @@ public class ParameterDialog
             return "0";
         }
 
-        @Override
         public boolean isChanged()
         {
             return (m_checkBox.isSelected() != m_initialValue);
         }
 
-        @Override
         public void createComponents(int gridy, JPanel panel,
                                      GridBagLayout gridbag)
         {
@@ -223,13 +219,11 @@ public class ParameterDialog
             m_initialIndex = initialIndex;
         }
 
-        @Override
         public String getNewValue()
         {
             return m_items[m_comboBox.getSelectedIndex()];
         }
 
-        @Override
         public boolean isChanged()
         {
             return (m_comboBox.getSelectedIndex() != m_initialIndex);
@@ -237,7 +231,6 @@ public class ParameterDialog
 
         // See comment at m_comboBox
         @SuppressWarnings("unchecked")
-        @Override
         public void createComponents(int gridy, JPanel panel,
                                      GridBagLayout gridbag)
         {
@@ -284,19 +277,16 @@ public class ParameterDialog
             super(key, value);
         }
 
-        @Override
         public String getNewValue()
         {
             return m_textField.getText().trim();
         }
 
-        @Override
         public boolean isChanged()
         {
             return ! getNewValue().equals(getValue());
         }
 
-        @Override
         public void createComponents(int gridy, JPanel panel,
                                      GridBagLayout gridbag)
         {
@@ -328,7 +318,7 @@ public class ParameterDialog
 
     private static ArrayList<Parameter> parseResponse(String response)
     {
-        ArrayList<Parameter> parameters = new ArrayList<>();
+        ArrayList<Parameter> parameters = new ArrayList<Parameter>();
         BufferedReader reader =
             new BufferedReader(new StringReader(response));
         while (true)
@@ -346,28 +336,18 @@ public class ParameterDialog
             AnalyzeUtil.Result result = AnalyzeUtil.parseParameterLine(line);
             if (result == null)
                 continue;
-            if (null == result.m_type)
+            if (result.m_type == ParameterType.BOOL)
+                parameters.add(new BoolParameter(result.m_key,
+                                                 result.m_value));
+            else if (result.m_type == ParameterType.LIST)
+                parameters.add(new ListParameter(result.m_typeInfo,
+                                                 result.m_key,
+                                                 result.m_value));
+            else
                 // Treat unknown types as string for compatibiliy with future
                 // types
                 parameters.add(new StringParameter(result.m_key,
-                        result.m_value));
-            else switch (result.m_type) {
-                case BOOL:
-                    parameters.add(new BoolParameter(result.m_key,
-                            result.m_value));
-                    break;
-                case LIST:
-                    parameters.add(new ListParameter(result.m_typeInfo,
-                            result.m_key,
-                            result.m_value));
-                    break;
-                default:
-                    // Treat unknown types as string for compatibiliy with future
-                    // types
-                    parameters.add(new StringParameter(result.m_key,
-                            result.m_value));
-                    break;
-            }
+                                                   result.m_value));
         }
         return parameters;
     }

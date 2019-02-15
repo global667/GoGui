@@ -18,7 +18,6 @@ public class ByteCountInputStream
         return m_byteCount;
     }
 
-    @Override
     public int read() throws IOException
     {
         int result = m_in.read();
@@ -27,7 +26,6 @@ public class ByteCountInputStream
         return result;
     }
 
-    @Override
     public int read(byte[] b) throws IOException
     {
         int result = m_in.read(b);
@@ -36,7 +34,6 @@ public class ByteCountInputStream
         return result;
     }
 
-    @Override
     public int read(byte[] b, int off, int len) throws IOException
     {
         int result = m_in.read(b, off, len);

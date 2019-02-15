@@ -63,7 +63,6 @@ public class GtpCommand
     }
 
     /** Check that command has n arguments.
-     * @param n
         @throws GtpError If command has not n arguments. */
     public void checkNuArg(int n) throws GtpError
     {
@@ -78,7 +77,6 @@ public class GtpCommand
     }
 
     /** Check that command has not more than n arguments.
-     * @param n
         @throws GtpError If command has more than n arguments. */
     public void checkNuArgLessEqual(int n) throws GtpError
     {
@@ -283,9 +281,9 @@ public class GtpCommand
         return m_arg.length;
     }
 
-    /** *  Get string buffer for construction the response.The response to the command can be constructed by appending to this
-        string buffer.
-     * @return  */
+    /** Get string buffer for construction the response.
+        The response to the command can be constructed by appending to this
+        string buffer. */
     public StringBuilder getResponse()
     {
         return m_response;

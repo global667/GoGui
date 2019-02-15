@@ -16,19 +16,16 @@ public final class Board
     public class BoardIterator
         implements Iterator<GoPoint>
     {
-        @Override
         public boolean hasNext()
         {
             return m_iterator.hasNext();
         }
 
-        @Override
         public GoPoint next()
         {
             return m_iterator.next();
         }
 
-        @Override
         public void remove()
         {
             throw new UnsupportedOperationException();
@@ -43,15 +40,11 @@ public final class Board
         in the range from one to GoPoint.MAX_SIZE */
     public Board(int boardSize)
     {
-        this.m_setup = new BlackWhiteSet<>(new PointList(), new PointList());
-        this.m_stack = new ArrayList<>(361);
-        this.m_captured = new BlackWhiteSet<>(0, 0);
         init(boardSize);
     }
 
     /** Check for two consecutive passes.
         @return true, if the last two moves were pass moves */
-    @Override
     public boolean bothPassed()
     {
         int n = getNumberMoves();
@@ -63,7 +56,6 @@ public final class Board
     /** Check if board contains a point.
         @param point The point to check
         @return true, if the point is on the board */
-    @Override
     public boolean contains(GoPoint point)
     {
         return point.isOnBoard(getSize());
@@ -72,26 +64,21 @@ public final class Board
     /** Get points adjacent to a point.
         @param point The point.
         @return List of points adjacent. */
-    @Override
     public ConstPointList getAdjacent(GoPoint point)
     {
         return m_constants.getAdjacent(point);
     }
 
     /** Get number of captured stones.
-     * @param c
         @return The total number of stones of the given color captured by
         opponent moves or by suicide. */
-    @Override
     public int getCaptured(GoColor c)
     {
         return m_captured.get(c);
     }
 
     /** Get state of a point on the board.
-     * @param p
         @return BLACK, WHITE or EMPTY */
-    @Override
     public GoColor getColor(GoPoint p)
     {
         return m_color[p.getIndex()];
@@ -114,7 +101,6 @@ public final class Board
         @return List of opponent stones (go.Point) captured in last move;
         empty if none were killed or there is no last move.
         @see #getSuicide() */
-    @Override
     public ConstPointList getKilled()
     {
         int n = getNumberMoves();
@@ -124,7 +110,6 @@ public final class Board
 
     /** Return last move.
         @return Last move or null if there is no last move. */
-    @Override
     public Move getLastMove()
     {
         int n = getNumberMoves();
@@ -136,7 +121,6 @@ public final class Board
     /** Get the number of moves played so far.
         @return The number of moves.
         @see #getMove */
-    @Override
     public int getNumberMoves()
     {
         return m_stack.size();
@@ -146,7 +130,6 @@ public final class Board
         @param i The number of the move (starting with zero).
         @return The move with the given number.
         @see #getNumberMoves() */
-    @Override
     public Move getMove(int i)
     {
         return m_stack.get(i).m_move;
@@ -157,7 +140,6 @@ public final class Board
         @return Initial stones of this color placed on the board by calling
         <code>setup</code>.
         @see #setup */
-    @Override
     public ConstPointList getSetup(GoColor c)
     {
         return m_setup.get(c);
@@ -167,7 +149,6 @@ public final class Board
         @return Player of initial setup position as used in the call to
         <code>setup</code>; <code>null</code> means unknown player color.
         @see #setup */
-    @Override
     public GoColor getSetupPlayer()
     {
         return m_setupPlayer;
@@ -175,17 +156,12 @@ public final class Board
 
     /** Get board size.
         @return The board size. */
-    @Override
     public int getSize()
     {
         return m_size;
     }
 
-    /** Get stones of a block.
-     * @param p
-     * @param color
-     * @param stones */
-    @Override
+    /** Get stones of a block. */
     public void getStones(GoPoint p, GoColor color, PointList stones)
     {
         assert m_mark.isCleared();
@@ -200,7 +176,6 @@ public final class Board
         including the stone played; empty if no stones were killed by suicide
         or if there is no last move.
         @see #getKilled() */
-    @Override
     public ConstPointList getSuicide()
     {
         int n = getNumberMoves();
@@ -210,7 +185,6 @@ public final class Board
 
     /** Get color to move.
         @return The color to move. */
-    @Override
     public GoColor getToMove()
     {
         return m_toMove;
@@ -234,7 +208,6 @@ public final class Board
         @param p The point to check.
         @return true, if a move on the given point by the given player would
         capture any opponent stones, or be a suicide move. */
-    @Override
     public boolean isCaptureOrSuicide(GoColor c, GoPoint p)
     {
         if (getColor(p) != EMPTY)
@@ -249,7 +222,6 @@ public final class Board
         @param point The point to check.
         @return true, if the given point is a handicap point.
         @see BoardConstants#isHandicap */
-    @Override
     public boolean isHandicap(GoPoint point)
     {
         return m_constants.isHandicap(point);
@@ -260,15 +232,12 @@ public final class Board
         @param point The point to check
         @return true, if a move at this point would violate the simple ko
         rule */
-    @Override
     public boolean isKo(GoPoint point)
     {
         return point == m_koPoint;
     }
 
-    /** Check if any moves were played or setup stones placed on the board.
-     * @return  */
-    @Override
+    /** Check if any moves were played or setup stones placed on the board. */
     public boolean isModified()
     {
         return (! m_stack.isEmpty()
@@ -281,7 +250,6 @@ public final class Board
         @return <code>true</code>, if the initial position was setup by
         calling setupHandicap, <code>false</code> otherwise.
         @see #setupHandicap */
-    @Override
     public boolean isSetupHandicap()
     {
         return m_isSetupHandicap;
@@ -292,7 +260,6 @@ public final class Board
         @param p The point to check.
         @return true, if a move at the given point by the given player
         would be a suicide move. */
-    @Override
     public boolean isSuicide(GoColor c, GoPoint p)
     {
         if (getColor(p) != EMPTY)
@@ -303,7 +270,6 @@ public final class Board
         return result;
     }
 
-    @Override
     public Iterator<GoPoint> iterator()
     {
         return new BoardIterator();
@@ -316,12 +282,11 @@ public final class Board
         for (GoPoint p : this)
             setColor(p, EMPTY);
         m_stack.clear();
-        BLACK_WHITE.stream().map((c) -> {
+        for (GoColor c : BLACK_WHITE)
+        {
             m_setup.get(c).clear();
-            return c;
-        }).forEachOrdered((c) -> {
             m_captured.set(c, 0);
-        });
+        }
         m_toMove = BLACK;
         m_koPoint = null;
         m_isSetupHandicap = false;
@@ -372,7 +337,8 @@ public final class Board
         m_setupPlayer = player;
         if (m_setupPlayer != null)
             m_toMove = player;
-        BLACK_WHITE.forEach((c) -> {
+        for (GoColor c : BLACK_WHITE)
+        {
             ConstPointList stones = (c == BLACK ? black : white);
             if (stones == null)
                 m_setup.set(c, new PointList());
@@ -382,13 +348,13 @@ public final class Board
                     setColor(p, c);
                 m_setup.set(c, new PointList(stones));
             }
-        });
+        }
     }
 
-    /** *  Setup initial handicap stones.This function is similar to an initial setup with only black stones,
+    /** Setup initial handicap stones.
+        This function is similar to an initial setup with only black stones,
         but it is remembered that the setup was a handicap and it can later
         be checked with <code>isSetupHandicap</code>.
-     * @param points
         @see #isSetupHandicap */
     public void setupHandicap(ConstPointList points)
     {
@@ -482,13 +448,11 @@ public final class Board
             {
                 GoColor c = m_move.getColor();
                 GoColor otherColor = c.otherColor();
-                m_suicide.forEach((stone) -> {
+                for (GoPoint stone : m_suicide)
                     board.setColor(stone, c);
-                });
                 board.setColor(p, m_oldColor);
-                m_killed.forEach((stone) -> {
+                for (GoPoint stone : m_killed)
                     board.setColor(stone, otherColor);
-                });
                 board.m_captured.set(c,
                                      board.m_captured.get(c)
                                      - m_suicide.size());
@@ -505,9 +469,11 @@ public final class Board
 
     private int m_size;
 
-    private final BlackWhiteSet<Integer> m_captured;
+    private final BlackWhiteSet<Integer> m_captured
+        = new BlackWhiteSet<Integer>(0, 0);
 
-    private final ArrayList<StackEntry> m_stack;
+    private final ArrayList<StackEntry> m_stack
+        = new ArrayList<StackEntry>(361);
 
     /** Temporary variable reused for efficiency. */
     private final PointList m_checkKillStones = new PointList();
@@ -515,7 +481,7 @@ public final class Board
     /** Temporary variable reused for efficiency. */
     private final PointList m_checkKillStack = new PointList();
 
-    private final GoColor[] m_color = new GoColor[GoPoint.NUMBER_INDEXES];
+    private GoColor[] m_color = new GoColor[GoPoint.NUMBER_INDEXES];
 
     private GoColor m_toMove;
 
@@ -525,7 +491,8 @@ public final class Board
 
     private GoPoint m_koPoint;
 
-    private final BlackWhiteSet<PointList> m_setup;
+    private final BlackWhiteSet<PointList> m_setup
+        = new BlackWhiteSet<PointList>(new PointList(), new PointList());
 
     private boolean m_isSetupHandicap;
 

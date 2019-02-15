@@ -21,7 +21,6 @@ import static net.sf.gogui.gui.I18n.i18n;
 public class BookmarkEditor
     implements ObjectListEditor.ItemEditor<Bookmark>
 {
-    @Override
     public Bookmark editItem(Component parent, Bookmark object,
                              MessageDialogs messageDialogs)
     {
@@ -60,7 +59,6 @@ public class BookmarkEditor
             if (selectName)
                 m_name.selectAll();
             dialog.addWindowListener(new WindowAdapter() {
-                    @Override
                     public void windowActivated(WindowEvent e) {
                         m_name.requestFocusInWindow();
                     }
@@ -68,7 +66,7 @@ public class BookmarkEditor
             dialog.setVisible(true);
             Object value = optionPane.getValue();
             if (! (value instanceof Integer)
-                || JOptionPane.OK_OPTION != ((Integer)value))
+                || ((Integer)value).intValue() != JOptionPane.OK_OPTION)
                 return null;
             done = validate(parent, messageDialogs);
         }
@@ -82,13 +80,11 @@ public class BookmarkEditor
         return newBookmark;
     }
 
-    @Override
     public String getItemLabel(Bookmark object)
     {
         return object.m_name;
     }
 
-    @Override
     public Bookmark cloneItem(Bookmark object)
     {
         return new Bookmark(object);

@@ -15,8 +15,7 @@ import net.sf.gogui.version.Version;
 /** TwoGtp main function. */
 public final class Main
 {
-    /** TwoGtp main function.
-     * @param args */
+    /** TwoGtp main function. */
     public static void main(String[] args)
     {
         boolean exitError = false;
@@ -139,7 +138,7 @@ public final class Main
             ResultFile resultFile = null;
             for (int i = 0; i < numberThreads; ++i)
             {
-                ArrayList<Program> allPrograms = new ArrayList<>();
+                ArrayList<Program> allPrograms = new ArrayList<Program>();
                 Program blackProgram =
                     new Program(black, "Black", "B", verbose);
                 allPrograms.add(blackProgram);
@@ -155,9 +154,8 @@ public final class Main
                         new Program(referee, "Referee", "R", verbose);
                     allPrograms.add(refereeProgram);
                 }
-                allPrograms.forEach((program) -> {
+                for (Program program : allPrograms)
                     program.setLabel(allPrograms);
-                });
                 if (! sgfFile.equals("") && resultFile == null)
                     resultFile =
                         new ResultFile(force, blackProgram, whiteProgram,
@@ -196,7 +194,7 @@ public final class Main
             if (resultFile != null)
                 resultFile.close();
         }
-        catch (Exception t)
+        catch (Throwable t)
         {
             StringUtil.printException(t);
             exitError = true;
@@ -224,7 +222,6 @@ class TwoGtpThread
         return m_exception;
     }
 
-    @Override
     public void run()
     {
         try
@@ -243,5 +240,5 @@ class TwoGtpThread
 
     private Exception m_exception;
 
-    private final TwoGtp m_twoGtp;
+    private TwoGtp m_twoGtp;
 }

@@ -17,8 +17,7 @@ public final class ThumbnailPlatform
         return getNormalDir().exists();
     }
 
-    /** Get directory for normal size thumbnails.
-     * @return  */
+    /** Get directory for normal size thumbnails. */
     public static File getNormalDir()
     {
         String home = System.getProperty("user.home", "");

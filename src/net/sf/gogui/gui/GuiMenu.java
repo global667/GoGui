@@ -2,14 +2,18 @@
 
 package net.sf.gogui.gui;
 
+import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.LookAndFeel;
+import javax.swing.UIManager;
 
 /** JMenu with additional features.
     - Supports marking the mnemonics in the label with a preceeding '&amp;'
@@ -24,7 +28,6 @@ public class GuiMenu
         GuiUtil.setTextAndMnemonic(this, text);
     }
 
-    @Override
     public JMenuItem add(JMenuItem item)
     {
         super.add(item);
@@ -61,7 +64,6 @@ public class GuiMenu
         return add(new GuiCheckBoxMenuItem(action));
     }
 
-    @Override
     public void remove(JMenuItem item)
     {
         int mnemonic = item.getMnemonic();
@@ -70,7 +72,7 @@ public class GuiMenu
         super.remove(item);
     }
 
-    private final ArrayList<Integer> m_mnemonics = new ArrayList<>();
+    private final ArrayList<Integer> m_mnemonics = new ArrayList<Integer>();
 }
 
 /** Radio menu item with additional "selected" action property. */
@@ -80,10 +82,12 @@ class GuiRadioButtonMenuItem
     public GuiRadioButtonMenuItem(GuiAction action)
     {
         super(action);
-        action.addPropertyChangeListener((PropertyChangeEvent e) -> {
-            if (e.getPropertyName().equals("selected"))
-                setSelected(((Boolean)e.getNewValue()));
-        });
+        action.addPropertyChangeListener(new PropertyChangeListener() {
+                public void  propertyChange(PropertyChangeEvent e) {
+                    if (e.getPropertyName().equals("selected"))
+                        setSelected(((Boolean)e.getNewValue()).booleanValue());
+                }
+            });
         GuiUtil.setTextAndMnemonic(this, action.getNameWithMnemonic());
     }
 }
@@ -95,10 +99,12 @@ class GuiCheckBoxMenuItem
     public GuiCheckBoxMenuItem(GuiAction action)
     {
         super(action);
-        action.addPropertyChangeListener((PropertyChangeEvent e) -> {
-            if (e.getPropertyName().equals("selected"))
-                setSelected(((Boolean)e.getNewValue()));
-        });
+        action.addPropertyChangeListener(new PropertyChangeListener() {
+                public void  propertyChange(PropertyChangeEvent e) {
+                    if (e.getPropertyName().equals("selected"))
+                        setSelected(((Boolean)e.getNewValue()).booleanValue());
+                }
+            });
         GuiUtil.setTextAndMnemonic(this, action.getNameWithMnemonic());
     }
 }

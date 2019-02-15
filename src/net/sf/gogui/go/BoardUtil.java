@@ -12,11 +12,10 @@ public final class BoardUtil
         @see #rotate */
     public static final int NUMBER_ROTATIONS = 8;
 
-    /** *  Copy the state of one board to another.Initializes the target board with the size and the setup stones of the
+    /** Copy the state of one board to another.
+        Initializes the target board with the size and the setup stones of the
         source board and executes all moves of the source board on the target
-        board.
-     * @param target
-     * @param source */
+        board. */
     public static void copy(Board target, ConstBoard source)
     {
         target.init(source.getSize());
@@ -34,10 +33,9 @@ public final class BoardUtil
             target.play(source.getMove(i));
     }
 
-    /** *  Get board position as text diagram (without additional game
-        information).Calls <code>toString()</code> with <code>withGameInfo == false</code>.
-     * @param board
-     * @return 
+    /** Get board position as text diagram (without additional game
+        information).
+        Calls <code>toString()</code> with <code>withGameInfo == false</code>.
         @see #toString(ConstBoard, boolean) */
     public static String toString(ConstBoard board)
     {
@@ -76,7 +74,25 @@ public final class BoardUtil
                 }
                 GoPoint point = GoPoint.get(x, y);
                 GoColor c = board.getColor(point);
-                if (null == c)
+                if (c == BLACK)
+                {
+                    if (color)
+                    {
+                        s.append(ansiStart);
+                        s.append("0;30;43m");
+                    }
+                    s.append('X');
+                }
+                else if (c == WHITE)
+                {
+                    if (color)
+                    {
+                        s.append(ansiStart);
+                        s.append("1;37;43m");
+                    }
+                    s.append('O');
+                }
+                else
                 {
                     if (color)
                     {
@@ -87,32 +103,6 @@ public final class BoardUtil
                         s.append('+');
                     else
                         s.append('.');
-                }
-                else switch (c) {
-                    case BLACK:
-                        if (color)
-                        {
-                            s.append(ansiStart);
-                            s.append("0;30;43m");
-                        }   s.append('X');
-                        break;
-                    case WHITE:
-                        if (color)
-                        {
-                            s.append(ansiStart);
-                            s.append("1;37;43m");
-                        }   s.append('O');
-                        break;
-                    default:
-                        if (color)
-                        {
-                            s.append(ansiStart);
-                            s.append("1;30;43m");
-                        }   if (board.isHandicap(point))
-                            s.append('+');
-                        else
-                            s.append('.');
-                        break;
                 }
             }
             if (color)

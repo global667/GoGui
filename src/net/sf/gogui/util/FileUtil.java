@@ -59,9 +59,8 @@ public final class FileUtil
         return result.toString();
     }
 
-    /** *  Return URI for file.Replacement for File.toURI() with defined (empty) authority.
-     * @param file
-     * @return  */
+    /** Return URI for file.
+        Replacement for File.toURI() with defined (empty) authority. */
     public static URI getURI(File file)
     {
         try
@@ -74,10 +73,7 @@ public final class FileUtil
         }
     }
 
-    /** Check for extension (case-insensitive).
-     * @param f
-     * @param extension
-     * @return  */
+    /** Check for extension (case-insensitive). */
     public static boolean hasExtension(File f, String extension)
     {
         String ext = getExtension(f);
@@ -86,19 +82,18 @@ public final class FileUtil
         return ext.equalsIgnoreCase(extension);
     }
 
-    /** *  Read a list of strings from a file.The file is expected to contain one string per line; leading and
-        trailing whitespaces are removed.Empty lines or lines beginning
-        with the comment character '#' are ignored.
-     * @param file
-     * @return
-     * @throws java.io.IOException  */
+    /** Read a list of strings from a file.
+        The file is expected to contain one string per line; leading and
+        trailing whitespaces are removed. Empty lines or lines beginning
+        with the comment character '#' are ignored. */
     public static ArrayList<String> readStringListFromFile(File file)
         throws IOException
     {
-        ArrayList<String> result = new ArrayList<>();
+        ArrayList<String> result = new ArrayList<String>();
         FileReader reader = new FileReader(file);
+            BufferedReader in = new BufferedReader(reader);
         try
-        (BufferedReader in = new BufferedReader(reader)) {
+        {
             while (true)
             {
                 String line = in.readLine();
@@ -110,13 +105,15 @@ public final class FileUtil
             }
             return result;
         }
+        finally
+        {
+            in.close();
+        }
     }
 
-    /** *  Remove extension in file name.If the file does not have the extension oldExtension,
-        the extension will not be removed.
-     * @param file
-     * @param oldExtension
-     * @return  */
+    /** Remove extension in file name.
+        If the file does not have the extension oldExtension,
+        the extension will not be removed. */
     public static String removeExtension(File file, String oldExtension)
     {
         String name = file.toString();
@@ -129,13 +126,10 @@ public final class FileUtil
         return name;
     }
 
-    /** *  Replace extension in file name.If the file does not have the extension oldExtension,
+    /** Replace extension in file name.
+        If the file does not have the extension oldExtension,
         the extension will not be replaced but the new extension will be
-        appended.
-     * @param file
-     * @param oldExtension
-     * @param newExtension
-     * @return  */
+        appended. */
     public static String replaceExtension(File file, String oldExtension,
                                           String newExtension)
     {
@@ -162,7 +156,7 @@ public final class FileUtil
 
     private static ArrayList<String> splitFile(File file)
     {
-        ArrayList<String> list = new ArrayList<>();
+        ArrayList<String> list = new ArrayList<String>();
         file = file.getAbsoluteFile();
         try
         {

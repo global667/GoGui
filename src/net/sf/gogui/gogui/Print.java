@@ -4,7 +4,6 @@ package net.sf.gogui.gogui;
 
 import java.awt.Component;
 import java.awt.print.Printable;
-import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import net.sf.gogui.gui.MessageDialogs;
 import static net.sf.gogui.gogui.I18n.i18n;
@@ -23,7 +22,7 @@ public final class Print
         {
             job.print();
         }
-        catch (PrinterException e)
+        catch (Exception e)
         {
             messageDialogs.showError(parent, i18n("MSG_PRINT_FAIL"), "");
         }

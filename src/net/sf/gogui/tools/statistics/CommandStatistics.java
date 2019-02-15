@@ -37,8 +37,8 @@ public final class CommandStatistics
         double max = m_statisticsAll.getMax();
         m_statisticsFinal
             = new PositionStatistics(command, tableFinal, true, min, max);
-        m_statisticsAtMove = new ArrayList<>();
-        ArrayList<String> columnTitles = new ArrayList<>();
+        m_statisticsAtMove = new ArrayList<PositionStatistics>();
+        ArrayList<String> columnTitles = new ArrayList<String>();
         columnTitles.add("Move");
         columnTitles.add("Mean");
         columnTitles.add("Error");

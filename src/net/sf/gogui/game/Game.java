@@ -37,9 +37,7 @@ public class Game
         init(tree);
     }
 
-    /** Add a mark property to current node.
-     * @param point
-     * @param type */
+    /** Add a mark property to current node. */
     public void addMarked(GoPoint point, MarkType type)
     {
         m_current.addMarked(point, type);
@@ -65,52 +63,26 @@ public class Game
         setModified();
     }
 
-    /**
-     *
-     * @return
-     */
-    @Override
     public ConstBoard getBoard()
     {
         return m_board;
     }
 
-    /**
-     *
-     * @return
-     */
-    @Override
     public ConstClock getClock()
     {
         return m_clock;
     }
 
-    /**
-     *
-     * @return
-     */
-    @Override
     public ConstNode getCurrentNode()
     {
         return m_current;
     }
 
-    /**
-     *
-     * @param node
-     * @return
-     */
-    @Override
     public ConstGameInfo getGameInfo(ConstNode node)
     {
         return m_tree.getGameInfoConst(node);
     }
 
-    /**
-     *
-     * @return
-     */
-    @Override
     public ConstNode getGameInfoNode()
     {
         return m_tree.getGameInfoNode(m_current);
@@ -121,43 +93,26 @@ public class Game
         return m_tree.getGameInfoNode(node);
     }
 
-    /**
-     *
-     * @return
-     */
-    @Override
     public int getMoveNumber()
     {
         return NodeUtil.getMoveNumber(getCurrentNode());
     }
 
-    /**
-     *
-     * @return
-     */
-    @Override
     public ConstNode getRoot()
     {
         return m_tree.getRoot();
     }
 
-    /**
-     *
-     * @return
-     */
-    @Override
     public int getSize()
     {
         return m_board.getSize();
     }
 
-    @Override
     public GoColor getToMove()
     {
         return m_board.getToMove();
     }
 
-    @Override
     public ConstGameTree getTree()
     {
         return m_tree;
@@ -204,7 +159,6 @@ public class Game
     /** Check if game was modified.
         @return true, if game was mofified since constructor or last call to
         one of the init() functions or to clearModified(). */
-    @Override
     public boolean isModified()
     {
         return m_modified;
@@ -256,9 +210,7 @@ public class Game
         m_clock.startMove(getToMove());
     }
 
-    /** Remove a mark property from current node.
-     * @param point
-     * @param type */
+    /** Remove a mark property from current node. */
     public void removeMarked(GoPoint point, MarkType type)
     {
         m_current.removeMarked(point, type);
@@ -282,17 +234,16 @@ public class Game
         m_clock.resume();
     }
 
-    /** *  Set clock listener.If the clock has a listener, the clock should be stopped with
+    /** Set clock listener.
+        If the clock has a listener, the clock should be stopped with
         haltClock() if it is no longer used, otherwise the timer thread can
-        keep an application from terminating.
-     * @param listener */
+        keep an application from terminating. */
     public void setClockListener(Clock.Listener listener)
     {
         m_clock.setListener(listener);
     }
 
-    /** Set comment in current node.
-     * @param comment */
+    /** Set comment in current node. */
     public void setComment(String comment)
     {
         setComment(comment, m_current);
@@ -326,9 +277,7 @@ public class Game
         setGameInfo(info, node); // updates m_modified
     }
 
-    /** Set label in current node.
-     * @param point
-     * @param value */
+    /** Set label in current node. */
     public void setLabel(GoPoint point, String value)
     {
         if (! ObjectUtil.equals(value, m_current.getLabel(point)))
@@ -363,8 +312,8 @@ public class Game
         updateBoard();
     }
 
-    /** *  Change the time settings.If the current node is the root node, the clock will also be reset.
-     * @param timeSettings */
+    /** Change the time settings.
+        If the current node is the root node, the clock will also be reset. */
     public void setTimeSettings(TimeSettings timeSettings)
     {
         Node node = m_tree.getGameInfoNode(m_current);

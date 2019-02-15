@@ -13,6 +13,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -86,34 +87,25 @@ public final class AnalyzeDialog
         setMinimumSize(new Dimension(minWidth, 192));
         pack();
         addWindowListener(new WindowAdapter() {
-                @Override
                 public void windowActivated(WindowEvent e) {
                     m_comboBoxHistory.requestFocusInWindow();
                 }
             });
     }
 
-    @Override
     public void actionPerformed(ActionEvent event)
     {
         String command = event.getActionCommand();
-        switch (command) {
-            case "clear":
-                clearCommand();
-                break;
-            case "comboBoxChanged":
-                comboBoxChanged();
-                break;
-            case "run":
-                runCommand();
-                break;
-            default:
-                assert false;
-                break;
-        }
+        if (command.equals("clear"))
+            clearCommand();
+        else if (command.equals("comboBoxChanged"))
+            comboBoxChanged();
+        else if (command.equals("run"))
+            runCommand();
+        else
+            assert false;
     }
 
-    @Override
     public void dispose()
     {
         if (! m_autoRun.isSelected())
@@ -137,7 +129,7 @@ public final class AnalyzeDialog
 
     public void saveRecent()
     {
-        ArrayList<String> recent = new ArrayList<>(MAX_SAVE_RECENT);
+        ArrayList<String> recent = new ArrayList<String>(MAX_SAVE_RECENT);
         int start = (m_firstIsTemp ? 1 : 0);
         for (int i = start; i < getComboBoxItemCount(); ++i)
         {
@@ -157,9 +149,9 @@ public final class AnalyzeDialog
                          recent);
     }
 
-    /** *  Set board size.Need for verifying responses to initial value for EPLIST commands.
-        Default is 19.
-     * @param boardSize */
+    /** Set board size.
+        Need for verifying responses to initial value for EPLIST commands.
+        Default is 19. */
     public void setBoardSize(int boardSize)
     {
         m_boardSize = boardSize;
@@ -176,7 +168,6 @@ public final class AnalyzeDialog
         selectColor();
     }
 
-    @Override
     public void valueChanged(ListSelectionEvent e)
     {
         int index = m_list.getSelectedIndex();
@@ -303,7 +294,6 @@ public final class AnalyzeDialog
         m_list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         m_list.setVisibleRowCount(25);
         m_list.addMouseListener(new MouseAdapter() {
-                @Override
                 public void mouseClicked(MouseEvent e) {
                     int modifiers = e.getModifiers();
                     int mask = ActionEvent.ALT_MASK;
@@ -312,7 +302,6 @@ public final class AnalyzeDialog
                 }
             });
         m_list.addFocusListener(new FocusAdapter() {
-                @Override
                 public void focusGained(FocusEvent e) {
                     int index = getSelectedCommand();
                     if (index >= 0)
@@ -351,10 +340,12 @@ public final class AnalyzeDialog
         Box leftBox = Box.createVerticalBox();
         leftPanel.add(leftBox);
         m_autoRun = new JCheckBox(i18n("LB_ANALYZE_AUTORUN"));
-        m_autoRun.addItemListener((ItemEvent e) -> {
-            if (! m_autoRun.isSelected())
-                m_listener.actionClearAnalyzeCommand();
-        });
+        m_autoRun.addItemListener(new ItemListener() {
+                public void itemStateChanged(ItemEvent e) {
+                    if (! m_autoRun.isSelected())
+                        m_listener.actionClearAnalyzeCommand();
+                }
+            });
         m_autoRun.setToolTipText(i18n("TT_ANALYZE_AUTORUN"));
         m_autoRun.setEnabled(false);
         leftBox.add(m_autoRun);

@@ -41,18 +41,15 @@ public class RadialGradientContext
         m_alphaDiff = color2.getAlpha() - m_alpha1;
     }
 
-    @Override
     public void dispose()
     {
     }
 
-    @Override
     public ColorModel getColorModel()
     {
         return ColorModel.getRGBdefault();
     }
 
-    @Override
     public Raster getRaster(int x, int y, int width, int height)
     {
         if (m_raster != null && x == m_x && y == m_y && width == m_width

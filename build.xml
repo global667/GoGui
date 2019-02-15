@@ -24,7 +24,7 @@ Build file for Apache Ant (http://ant.apache.org/)
 	  value="/usr/share/xml/docbook/stylesheet/docbook-xsl"/>
 <property name="docbook.dtd-4.2"
           value="/usr/share/xml/docbook/schema/dtd/4.2/docbookx.dtd"/>
-<property name="osx.setfile" value="/Developer/Tools/SetFile"/>
+<property name="osx.setfile" value="SetFile"/>
 <property name="scripts" value="
  gogui
  gogui-adapter
@@ -66,11 +66,6 @@ Build file for Apache Ant (http://ant.apache.org/)
  mac/packaging/GoGui.icns
  mac/packaging/Info.plist.in
  mac/packaging/PkgInfo
- mac/src/com/apple/eawt/Application.java
- mac/src/com/apple/eawt/ApplicationEvent.java
- mac/src/com/apple/eawt/ApplicationListener.java
- mac/src/com/apple/eawt/ApplicationAdapter.java
- mac/src/net/sf/gogui/specialmac/RegisterSpecialMacHandler.java
  sgf/openings/9x9/README.html
  sgf/openings/9x9/*.sgf
  sgf/openings/19x19/README.html
@@ -185,7 +180,7 @@ Build file for Apache Ant (http://ant.apache.org/)
 <target name="compile" depends="depend,version,doc">
 <mkdir dir="build"/>
 <mkdir dir="build/classes"/>
-<javac srcdir="src" destdir="build/classes" source="1.8" target="1.8"
+<javac srcdir="src" destdir="build/classes" source="1.6" target="1.6"
  deprecation="true" debug="true" listfiles="yes" includeAntRuntime="false">
 <compilerarg value="-Xlint:unchecked"/>
 </javac>
@@ -202,13 +197,6 @@ Build file for Apache Ant (http://ant.apache.org/)
 <fileset dir="doc/manual/html" includes="*.html *.png"/>
 </copy>
 <mkdir dir="build/specialmac"/>
-<javac srcdir="mac/src" destdir="build/specialmac" source="1.8"
- deprecation="true" classpath="build/classes" listfiles="yes"
- includeAntRuntime="false"
- includes="
-  net/sf/gogui/specialmac/RegisterSpecialMacHandler.java
-  com/apple/eawt/*.java
-"/>
 </target>
 
 <target name="depend">

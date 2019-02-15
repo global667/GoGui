@@ -17,7 +17,6 @@ public final class Komi
         m_value = komi;
     }
 
-    @Override
     public boolean equals(Object object)
     {
         if (object == null || object.getClass() != getClass())
@@ -26,7 +25,6 @@ public final class Komi
         return (komi.m_value == m_value);
     }
 
-    @Override
     public int hashCode()
     {
         // As in Double.hashCode()
@@ -42,8 +40,7 @@ public final class Komi
     /** Parse komi from string.
         @param s The string (null not allowed), empty string means unknown
         komi.
-        @return The komi or null if unknown komi.
-     * @throws net.sf.gogui.go.InvalidKomiException */
+        @return The komi or null if unknown komi. */
     public static Komi parseKomi(String s) throws InvalidKomiException
     {
         assert s != null;
@@ -66,9 +63,7 @@ public final class Komi
         return m_value;
     }
 
-    /** Like Komi.toString() but interprets null argument as zero komi.
-     * @param komi
-     * @return  */
+    /** Like Komi.toString() but interprets null argument as zero komi. */
     static public String toString(Komi komi)
     {
         if (komi == null)
@@ -76,7 +71,6 @@ public final class Komi
         return komi.toString();
     }
 
-    @Override
     public String toString()
     {
         DecimalFormat format =

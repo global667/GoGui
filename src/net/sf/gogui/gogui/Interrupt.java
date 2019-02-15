@@ -13,11 +13,9 @@ import net.sf.gogui.util.Platform;
 /** Interrupt command. */
 public final class Interrupt
 {
-    /** *  Interrupt command.Confirm interrupt by user and send interrupt comment line if
+    /** Interrupt command.
+        Confirm interrupt by user and send interrupt comment line if
         supported by the program, otherwise kill the program.
-     * @param parent
-     * @param gtp
-     * @param messageDialogs
         @return true if interrupt comment line was sent. */
     public boolean run(Component parent, GuiGtpClient gtp,
                        MessageDialogs messageDialogs)

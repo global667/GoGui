@@ -3,7 +3,6 @@
 package net.sf.gogui.tools.convert;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -22,8 +21,7 @@ import net.sf.gogui.xml.XmlWriter;
 /** Convert SGF and Jago XML Go game files to other formats. */
 public final class Main
 {
-    /** Main function.
-     * @param args */
+    /** Main function. */
     public static void main(String[] args)
     {
         try
@@ -93,25 +91,19 @@ public final class Main
             if (! checkOnly)
             {
                 String version = Version.get();
-                switch (format) {
-                    case "xml":
-                        new XmlWriter(new FileOutputStream(out), tree,
-                                "gogui-convert:" + version);
-                        break;
-                    case "sgf":
-                        new SgfWriter(new FileOutputStream(out), tree,
-                                "gogui-convert", version);
-                        break;
-                    case "tex":
-                        new TexWriter(title, new FileOutputStream(out), tree);
-                        break;
-                    default:
-                        assert false; // checked above
-                        break;
-                }
+                if (format.equals("xml"))
+                    new XmlWriter(new FileOutputStream(out), tree,
+                                  "gogui-convert:" + version);
+                else if (format.equals("sgf"))
+                    new SgfWriter(new FileOutputStream(out), tree,
+                                  "gogui-convert", version);
+                else if (format.equals("tex"))
+                    new TexWriter(title, new FileOutputStream(out), tree);
+                else
+                    assert false; // checked above
             }
         }
-        catch (FileNotFoundException | ErrorMessage t)
+        catch (Throwable t)
         {
             StringUtil.printException(t);
             System.exit(1);

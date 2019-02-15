@@ -22,7 +22,6 @@ class GameTreeJunction
         setPreferredSize(new Dimension(fullSize, lastDy));
     }
 
-    @Override
     public void paintComponent(Graphics graphics)
     {
         int size = m_gameTreePanel.getNodeSize();

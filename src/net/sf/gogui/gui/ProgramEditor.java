@@ -27,7 +27,6 @@ import net.sf.gogui.util.StringUtil;
 public class ProgramEditor
     implements ObjectListEditor.ItemEditor<Program>
 {
-    @Override
     public Program editItem(Component parent, Program object,
                            MessageDialogs messageDialogs)
     {
@@ -44,8 +43,7 @@ public class ProgramEditor
         set after querying the program)
         @param editOnlyLabel Edit only the label (show the other information
         non-editable)
-        @param messageDialogs Message dialog manager
-     * @return  */
+        @param messageDialogs Message dialog manager */
     public Program editItem(Component parent, String title, Program program,
                             boolean editOnlyCommand, boolean editOnlyLabel,
                             MessageDialogs messageDialogs)
@@ -108,7 +106,6 @@ public class ProgramEditor
                                                  JOptionPane.OK_CANCEL_OPTION);
         m_dialog = optionPane.createDialog(parent, title);
         m_dialog.addWindowListener(new WindowAdapter() {
-                @Override
                 public void windowActivated(WindowEvent e) {
                     if (m_label == null)
                         m_command.requestFocusInWindow();
@@ -129,7 +126,7 @@ public class ProgramEditor
             m_dialog.setVisible(true);
             Object value = optionPane.getValue();
             if (! (value instanceof Integer)
-                || ((Integer)value) != JOptionPane.OK_OPTION)
+                || ((Integer)value).intValue() != JOptionPane.OK_OPTION)
                 return null;
             done = validate(parent, messageDialogs);
         }
@@ -150,13 +147,11 @@ public class ProgramEditor
         return newProgram;
     }
 
-    @Override
     public String getItemLabel(Program object)
     {
         return object.m_label;
     }
 
-    @Override
     public Program cloneItem(Program object)
     {
         return new Program(object);
@@ -246,19 +241,20 @@ public class ProgramEditor
                                            i18n("LB_BROWSE")));
             GuiUtil.setMacBevelButton(button);
             button.setToolTipText(i18n(browseToolTip));
-            button.addActionListener((ActionEvent e) -> {
-                File file =
-                        FileDialogs.showOpen(m_dialog, i18n(title));
-                if (file == null)
-                    return;
-                String text1 = file.toString();
-                if (text1.indexOf(' ') >= 0) {
-                    text1 = "\"" + text1 + "\"";
-                }
-                field.setText(text1);
-                field.setCaretPosition(text1.length());
-                field.requestFocusInWindow();
-            });
+            button.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        File file =
+                            FileDialogs.showOpen(m_dialog, i18n(title));
+                        if (file == null)
+                            return;
+                        String text = file.toString();
+                        if (text.indexOf(' ') >= 0)
+                            text = "\"" + text + "\"";
+                        field.setText(text);
+                        field.setCaretPosition(text.length());
+                        field.requestFocusInWindow();
+                    }
+                });
         }
         else
             GuiUtil.setEditableFalse(field);

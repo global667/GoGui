@@ -33,8 +33,7 @@ public class Comment
     {
         void changed(String comment);
 
-        /** Callback if some text is selected.
-         * @param text */
+        /** Callback if some text is selected. */
         void textSelected(String text);
     }
 
@@ -47,11 +46,15 @@ public class Comment
                          Color.decode("#38d878"), false);
         setPreferredSize();
         m_textPane.getDocument().addDocumentListener(this);
-        CaretListener caretListener = (CaretEvent event) -> {
-            if (m_listener == null)
-                return;
-            m_listener.textSelected(m_textPane.getSelectedText());
-        };
+        CaretListener caretListener = new CaretListener()
+            {
+                public void caretUpdate(CaretEvent event)
+                {
+                    if (m_listener == null)
+                        return;
+                    m_listener.textSelected(m_textPane.getSelectedText());
+                }
+            };
         m_textPane.addCaretListener(caretListener);
         setViewportView(m_textPane);
         setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -62,7 +65,6 @@ public class Comment
         setMonoFont(false);
     }
 
-    @Override
     public void changedUpdate(DocumentEvent e)
     {
         fireChangedEvent();
@@ -83,7 +85,6 @@ public class Comment
         return m_textPane.getSelectedText();
     }
 
-    @Override
     public void insertUpdate(DocumentEvent e)
     {
         fireChangedEvent();
@@ -116,14 +117,12 @@ public class Comment
         }
     }
 
-    @Override
     public void removeUpdate(DocumentEvent e)
     {
         fireChangedEvent();
     }
 
-    /** Enable/disable fixed size font.
-     * @param enable */
+    /** Enable/disable fixed size font. */
     public final void setMonoFont(boolean enable)
     {
         if (enable)
@@ -175,7 +174,7 @@ public class Comment
     private static void setFocusTraversalKeys(JTextPane textPane)
     {
         int id = KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS;
-        Set<AWTKeyStroke> keystrokes = new HashSet<>();
+        Set<AWTKeyStroke> keystrokes = new HashSet<AWTKeyStroke>();
         keystrokes.add(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, 0));
         textPane.setFocusTraversalKeys(id, keystrokes);
     }

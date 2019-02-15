@@ -103,7 +103,7 @@ public final class Main
             int port = Integer.parseInt(arguments.get(1));
             new Main(hostname, port, timeout);
         }
-        catch (Exception t)
+        catch (Throwable t)
         {
             StringUtil.printException(t);
             System.exit(1);
@@ -131,7 +131,6 @@ class SocketOutputCopy
         m_socket = socket;
     }
 
-    @Override
     public void run()
     {
         try
@@ -151,7 +150,7 @@ class SocketOutputCopy
                 dest.flush();
             }
         }
-        catch (IOException e)
+        catch (Throwable e)
         {
             StringUtil.printException(e);
         }

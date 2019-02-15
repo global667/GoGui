@@ -40,8 +40,6 @@ public final class Program
     }
 
     /** Find program info for a given command in a list of program infos.
-     * @param programs
-     * @param command
         @return The program info or null if no program with this comamnd
         exists */
     public static Program findProgram(ArrayList<Program> programs,
@@ -55,7 +53,7 @@ public final class Program
 
     public static ArrayList<Program> load()
     {
-        ArrayList<Program> programs = new ArrayList<>();
+        ArrayList<Program> programs = new ArrayList<Program>();
         Preferences prefs = PrefUtil.getNode("net/sf/gogui/gui/program");
         if (prefs == null)
             return programs;
@@ -99,8 +97,7 @@ public final class Program
     }
 
     /** Suggest and set a label derived from program name without
-        collision with an existing array of programs.
-     * @param programs */
+        collision with an existing array of programs. */
     public void setUniqueLabel(ArrayList<Program> programs)
     {
         String label = m_name;

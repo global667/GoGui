@@ -108,9 +108,9 @@ public class Dummy
         File file = new File(cmd.getArg());
         try
         {
-            try (PrintStream out = new PrintStream(file)) {
-                out.println("Hello world!");
-            }
+            PrintStream out = new PrintStream(file);
+            out.println("Hello world!");
+            out.close();
         }
         catch (IOException e)
         {
@@ -311,7 +311,6 @@ public class Dummy
         sleep(remaining);
     }
 
-    @Override
     public void handleCommand(GtpCommand cmd) throws GtpError
     {
         if (m_nextResponseFixed)
@@ -373,32 +372,72 @@ public class Dummy
 
     private void registerCommands()
     {
-        register("boardsize", (GtpCommand cmd) -> {
-            cmdBoardsize(cmd);
-        });
-        register("clear_board", this::cmdClearBoard);
-        register("gogui-dummy-bwboard", this::cmdBWBoard);
-        register("gogui-dummy-crash", this::cmdCrash);
-        register("gogui-dummy-delay", this::cmdDelay);
-        register("gogui-dummy-eplist", this::cmdEPList);
-        register("gogui-dummy-file_open", this::cmdFileOpen);
-        register("gogui-dummy-file_save", (GtpCommand cmd) -> {
-            cmdFileSave(cmd);
-        });
-        register("gogui-dummy-gfx", this::cmdGfx);
-        register("gogui-dummy-invalid", this::cmdInvalid);
-        register("gogui-dummy-live_gfx", this::cmdLiveGfx);
-        register("gogui-dummy-long_response", this::cmdLongResponse);
-        register("gogui-dummy-next_failure", this::cmdNextFailure);
-        register("gogui-dummy-next_success", this::cmdNextSuccess);
-        register("gogui-dummy-sboard", this::cmdSBoard);
-        register("gogui-dummy-sleep", this::cmdSleep);
-        register("echo", this::cmdEcho);
-        register("echo_err", this::cmdEchoErr);
-        register("genmove", this::cmdGenmove);
-        register("gogui-analyze_commands", this::cmdGoGuiAnalyzeCommands);
-        register("gogui-interrupt", this::cmdInterrupt);
-        register("play", this::cmdPlay);
+        register("boardsize", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdBoardsize(cmd); } });
+        register("clear_board", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdClearBoard(cmd); } });
+        register("gogui-dummy-bwboard", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdBWBoard(cmd); } });
+        register("gogui-dummy-crash", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdCrash(cmd); } });
+        register("gogui-dummy-delay", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdDelay(cmd); } });
+        register("gogui-dummy-eplist", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdEPList(cmd); } });
+        register("gogui-dummy-file_open", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdFileOpen(cmd); } });
+        register("gogui-dummy-file_save", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdFileSave(cmd); } });
+        register("gogui-dummy-gfx", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdGfx(cmd); } });
+        register("gogui-dummy-invalid", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdInvalid(cmd); } });
+        register("gogui-dummy-live_gfx", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdLiveGfx(cmd); } });
+        register("gogui-dummy-long_response", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdLongResponse(cmd); } });
+        register("gogui-dummy-next_failure", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdNextFailure(cmd); } });
+        register("gogui-dummy-next_success", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdNextSuccess(cmd); } });
+        register("gogui-dummy-sboard", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdSBoard(cmd); } });
+        register("gogui-dummy-sleep", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdSleep(cmd); } });
+        register("echo", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdEcho(cmd); } });
+        register("echo_err", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdEchoErr(cmd); } });
+        register("genmove", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdGenmove(cmd); } });
+        register("gogui-analyze_commands", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdGoGuiAnalyzeCommands(cmd); } });
+        register("gogui-interrupt", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdInterrupt(cmd); } });
+        register("play", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdPlay(cmd); } });
     }
 
     private void sleep(long millis)

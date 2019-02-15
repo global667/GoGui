@@ -74,15 +74,13 @@ public final class BoardConstants
         return result;
     }
 
-    /** Get list containing all points on the board.
-     * @return  */
+    /** Get list containing all points on the board. */
     public ConstPointList getPoints()
     {
         return m_allPoints;
     }
 
-    /** Get board size.
-     * @return  */
+    /** Get board size. */
     public int getSize()
     {
         return m_size;
@@ -121,7 +119,7 @@ public final class BoardConstants
         return (isHandicapLine(x) && isHandicapLine(y));
     }
 
-    private static final BoardConstants[] s_boardConstants
+    private static BoardConstants[] s_boardConstants
         = new BoardConstants[GoPoint.MAX_SIZE + 1];
 
     private final int m_size;

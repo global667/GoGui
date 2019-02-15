@@ -5,7 +5,6 @@ package net.sf.gogui.game;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.function.Consumer;
 import net.sf.gogui.go.BlackWhiteSet;
 import net.sf.gogui.go.GoColor;
 import static net.sf.gogui.go.GoColor.BLACK;
@@ -24,14 +23,10 @@ public class GameInfo
 {
     public GameInfo()
     {
-        this.m_stringInfoColor = new TreeMap<>();
-        this.m_stringInfo = new TreeMap<>();
     }
 
     public GameInfo(ConstGameInfo info)
     {
-        this.m_stringInfoColor = new TreeMap<>();
-        this.m_stringInfo = new TreeMap<>();
         copyFrom(info);
     }
 
@@ -44,18 +39,19 @@ public class GameInfo
         m_stringInfo.clear();
         m_stringInfo.putAll(infoNonConst.m_stringInfo);
         m_stringInfoColor.clear();
-        infoNonConst.m_stringInfoColor.entrySet().forEach((Map.Entry<StringInfoColor, BlackWhiteSet<String>> entry) -> {
+        for (Map.Entry<StringInfoColor,BlackWhiteSet<String>> entry
+                 : infoNonConst.m_stringInfoColor.entrySet())
+        {
             StringInfoColor type = entry.getKey();
             BlackWhiteSet<String> set = entry.getValue();
             assert set != null;
-            BlackWhiteSet<String> newSet = new BlackWhiteSet<>();
+            BlackWhiteSet<String> newSet = new BlackWhiteSet<String>();
             newSet.set(BLACK, set.get(BLACK));
             newSet.set(WHITE, set.get(WHITE));
             m_stringInfoColor.put(type, newSet);
-        });
+        }
     }
 
-    @Override
     public boolean equals(Object object)
     {
         if (object == null || object.getClass() != getClass())
@@ -68,13 +64,11 @@ public class GameInfo
                 && m_stringInfoColor.equals(info.m_stringInfoColor));
     }
 
-    @Override
     public String get(StringInfo type)
     {
         return m_stringInfo.get(type);
     }
 
-    @Override
     public String get(StringInfoColor type, GoColor c)
     {
         BlackWhiteSet<String> set = m_stringInfoColor.get(type);
@@ -83,7 +77,6 @@ public class GameInfo
         return set.get(c);
     }
 
-    @Override
     public int getHandicap()
     {
         return m_handicap;
@@ -91,17 +84,11 @@ public class GameInfo
 
     /** Get komi.
         @return The komi or null if komi is unknown. */
-    @Override
     public Komi getKomi()
     {
         return m_komi;
     }
 
-    /**
-     *
-     * @return
-     */
-    @Override
     public TimeSettings getTimeSettings()
     {
         return m_timeSettings;
@@ -110,7 +97,6 @@ public class GameInfo
     /** Hash code dummy function (don't use).
         This class is not desgined to be used in a HashMap/HashTable. The
         function will trigger an assertion if assertions are enabled. */
-    @Override
     public int hashCode()
     {
         assert false : "hashCode not designed";
@@ -126,7 +112,6 @@ public class GameInfo
     /** Try to parse rules.
         @return Score.ScoringMethod.TERRITORY if rules string (to lowercase)
         is "japanese", Score.ScoringMethod.AREA otherwise. */
-    @Override
     public ScoringMethod parseRules()
     {
         ScoringMethod result = AREA;
@@ -155,7 +140,7 @@ public class GameInfo
         BlackWhiteSet<String> set = m_stringInfoColor.get(type);
         if (set == null)
         {
-            set = new BlackWhiteSet<>();
+            set = new BlackWhiteSet<String>();
             m_stringInfoColor.put(type, set);
         }
         set.set(c, value);
@@ -173,8 +158,7 @@ public class GameInfo
         m_komi = komi;
     }
 
-    /** Set time settings.
-     * @param timeSettings */
+    /** Set time settings. */
     public void setTimeSettings(TimeSettings timeSettings)
     {
         m_timeSettings = timeSettings;
@@ -183,7 +167,6 @@ public class GameInfo
     /** Suggest a game name from the player names.
         @return A game name built from the player names or null, if not at
         least one player name is known. */
-    @Override
     public String suggestGameName()
     {
         String playerBlack = get(StringInfoColor.NAME, BLACK);
@@ -209,9 +192,11 @@ public class GameInfo
 
     private TimeSettings m_timeSettings;
 
-    private Map<StringInfo,String> m_stringInfo;
+    private Map<StringInfo,String> m_stringInfo =
+        new TreeMap<StringInfo,String>();
 
-    private Map<StringInfoColor,BlackWhiteSet<String>> m_stringInfoColor;
+    private Map<StringInfoColor,BlackWhiteSet<String>> m_stringInfoColor =
+        new TreeMap<StringInfoColor,BlackWhiteSet<String>>();
 
     private String checkEmpty(String s)
     {

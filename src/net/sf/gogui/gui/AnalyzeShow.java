@@ -28,16 +28,10 @@ import net.sf.gogui.util.StringUtil;
 public final class AnalyzeShow
 {
     /** Parse analyze command response and display it on the board.
-     * @param command
-     * @param guiBoard
-     * @param statusBar
-     * @param board
-     * @param response
         @param showTextBuffer If not null, text lines from AnalyzeType.GFX
         commands will not be shown immediately in the status bar, but appended
         to the text buffer. This is for allowing multiline text in gfx commands
-        that will be shown in a separate window later.
-     * @throws net.sf.gogui.gtp.GtpResponseFormatError */
+        that will be shown in a separate window later. */
     public static void show(AnalyzeCommand command, GuiBoard guiBoard,
                             StatusBar statusBar, ConstBoard board,
                             String response, StringBuilder showTextBuffer)
@@ -92,7 +86,7 @@ public final class AnalyzeShow
         case PSPAIRS:
             {
                 PointList pointList = new PointList(32);
-                ArrayList<String> stringList = new ArrayList<>(32);
+                ArrayList<String> stringList = new ArrayList<String>(32);
                 GtpUtil.parsePointStringList(response, pointList, stringList,
                                              size);
                 GuiBoardUtil.showPointStringList(guiBoard, pointList,
@@ -145,9 +139,6 @@ public final class AnalyzeShow
     }
 
     /** Parse gfx analyze command response and display it on the board.
-     * @param response
-     * @param guiBoard
-     * @param statusBar
         @param showTextBuffer See AnalyzeShow.show() */
     public static void showGfx(String response, GuiBoard guiBoard,
                                StatusBar statusBar,
@@ -227,7 +218,10 @@ public final class AnalyzeShow
                 double value = Double.parseDouble(arg[i + 1]);
                 guiBoard.setInfluence(point, value);
             }
-            catch (InvalidPointException | NumberFormatException e)
+            catch (InvalidPointException e)
+            {
+            }
+            catch (NumberFormatException e)
             {
             }
         }
@@ -254,9 +248,6 @@ public final class AnalyzeShow
     }
 
     /** Parse gfx analyze command response line and display it on the board.
-     * @param line
-     * @param guiBoard
-     * @param statusBar
         @param showTextBuffer See AnalyzeShow.show() */
     public static void showGfxLine(String line, GuiBoard guiBoard,
                                    StatusBar statusBar,
@@ -266,57 +257,44 @@ public final class AnalyzeShow
         if (args.length == 0)
             return;
         String cmd = args[0].toUpperCase(Locale.ENGLISH);
-        switch (cmd) {
-            case "BLACK":
-                showGfxTerritory(args, BLACK, guiBoard);
-                break;
-            case "CIRCLE":
-                showGfxCircle(args, guiBoard);
-                break;
-            case "CLEAR":
-                guiBoard.clearAll();
-                break;
-            case "COLOR":
-                showGfxColor(args, guiBoard);
-                break;
-            case "INFLUENCE":
-                showGfxInfluence(args, guiBoard);
-                break;
-            case "LABEL":
-                showGfxLabel(args, guiBoard);
-                break;
-            case "MARK":
-                showGfxMark(args, guiBoard);
-                break;
-            case "SQUARE":
-                showGfxSquare(args, guiBoard);
-                break;
-            case "TEXT":
-                line = line.trim();
-                int pos = line.indexOf(' ');
-                String text = "";
-                if (pos > 0)
-                    text = line.substring(pos + 1);
-                if (showTextBuffer == null)
-                    statusBar.setText(text);
-                else
-                {
-                    if (showTextBuffer.length() > 0)
-                        showTextBuffer.append('\n');
-                    showTextBuffer.append(text);
-                }   break;
-            case "TRIANGLE":
-                showGfxTriangle(args, guiBoard);
-                break;
-            case "VAR":
-                showGfxVariation(args, guiBoard);
-                break;
-            case "WHITE":
-                showGfxTerritory(args, WHITE, guiBoard);
-                break;
-            default:
-                break;
+        if (cmd.equals("BLACK"))
+            showGfxTerritory(args, BLACK, guiBoard);
+        else if (cmd.equals("CIRCLE"))
+            showGfxCircle(args, guiBoard);
+        else if (cmd.equals("CLEAR"))
+            guiBoard.clearAll();
+        else if (cmd.equals("COLOR"))
+            showGfxColor(args, guiBoard);
+        else if (cmd.equals("INFLUENCE"))
+            showGfxInfluence(args, guiBoard);
+        else if (cmd.equals("LABEL"))
+            showGfxLabel(args, guiBoard);
+        else if (cmd.equals("MARK"))
+            showGfxMark(args, guiBoard);
+        else if (cmd.equals("SQUARE"))
+            showGfxSquare(args, guiBoard);
+        else if (cmd.equals("TEXT"))
+        {
+            line = line.trim();
+            int pos = line.indexOf(' ');
+            String text = "";
+            if (pos > 0)
+                text = line.substring(pos + 1);
+            if (showTextBuffer == null)
+                statusBar.setText(text);
+            else
+            {
+                if (showTextBuffer.length() > 0)
+                    showTextBuffer.append('\n');
+                showTextBuffer.append(text);
+            }
         }
+        else if (cmd.equals("TRIANGLE"))
+            showGfxTriangle(args, guiBoard);
+        else if (cmd.equals("VAR"))
+            showGfxVariation(args, guiBoard);
+        else if (cmd.equals("WHITE"))
+            showGfxTerritory(args, WHITE, guiBoard);
     }
 
     public static void showGfxMark(String[] args, GuiBoard guiBoard)

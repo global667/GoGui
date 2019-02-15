@@ -47,7 +47,6 @@ public class FindDialog
 
     // See comment at m_comboBox
     @SuppressWarnings("unchecked")
-    @Override
     public void actionPerformed(ActionEvent event)
     {
         String command = event.getActionCommand();
@@ -156,18 +155,16 @@ public class FindDialog
         m_comboBox.addActionListener(this);
         m_textField = (JTextField)editor.getEditorComponent();
         m_textField.selectAll();
-        KeyListener keyListener;
-        keyListener = new KeyAdapter()
-        {
-            @Override
-            public void keyPressed(KeyEvent e)
+        KeyListener keyListener = new KeyAdapter()
             {
-                int c = e.getKeyCode();
-                if (c == KeyEvent.VK_ESCAPE
+                public void keyPressed(KeyEvent e)
+                {
+                    int c = e.getKeyCode();
+                    if (c == KeyEvent.VK_ESCAPE
                         && ! m_comboBox.isPopupVisible())
-                    dispose();
-            }
-        };
+                        dispose();
+                }
+            };
         m_textField.addKeyListener(keyListener);
         GuiUtil.setMonospacedFont(m_comboBox);
         innerPanel.add(m_comboBox, BorderLayout.CENTER);
@@ -177,7 +174,7 @@ public class FindDialog
 
     private void putHistory()
     {
-        ArrayList<String> history = new ArrayList<>(32);
+        ArrayList<String> history = new ArrayList<String>(32);
         int maxHistory = 20;
         int itemCount = m_comboBox.getItemCount();
         int n = itemCount;

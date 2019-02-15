@@ -16,7 +16,6 @@ import net.sf.gogui.util.FileUtil;
 class Filter
     implements FileFilter
 {
-    @Override
     public boolean accept(File f)
     {
         return FileUtil.hasExtension(f, "sgf");
@@ -43,45 +42,37 @@ public class Openings
         return getTree().getBoardSize();
     }
 
-    /** Get name of directory.
-     * @return  */
+    /** Get name of directory. */
     public String getDirectory()
     {
         return m_directory.toString();
     }
 
-    /** Get name of currently loaded file.
-     * @return  */
+    /** Get name of currently loaded file. */
     public String getFilename()
     {
         return m_files[m_currentFile].toString();
     }
 
-    /** Get game information of currently loaded file.
-     * @return  */
+    /** Get game information of currently loaded file. */
     public GameInfo getGameInfo()
     {
         return m_tree.getGameInfo(m_tree.getRoot());
     }
 
-    /** Get game tree of currently loaded file.
-     * @return  */
+    /** Get game tree of currently loaded file. */
     public GameTree getTree()
     {
         return m_tree;
     }
 
-    /** Get number of opening files in directory.
-     * @return  */
+    /** Get number of opening files in directory. */
     public int getNumber()
     {
         return m_files.length;
     }
 
-    /** Load opening file number i.
-     * @param i
-     * @throws java.io.IOException
-     * @throws net.sf.gogui.sgf.SgfError */
+    /** Load opening file number i. */
     public void loadFile(int i) throws IOException, SgfError
     {
         File file = m_files[i];

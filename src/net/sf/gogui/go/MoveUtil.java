@@ -7,16 +7,14 @@ import java.util.ArrayList;
 /** Static utility functions related to class Move. */
 public final class MoveUtil
 {
-    /** *  Fill a list of moves with pass moves.The resulting list will contain all moves of the original list
+    /** Fill a list of moves with pass moves.
+        The resulting list will contain all moves of the original list
         in the same order, but ensure it starts with a move of color toMove
-        and have no subsequent moves of the same color.
-     * @param moves
-     * @param toMove
-     * @return  */
+        and have no subsequent moves of the same color. */
     public static ArrayList<Move> fillPasses(ArrayList<Move> moves,
                                              GoColor toMove)
     {
-        ArrayList<Move> result = new ArrayList<>(moves.size() * 2);
+        ArrayList<Move> result = new ArrayList<Move>(moves.size() * 2);
         if (moves.isEmpty())
             return result;
         for (Move move : moves)

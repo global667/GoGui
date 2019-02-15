@@ -47,29 +47,26 @@ public class GameTreeViewer
             // Default Apple L&F uses no border, but Quaqua 3.7.4 does
             m_scrollPane.setBorder(null);
         GuiUtil.removeKeyBinding(m_scrollPane, "control END");
-        KeyAdapter keyAdapter;
-        keyAdapter = new KeyAdapter()
-        {
-            @Override
-            public void keyReleased(KeyEvent e)
+        KeyAdapter keyAdapter = new KeyAdapter()
             {
-                int c;
-                c = e.getKeyCode();
-                int mod = e.getModifiers();
-                if ((mod & m_shortcut) == 0)
+                public void keyReleased(KeyEvent e)
                 {
-                    if (c == KeyEvent.VK_HOME)
-                        scrollToCurrent();
-                    return;
+                    int c = e.getKeyCode();
+                    int mod = e.getModifiers();
+                    if ((mod & m_shortcut) == 0)
+                    {
+                        if (c == KeyEvent.VK_HOME)
+                            scrollToCurrent();
+                        return;
+                    }
+                    boolean shift = ((mod & ActionEvent.SHIFT_MASK) != 0);
+                    if (c == KeyEvent.VK_ENTER && ! shift)
+                        m_panel.showPopup();
                 }
-                boolean shift = ((mod & ActionEvent.SHIFT_MASK) != 0);
-                if (c == KeyEvent.VK_ENTER && ! shift)
-                    m_panel.showPopup();
-            }
-            
-            private final int m_shortcut
+
+                private final int m_shortcut
                     = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
-        };
+            };
         m_scrollPane.addKeyListener(keyAdapter);
         m_panel.setScrollPane(m_scrollPane);
         m_scrollPane.setFocusable(true);
@@ -80,7 +77,6 @@ public class GameTreeViewer
         viewport.setFocusTraversalKeysEnabled(false);
         setFocusTraversalKeysEnabled(false);
         addWindowListener(new WindowAdapter() {
-                @Override
                 public void windowActivated(WindowEvent e) {
                     m_scrollPane.requestFocusInWindow();
                 }

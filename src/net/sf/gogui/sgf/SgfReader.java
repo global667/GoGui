@@ -61,7 +61,6 @@ public final class SgfReader
                      long size)
         throws SgfError
     {
-        this.m_props = new TreeMap<>();
         m_file = file;
         m_progressShow = progressShow;
         m_size = size;
@@ -121,12 +120,11 @@ public final class SgfReader
         if (m_warnings.isEmpty())
             return null;
         StringBuilder result = new StringBuilder(m_warnings.size() * 80);
-        m_warnings.stream().map((s) -> {
+        for (String s : m_warnings)
+        {
             result.append(s);
-            return s;
-        }).forEachOrdered((_item) -> {
             result.append('\n');
-        });
+        }
         return result.toString();
     }
 
@@ -161,7 +159,7 @@ public final class SgfReader
     private final ProgressShow m_progressShow;
 
     /** Contains strings with warnings. */
-    private final Set<String> m_warnings = new TreeSet<>();
+    private final Set<String> m_warnings = new TreeSet<String>();
 
     private StreamTokenizer m_tokenizer;
 
@@ -173,8 +171,10 @@ public final class SgfReader
     private final StringBuilder m_buffer = new StringBuilder(512);
 
     private final PointList m_pointList = new PointList();
+
     /** Map containing the properties of the current node. */
-    private final Map<String,ArrayList<String>> m_props;
+    private final Map<String,ArrayList<String>> m_props =
+        new TreeMap<String,ArrayList<String>>();
 
     /** Apply some fixes for broken SGF files. */
     private void applyFixes()
@@ -237,77 +237,50 @@ public final class SgfReader
             return property;
         property = property.intern();
         String shortName = null;
-        if (null != property)
-            switch (property) {
-            case "ADDBLACK":
-                shortName = "AB";
-                break;
-            case "ADDEMPTY":
-                shortName = "AE";
-                break;
-            case "ADDWHITE":
-                shortName = "AW";
-                break;
-            case "BLACK":
-                shortName = "B";
-                break;
-            case "BLACKRANK":
-                shortName = "BR";
-                break;
-            case "COMMENT":
-                shortName = "C";
-                break;
-            case "COPYRIGHT":
-                shortName = "CP";
-                break;
-            case "DATE":
-                shortName = "DT";
-                break;
-            case "EVENT":
-                shortName = "EV";
-                break;
-            case "GAME":
-                shortName = "GM";
-                break;
-            case "HANDICAP":
-                shortName = "HA";
-                break;
-            case "KOMI":
-                shortName = "KM";
-                break;
-            case "PLACE":
-                shortName = "PC";
-                break;
-            case "PLAYERBLACK":
-                shortName = "PB";
-                break;
-            case "PLAYERWHITE":
-                shortName = "PW";
-                break;
-            case "PLAYER":
-                shortName = "PL";
-                break;
-            case "RESULT":
-                shortName = "RE";
-                break;
-            case "ROUND":
-                shortName = "RO";
-                break;
-            case "RULES":
-                shortName = "RU";
-                break;
-            case "SIZE":
-                shortName = "SZ";
-                break;
-            case "WHITE":
-                shortName = "W";
-                break;
-            case "WHITERANK":
-                shortName = "WR";
-                break;
-            default:
-                break;
-        }
+        if (property == "ADDBLACK")
+            shortName = "AB";
+        else if (property == "ADDEMPTY")
+            shortName = "AE";
+        else if (property == "ADDWHITE")
+            shortName = "AW";
+        else if (property == "BLACK")
+            shortName = "B";
+        else if (property == "BLACKRANK")
+            shortName = "BR";
+        else if (property == "COMMENT")
+            shortName = "C";
+        else if (property == "COPYRIGHT")
+            shortName = "CP";
+        else if (property == "DATE")
+            shortName = "DT";
+        else if (property == "EVENT")
+            shortName = "EV";
+        else if (property == "GAME")
+            shortName = "GM";
+        else if (property == "HANDICAP")
+            shortName = "HA";
+        else if (property == "KOMI")
+            shortName = "KM";
+        else if (property == "PLACE")
+            shortName = "PC";
+        else if (property == "PLAYERBLACK")
+            shortName = "PB";
+        else if (property == "PLAYERWHITE")
+            shortName = "PW";
+        else if (property == "PLAYER")
+            shortName = "PL";
+        else if (property == "RESULT")
+            shortName = "RE";
+        else if (property == "ROUND")
+            shortName = "RO";
+        else if (property == "RULES")
+            shortName = "RU";
+        else if (property == "SIZE")
+            shortName = "SZ";
+        else if (property == "WHITE")
+            shortName = "W";
+        else if (property == "WHITERANK")
+            shortName = "WR";
         if (shortName != null)
             return shortName;
         return property;
@@ -324,25 +297,23 @@ public final class SgfReader
         {
             m_tokenizer.nextToken();
             int t = m_tokenizer.ttype;
-            switch (t) {
-                case '(':
-                    // Better make sure that ( is followed by a node
-                    m_tokenizer.nextToken();
-                    t = m_tokenizer.ttype;
-                    if (t == ';')
-                    {
-                        m_tokenizer.pushBack();
-                        return;
-                    }
-                    else
-                        setWarning("Extra text before SGF tree");
-                    break;
-                case StreamTokenizer.TT_EOF:
-                    throw getError("No root tree found");
-                default:
+            if (t == '(')
+            {
+                // Better make sure that ( is followed by a node
+                m_tokenizer.nextToken();
+                t = m_tokenizer.ttype;
+                if (t == ';')
+                {
+                    m_tokenizer.pushBack();
+                    return;
+                }
+                else
                     setWarning("Extra text before SGF tree");
-                    break;
             }
+            else if (t == StreamTokenizer.TT_EOF)
+                throw getError("No root tree found");
+            else
+                setWarning("Extra text before SGF tree");
         }
     }
 
@@ -396,28 +367,28 @@ public final class SgfReader
             String p = entry.getKey();
             ArrayList<String> values = entry.getValue();
             String v = values.get(0);
-            if ("AB".equals(p))
+            if (p == "AB")
             {
                 parsePointList(values);
                 node.addStones(BLACK, m_pointList);
             }
-            else if ("AE".equals(p))
+            else if (p == "AE")
             {
                 parsePointList(values);
                 node.addStones(EMPTY, m_pointList);
             }
-            else if ("AN".equals(p))
+            else if (p == "AN")
                 set(node, StringInfo.ANNOTATION, v);
-            else if ("AW".equals(p))
+            else if (p == "AW")
             {
                 parsePointList(values);
                 node.addStones(WHITE, m_pointList);
             }
-            else if ("B".equals(p))
+            else if (p == "B")
             {
                 node.setMove(Move.get(BLACK, parsePoint(v)));
             }
-            else if ("BL".equals(p))
+            else if (p == "BL")
             {
                 try
                 {
@@ -427,13 +398,13 @@ public final class SgfReader
                 {
                 }
             }
-            else if ("BR".equals(p))
+            else if (p == "BR")
                 set(node, StringInfoColor.RANK, BLACK, v);
-            else if ("BT".equals(p))
+            else if (p == "BT")
                 set(node, StringInfoColor.TEAM, BLACK, v);
-            else if ("C".equals(p))
+            else if (p == "C")
                 node.setComment(v);
-            else if ("CA".equals(p))
+            else if (p == "CA")
             {
                 if (isRoot && m_isFile && m_newCharset == null)
                 {
@@ -445,13 +416,13 @@ public final class SgfReader
                                    + "\"");
                 }
             }
-            else if ("CP".equals(p))
+            else if (p == "CP")
                 set(node, StringInfo.COPYRIGHT, v);
-            else if ("CR".equals(p))
+            else if (p == "CR")
                 parseMarked(node, MarkType.CIRCLE, values);
-            else if ("DT".equals(p))
+            else if (p == "DT")
                 set(node, StringInfo.DATE, v);
-            else if ("FF".equals(p))
+            else if (p == "FF")
             {
                 int format = -1;
                 try
@@ -464,14 +435,14 @@ public final class SgfReader
                 if (format < 1 || format > 4)
                     setWarning("Unknown SGF file format version");
             }
-            else if ("GM".equals(p))
+            else if (p == "GM")
             {
                 // Some SGF files contain GM[], interpret as GM[1]
                 v = v.trim();
                 if (! v.equals("") && ! v.equals("1"))
                     throw getError("Not a Go game");
             }
-            else if ("HA".equals(p))
+            else if (p == "HA")
             {
                 // Some SGF files contain HA[], interpret as unknown handicap
                 v = v.trim();
@@ -491,9 +462,9 @@ public final class SgfReader
                     }
                 }
             }
-            else if ("KM".equals(p))
+            else if (p == "KM")
                 parseKomi(node, v);
-            else if ("LB".equals(p))
+            else if (p == "LB")
             {
                 for (int i = 0; i < values.size(); ++i)
                 {
@@ -507,9 +478,9 @@ public final class SgfReader
                     }
                 }
             }
-            else if ("MA".equals(p) || "M".equals(p))
+            else if (p == "MA" || p == "M")
                 parseMarked(node, MarkType.MARK, values);
-            else if ("OB".equals(p))
+            else if (p == "OB")
             {
                 try
                 {
@@ -519,13 +490,13 @@ public final class SgfReader
                 {
                 }
             }
-            else if ("OM".equals(p))
+            else if (p == "OM")
                 parseOvertimeMoves(v);
-            else if ("OP".equals(p))
+            else if (p == "OP")
                 parseOvertimePeriod(v);
-            else if ("OT".equals(p))
+            else if (p == "OT")
                 parseOvertime(node, v);
-            else if ("OW".equals(p))
+            else if (p == "OW")
             {
                 try
                 {
@@ -535,37 +506,37 @@ public final class SgfReader
                 {
                 }
             }
-            else if ("PB".equals(p))
+            else if (p == "PB")
                 set(node, StringInfoColor.NAME, BLACK, v);
-            else if ("PW".equals(p))
+            else if (p == "PW")
                 set(node, StringInfoColor.NAME, WHITE, v);
-            else if ("PL".equals(p))
+            else if (p == "PL")
                 node.setPlayer(parseColor(v));
-            else if ("RE".equals(p))
+            else if (p == "RE")
                 set(node, StringInfo.RESULT, v);
-            else if ("RO".equals(p))
+            else if (p == "RO")
                 set(node, StringInfo.ROUND, v);
-            else if ("RU".equals(p))
+            else if (p == "RU")
                 set(node, StringInfo.RULES, v);
-            else if ("SO".equals(p))
+            else if (p == "SO")
                 set(node, StringInfo.SOURCE, v);
-            else if ("SQ".equals(p))
+            else if (p == "SQ")
                 parseMarked(node, MarkType.SQUARE, values);
-            else if ("SL".equals(p))
+            else if (p == "SL")
                 parseMarked(node, MarkType.SELECT, values);
-            else if ("TB".equals(p))
+            else if (p == "TB")
                 parseMarked(node, MarkType.TERRITORY_BLACK, values);
-            else if ("TM".equals(p))
+            else if (p == "TM")
                 parseTime(node, v);
-            else if ("TR".equals(p))
+            else if (p == "TR")
                 parseMarked(node, MarkType.TRIANGLE, values);
-            else if ("US".equals(p))
+            else if (p == "US")
                 set(node, StringInfo.USER, v);
-            else if ("W".equals(p))
+            else if (p == "W")
                 node.setMove(Move.get(WHITE, parsePoint(v)));
-            else if ("TW".equals(p))
+            else if (p == "TW")
                 parseMarked(node, MarkType.TERRITORY_WHITE, values);
-            else if ("V".equals(p))
+            else if (p == "V")
             {
                 try
                 {
@@ -575,7 +546,7 @@ public final class SgfReader
                 {
                 }
             }
-            else if ("WL".equals(p))
+            else if (p == "WL")
             {
                 try
                 {
@@ -585,11 +556,11 @@ public final class SgfReader
                 {
                 }
             }
-            else if ("WR".equals(p))
+            else if (p == "WR")
                 set(node, StringInfoColor.RANK, WHITE, v);
-            else if ("WT".equals(p))
+            else if (p == "WT")
                 set(node, StringInfoColor.TEAM, WHITE, v);
-            else if (!"FF".equals(p) && !"GN".equals(p) && !"AP".equals(p))
+            else if (p != "FF" && p != "GN" && p != "AP")
                 node.addSgfProperty(p, values);
         }
     }
@@ -598,18 +569,12 @@ public final class SgfReader
     {
         GoColor color;
         s = s.trim().toLowerCase(Locale.ENGLISH);
-        switch (s) {
-            case "b":
-            case "1":
-                color = BLACK;
-                break;
-            case "w":
-            case "2":
-                color = WHITE;
-                break;
-            default:
-                throw getError("Invalid color value");
-        }
+        if (s.equals("b") || s.equals("1"))
+            color = BLACK;
+        else if (s.equals("w") || s.equals("2"))
+            color = WHITE;
+        else
+            throw getError("Invalid color value");
         return color;
     }
 
@@ -647,9 +612,8 @@ public final class SgfReader
         throws SgfError
     {
         parsePointList(values);
-        m_pointList.forEach((p) -> {
+        for (GoPoint p : m_pointList)
             node.addMarked(p, type);
-        });
     }
 
     private void parseOvertime(Node node, String value)
@@ -789,7 +753,6 @@ public final class SgfReader
             m_preByoyomi = preByoyomi;
     }
 
-    @SuppressWarnings("empty-statement")
     private Node readNext(Node father, boolean isRoot)
         throws IOException, SgfError, SgfCharsetChanged
     {
@@ -847,7 +810,7 @@ public final class SgfReader
         {
             // Use intern() to allow fast comparsion with ==
             String p = m_tokenizer.sval.toUpperCase(Locale.ENGLISH).intern();
-            ArrayList<String> values = new ArrayList<>();
+            ArrayList<String> values = new ArrayList<String>();
             String s;
             while ((s = readValue()) != null)
                 values.add(s);
@@ -947,7 +910,7 @@ public final class SgfReader
             {
                 if (c != '\n' && c != '\r')
                     m_buffer.append((char)c);
-                last = (char)c;
+                last = Character.valueOf((char)c);
                 quoted = false;
             }
             else
@@ -961,10 +924,10 @@ public final class SgfReader
                     // CRLF) to a single '\n'
                     boolean isLinebreak = (c == '\n' || c == '\r');
                     boolean lastLinebreak =
-                        (last != null && (last == '\n'
-                                          || last == '\r'));
+                        (last != null && (last.charValue() == '\n'
+                                          || last.charValue() == '\r'));
                     boolean filterSecondLinebreak =
-                        (isLinebreak && lastLinebreak && c != last);
+                        (isLinebreak && lastLinebreak && c != last.charValue());
                     if (filterSecondLinebreak)
                         last = null;
                     else
@@ -973,7 +936,7 @@ public final class SgfReader
                             m_buffer.append('\n');
                         else
                             m_buffer.append((char)c);
-                        last = (char)c;
+                        last = Character.valueOf((char)c);
                     }
                 }
             }

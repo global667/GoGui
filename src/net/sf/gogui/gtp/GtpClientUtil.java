@@ -16,11 +16,11 @@ import net.sf.gogui.util.ErrorMessage;
 /** Utility functions for using a GtpClient. */
 public final class GtpClientUtil
 {
-    /** *  Query analyze commands configuration from the program.Sends the command gogui-analyze_commands (or gogui_analyze_commands
+    /** Query analyze commands configuration from the program.
+        Sends the command gogui-analyze_commands (or gogui_analyze_commands
         as used by older versions of GoGui, if the program does not support
         the new command).
         Note: call GtpClientBase.querySupportedCommands() first.
-     * @param gtp
         @return The response to gogui-analyze_commands or null, if this
         command is not supported or returns an error. */
     public static String getAnalyzeCommands(GtpClientBase gtp)
@@ -43,10 +43,7 @@ public final class GtpClientUtil
         }
     }
 
-    /** Construct a gogui-play_sequence command from a list of moves.
-     * @param gtp
-     * @param moves
-     * @return  */
+    /** Construct a gogui-play_sequence command from a list of moves. */
     public static String getPlaySequenceCommand(GtpClientBase gtp,
                                                 ArrayList<Move> moves)
     {
@@ -70,10 +67,10 @@ public final class GtpClientUtil
         return null;
     }
 
-    /** *  Get title for current game from program.Uses gogui-title (see GoGui documentation) or the deprectated
+    /** Get title for current game from program.
+        Uses gogui-title (see GoGui documentation) or the deprectated
         command gogui_title.
         Note: call GtpClientBase.querySupportedCommands() first.
-     * @param gtp
         @return The response to the command or null, if neither command
         is supported or the command failed. */
     public static String getTitle(GtpClientBase gtp)
@@ -96,13 +93,13 @@ public final class GtpClientUtil
         return (getPlaySequenceCommand(gtp) != null);
     }
 
-    /** *  Save parameters to a GTP file.Sends all analyze commands of type "param" to the program to query the
+    /** Save parameters to a GTP file.
+        Sends all analyze commands of type "param" to the program to query the
         current parameter values and creates a config file with GTP commands
         that allows to restore the values.
         @param gtp The GTP connection.
         @param analyzeCommands The analyze command definitions for this
         program (e.g. from AnalyzeDefinition.read()).
-     * @param file
         @throws ErrorMessage If writing the file fails or none of the analyze
         commands have the type "param" (error responses from the program are
         written in comment lines in the resulting file).
@@ -112,8 +109,10 @@ public final class GtpClientUtil
                        ArrayList<AnalyzeDefinition> analyzeCommands,
                        File file) throws ErrorMessage
     {
+        PrintStream out = null;
         try
-        (PrintStream out = new PrintStream(file)) {
+        {
+            out = new PrintStream(file);
             for (AnalyzeDefinition definition : analyzeCommands)
                 if (definition.getType() == AnalyzeType.PARAM)
                 {
@@ -155,6 +154,11 @@ public final class GtpClientUtil
         catch (IOException e)
         {
             throw new ErrorMessage(e.getMessage());
+        }
+        finally
+        {
+            if (out != null)
+                out.close();
         }
     }
 

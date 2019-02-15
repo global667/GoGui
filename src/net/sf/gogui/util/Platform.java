@@ -5,7 +5,6 @@ package net.sf.gogui.util;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.net.URL;
@@ -42,8 +41,8 @@ public class Platform
         return name;
     }
 
-    /** *  Return information on this computer.Returns host name and cpu information (if /proc/cpuinfo exists).
-     * @return  */
+    /** Return information on this computer.
+        Returns host name and cpu information (if /proc/cpuinfo exists). */
     public static String getHostInfo()
     {
         String info;
@@ -81,22 +80,19 @@ public class Platform
         return info;
     }
 
-    /** Check if the platform is Mac OS X.
-     * @return  */
+    /** Check if the platform is Mac OS X. */
     public static boolean isMac()
     {
         return s_isMac;
     }
 
-    /** Check if the platform is Unix.
-     * @return  */
+    /** Check if the platform is Unix. */
     public static boolean isUnix()
     {
         return s_isUnix;
     }
 
-    /** Check if the platform is Windows.
-     * @return  */
+    /** Check if the platform is Windows. */
     public static boolean isWindows()
     {
         return s_isWindows;
@@ -173,25 +169,25 @@ public class Platform
             Constructor constructor = registerClass.getConstructor(arglist);
             constructor.newInstance(args);
         }
-        catch (ClassNotFoundException | IllegalAccessException | IllegalArgumentException | InstantiationException | NoSuchMethodException | SecurityException | InvocationTargetException e)
+        catch (Throwable e)
         {
             System.err.println("Could not register handler for Mac events." +
                                " (com.apple.eawt classes not found)");
         }
     }
 
-    private static final boolean s_isMac;
+    private static boolean s_isMac;
 
-    private static final boolean s_isUnix;
+    private static boolean s_isUnix;
 
-    private static final boolean s_isWindows;
+    private static boolean s_isWindows;
 
     static
     {
         // See http://developer.apple.com/technotes/tn2002/tn2110.html
         String name = System.getProperty("os.name");
         s_isMac = name.toLowerCase(Locale.getDefault()).startsWith("mac os x");
-        s_isUnix = (name.contains("nix") || name.contains("nux"));
+        s_isUnix = (name.indexOf("nix") >= 0 || name.indexOf("nux") >= 0);
         s_isWindows = name.startsWith("Windows");
     }
 
@@ -201,7 +197,7 @@ public class Platform
         {
             String[] cmdArray = { "dcop" };
             String result = ProcessUtil.runCommand(cmdArray);
-            return (result.contains("kicker"));
+            return (result.indexOf("kicker") >= 0);
         }
         catch (IOException e)
         {

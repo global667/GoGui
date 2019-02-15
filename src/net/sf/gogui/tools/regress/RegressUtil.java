@@ -29,20 +29,20 @@ public class RegressUtil
         }
     }
 
-    /** *  Expands all test suites (names starting with '@') by the tests in
-        the test suite file (without the '@').The file is expected to be in a format as used by
+    /** Expands all test suites (names starting with '@') by the tests in
+        the test suite file (without the '@').
+        The file is expected to be in a format as used by
         FileUtil.readStringListFromFile.
         The expansion is done recursively.
         @param list List of test names (as strings)
         @return List of test names (as strings) with all test suites
-        expanded.
-     * @throws java.io.IOException */
+        expanded. */
     public static ArrayList<String> expandTestSuites(ArrayList<String> list)
         throws IOException
     {
         while (containsTestSuite(list))
         {
-            ArrayList<String> newList = new ArrayList<>();
+            ArrayList<String> newList = new ArrayList<String>();
             for (int i = 0; i < list.size(); ++i)
             {
                 String name = list.get(i);

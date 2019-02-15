@@ -48,24 +48,20 @@ public class Display
         m_board = new Board(m_size);
         m_frame = new JFrame();
         m_frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-        WindowAdapter windowAdapter;
-        windowAdapter = new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent event) {
-                closeFrame();
-            }
-        };
+        WindowAdapter windowAdapter = new WindowAdapter() {
+                public void windowClosing(WindowEvent event) {
+                    closeFrame();
+                }
+            };
         m_frame.addWindowListener(windowAdapter);
         Container contentPane = m_frame.getContentPane();
         m_guiBoard = new GuiBoard(m_size);
         m_guiBoard.setListener(new GuiBoard.Listener() {
-                @Override
                 public void contextMenu(GoPoint point, Component invoker,
                                         int x, int y)
                 {
                 }
 
-                @Override
                 public void fieldClicked(GoPoint point,
                                          boolean modifiedSelect)
                 {
@@ -78,31 +74,26 @@ public class Display
         contentPane.add(m_statusBar, BorderLayout.SOUTH);
         if (! StringUtil.isEmpty(program))
         {
-            GtpClient.IOCallback ioCallback;
-            ioCallback = new GtpClient.IOCallback() {
-                @Override
-                public void receivedInvalidResponse(String s) {
-                }
-                
-                @Override
-                public void receivedResponse(boolean error, String s) {
-                }
-                
-                @Override
-                public void receivedStdErr(String s) {
-                    m_lineReader.add(s);
-                    while (m_lineReader.hasLines())
-                        m_liveGfx.handleLine(m_lineReader.getLine());
-                }
-                
-                @Override
-                public void sentCommand(String s) {
-                }
-                
-                private final LineReader m_lineReader = new LineReader();
-                
-                private final LiveGfx m_liveGfx = new LiveGfx(Display.this);
-            };
+            GtpClient.IOCallback ioCallback = new GtpClient.IOCallback() {
+                    public void receivedInvalidResponse(String s) {
+                    }
+
+                    public void receivedResponse(boolean error, String s) {
+                    }
+
+                    public void receivedStdErr(String s) {
+                        m_lineReader.add(s);
+                        while (m_lineReader.hasLines())
+                            m_liveGfx.handleLine(m_lineReader.getLine());
+                    }
+
+                    public void sentCommand(String s) {
+                    }
+
+                    private final LineReader m_lineReader = new LineReader();
+
+                    private LiveGfx m_liveGfx = new LiveGfx(Display.this);
+                };
             m_gtp = new GtpClient(program, null, verbose, ioCallback);
             m_gtp.queryProtocolVersion();
             m_gtp.querySupportedCommands();
@@ -131,17 +122,21 @@ public class Display
             m_gtp.close();
             m_gtp.waitForExit();
         }
-        GuiUtil.invokeAndWait(() -> {
-            if (m_frame != null)
+        GuiUtil.invokeAndWait(new Runnable()
             {
-                m_messageDialogs.showInfo(m_frame,
-                        "GTP stream was closed",
-                        "", true);
-                showStatus("GTP stream was closed");
-            }
-            else if (m_gtp == null)
-                System.exit(0);
-        });
+                public void run()
+                {
+                    if (m_frame != null)
+                    {
+                        m_messageDialogs.showInfo(m_frame,
+                                                  "GTP stream was closed",
+                                                  "", true);
+                        showStatus("GTP stream was closed");
+                    }
+                    else if (m_gtp == null)
+                        System.exit(0);
+                }
+            });
     }
 
     public void cmdForward(GtpCommand cmd) throws GtpError
@@ -149,7 +144,6 @@ public class Display
         send(cmd.getLine(), cmd.getResponse());
     }
 
-    @Override
     public void cmdName(GtpCommand cmd)
     {
         if (m_gtp == null)
@@ -158,7 +152,6 @@ public class Display
             cmd.setResponse(m_name);
     }
 
-    @Override
     public void cmdQuit(GtpCommand cmd) throws GtpError
     {
         if (m_gtp != null)
@@ -166,14 +159,12 @@ public class Display
         setQuit();
     }
 
-    @Override
     public void handleCommand(GtpCommand cmd) throws GtpError
     {
         showStatus(cmd.getLine());
         super.handleCommand(cmd);
     }
 
-    @Override
     public void interruptCommand()
     {
         if (m_gtp == null)
@@ -189,7 +180,6 @@ public class Display
         }
     }
 
-    @Override
     public void showLiveGfx(final String text)
     {
         assert SwingUtilities.isEventDispatchThread();
@@ -272,15 +262,19 @@ public class Display
             send(command);
         }
         m_size = size;
-        GuiUtil.invokeAndWait(() -> {
-            m_board.init(m_size);
-            if (m_guiBoard.getBoardSize() != m_size)
+        GuiUtil.invokeAndWait(new Runnable()
             {
-                m_guiBoard.initSize(m_size);
-                m_frame.pack();
-            }
-            updateFromGoBoard();
-        });
+                public void run()
+                {
+                    m_board.init(m_size);
+                    if (m_guiBoard.getBoardSize() != m_size)
+                    {
+                        m_guiBoard.initSize(m_size);
+                        m_frame.pack();
+                    }
+                    updateFromGoBoard();
+                }
+            });
     }
 
     private void cmdClearBoard(GtpCommand cmd) throws GtpError
@@ -291,10 +285,14 @@ public class Display
             String command = m_gtp.getCommandClearBoard(m_size);
             send(command);
         }
-        GuiUtil.invokeAndWait(() -> {
-            m_board.clear();
-            updateFromGoBoard();
-        });
+        GuiUtil.invokeAndWait(new Runnable()
+            {
+                public void run()
+                {
+                    m_board.clear();
+                    updateFromGoBoard();
+                }
+            });
     }
 
     private void cmdGenmove(GtpCommand cmd) throws GtpError
@@ -340,12 +338,16 @@ public class Display
             }
         }
         m_move = Move.get(color, point);
-        GuiUtil.invokeAndWait(() -> {
-            m_board.play(m_move);
-            updateFromGoBoard();
-            if (m_gtp == null)
-                clearStatus();
-        });
+        GuiUtil.invokeAndWait(new Runnable()
+            {
+                public void run()
+                {
+                    m_board.play(m_move);
+                    updateFromGoBoard();
+                    if (m_gtp == null)
+                        clearStatus();
+                }
+            });
     }
 
     private void cmdKomi(GtpCommand cmd) throws GtpError
@@ -400,46 +402,69 @@ public class Display
             send(command);
         }
         m_move = Move.get(color, point);
-        GuiUtil.invokeAndWait(() -> {
-            m_board.play(m_move);
-            updateFromGoBoard();
-        });
+        GuiUtil.invokeAndWait(new Runnable()
+            {
+                public void run()
+                {
+                    m_board.play(m_move);
+                    updateFromGoBoard();
+                }
+            });
     }
 
     private void registerCommands()
     {
         if (m_gtp != null)
         {
-            GtpCallback forwardCallback = (GtpCommand cmd) -> {
-                cmdForward(cmd);
-            };
+            GtpCallback forwardCallback = new GtpCallback() {
+                    public void run(GtpCommand cmd) throws GtpError {
+                        cmdForward(cmd); } };
             ArrayList<String> commands = m_gtp.getSupportedCommands();
-            commands.stream().filter((c) -> !(GtpUtil.isStateChangingCommand(c)
+            for (String c : commands)
+            {
+                if (GtpUtil.isStateChangingCommand(c)
                     || c.equals("help")
                     || c.equals("known_command")
                     || c.equals("komi")
                     || c.equals("list_commands")
-                    || c.equals("protocol_version"))).forEachOrdered((c) -> {
-                        register(c, forwardCallback);
-            });
+                    || c.equals("protocol_version"))
+                    continue;
+                register(c, forwardCallback);
+            }
         }
-        register("boardsize", (GtpCommand cmd) -> {
-            cmdBoardsize(cmd);
-        });
-        register("clear_board", (GtpCommand cmd) -> {
-            cmdClearBoard(cmd);
-        });
-        register("genmove", (GtpCommand cmd) -> {
-            cmdGenmove(cmd);
-        });
-        register("komi", this::cmdKomi);
-        register("name", this::cmdName);
-        register("place_free_handicap", this::cmdPlaceFreeHandicap);
-        register("play", this::cmdPlay);
-        register("quit", this::cmdQuit);
-        register("set_free_handicap", this::cmdSetFreeHandicap);
-        register("undo", this::cmdUndo);
-        register("version", this::cmdVersion);
+        register("boardsize", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdBoardsize(cmd); } });
+        register("clear_board", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdClearBoard(cmd); } });
+        register("genmove", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdGenmove(cmd); } });
+        register("komi", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdKomi(cmd); } });
+        register("name", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdName(cmd); } });
+        register("place_free_handicap", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdPlaceFreeHandicap(cmd); } });
+        register("play", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdPlay(cmd); } });
+        register("quit", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdQuit(cmd); } });
+        register("set_free_handicap", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdSetFreeHandicap(cmd); } });
+        register("undo", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdUndo(cmd); } });
+        register("version", new GtpCallback() {
+                public void run(GtpCommand cmd) throws GtpError {
+                    cmdVersion(cmd); } });
     }
 
     private void send(String cmd, StringBuilder response) throws GtpError
@@ -454,10 +479,14 @@ public class Display
 
     private void showStatus(final String text)
     {
-        Runnable runnable = () -> {
-            if (m_frame != null)
-                m_statusBar.setText(text);
-        };
+        Runnable runnable = new Runnable()
+            {
+                public void run()
+                {
+                    if (m_frame != null)
+                        m_statusBar.setText(text);
+                }
+            };
         if (SwingUtilities.isEventDispatchThread())
             runnable.run();
         else
@@ -468,10 +497,14 @@ public class Display
     {
         if (m_gtp != null)
             send("undo");
-        GuiUtil.invokeAndWait(() -> {
-            m_board.undo();
-            updateFromGoBoard();
-        });
+        GuiUtil.invokeAndWait(new Runnable()
+            {
+                public void run()
+                {
+                    m_board.undo();
+                    updateFromGoBoard();
+                }
+            });
     }
 
     private void updateFromGoBoard()

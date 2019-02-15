@@ -16,8 +16,7 @@ import net.sf.gogui.util.Platform;
 public class GoGuiToolBar
     extends JToolBar
 {
-    /** Tool bar for GoGui.
-     * @param goGui */
+    /** Tool bar for GoGui. */
     public GoGuiToolBar(GoGui goGui)
     {
         m_goGui = goGui;
@@ -61,6 +60,7 @@ public class GoGuiToolBar
     private JButton addButton(AbstractAction action)
     {
         JButton button = new JButton(action);
+        //button.putClientProperty("Quaqua.Button.style", "toolbar");
         setAction(button, action);
         addButton(button);
         return button;
@@ -88,9 +88,11 @@ class GoGuiToggleButton
     public GoGuiToggleButton(AbstractAction action)
     {
         super(action);
-        action.addPropertyChangeListener((PropertyChangeEvent e) -> {
-            if (e.getPropertyName().equals("selected"))
-                setSelected(((Boolean)e.getNewValue()));
-        });
+        action.addPropertyChangeListener(new PropertyChangeListener() {
+                public void  propertyChange(PropertyChangeEvent e) {
+                    if (e.getPropertyName().equals("selected"))
+                        setSelected(((Boolean)e.getNewValue()).booleanValue());
+                }
+            });
     }
 }

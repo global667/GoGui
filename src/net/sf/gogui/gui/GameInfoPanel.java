@@ -36,15 +36,13 @@ public class GameInfoPanel
 {
     public GameInfoPanel(Game game)
     {
-        this.m_prisoners = new BlackWhiteSet<Prisoners>();
-        this.m_icon = new BlackWhiteSet<>();
-        this.m_clock = new BlackWhiteSet<>();
         setBorder(GuiUtil.createEmptyBorder());
         JPanel panel =
             new JPanel(new GridLayout(0, 2, GuiUtil.PAD, GuiUtil.PAD));
         add(panel, BorderLayout.CENTER);
         m_game = game;
-        WHITE_BLACK.forEach((c) -> {
+        for (GoColor c : WHITE_BLACK)
+        {
             Box box = Box.createVerticalBox();
             panel.add(box);
             ImageIcon icon;
@@ -62,10 +60,13 @@ public class GameInfoPanel
             GoColor otherColor = c.otherColor();
             m_prisoners.set(otherColor, new Prisoners(otherColor));
             box.add(m_prisoners.get(otherColor));
-        });
-        Clock.Listener listener = () -> {
-            SwingUtilities.invokeLater(m_updateTime);
-        };
+        }
+        Clock.Listener listener = new Clock.Listener() {
+                public void clockChanged()
+                {
+                    SwingUtilities.invokeLater(m_updateTime);
+                }
+            };
         game.setClockListener(listener);
     }
 
@@ -75,36 +76,34 @@ public class GameInfoPanel
         ConstNode node = m_game.getCurrentNode();
         ConstGameTree tree = m_game.getTree();
         ConstGameInfo info = tree.getGameInfoConst(node);
-        BLACK_WHITE.stream().map((c) -> {
+        for (GoColor c : BLACK_WHITE)
+        {
             String name = info.get(StringInfoColor.NAME, c);
             String rank = info.get(StringInfoColor.RANK, c);
             updatePlayerToolTip(m_icon.get(c), name, rank, c);
-            return c;
-        }).map((c) -> {
             m_prisoners.get(c).setCount(board.getCaptured(c));
-            return c;
-        }).forEachOrdered((c) -> {
             updateTimeFromClock(m_game.getClock(), c);
-        });
+        }
     }
 
     private class UpdateTimeRunnable
         implements Runnable
     {
-        @Override
         public void run()
         {
-            BLACK_WHITE.forEach((c) -> {
+            for (GoColor c : BLACK_WHITE)
                 updateTimeFromClock(m_game.getClock(), c);
-            });
         }
     }
 
-    private final BlackWhiteSet<GuiClock> m_clock;
+    private final BlackWhiteSet<GuiClock> m_clock
+        = new BlackWhiteSet<GuiClock>();
 
-    private final BlackWhiteSet<JLabel> m_icon;
+    private final BlackWhiteSet<JLabel> m_icon
+        = new BlackWhiteSet<JLabel>();
 
-    private final BlackWhiteSet<Prisoners> m_prisoners;
+    private final BlackWhiteSet<Prisoners> m_prisoners
+        = new BlackWhiteSet<Prisoners>();
 
     private final Game m_game;
 
@@ -156,7 +155,6 @@ class GuiClock
         setText("00:00");
     }
 
-    @Override
     public final void setText(String text)
     {
         super.setText(text);

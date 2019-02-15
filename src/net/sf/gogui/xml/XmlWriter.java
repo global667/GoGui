@@ -36,10 +36,7 @@ import net.sf.gogui.util.XmlUtil;
     of the GoGui documentation. */
 public class XmlWriter
 {
-    /** Construct writer and write tree.
-     * @param out
-     * @param tree
-     * @param application */
+    /** Construct writer and write tree. */
     public XmlWriter(OutputStream out, ConstGameTree tree, String application)
     {
         try
@@ -76,7 +73,7 @@ public class XmlWriter
         m_out.close();
     }
 
-    private final int m_boardSize;
+    private int m_boardSize;
 
     private PrintStream m_out;
 
@@ -175,10 +172,9 @@ public class XmlWriter
                             + "</Arg></SGF>\n");
         Map<GoPoint,String> labels = node.getLabelsUnmodifiable();
         if (labels != null)
-            labels.entrySet().forEach((e) -> {
+            for (Map.Entry<GoPoint,String> e : labels.entrySet())
                 m_out.print("<Mark at=\"" + e.getKey() + "\" label=\""
-                        + XmlUtil.escapeAttr(e.getValue()) + "\"/>\n");
-        });
+                            + XmlUtil.escapeAttr(e.getValue()) + "\"/>\n");
     }
 
     private void printMarkup(ConstNode node, MarkType type, String attributes)
@@ -327,19 +323,16 @@ public class XmlWriter
 
     private void printSgfProperties(ConstSgfProperties sgfProps)
     {
-        sgfProps.getKeys().stream().map((key) -> {
+        for (String key : sgfProps.getKeys())
+        {
             m_out.print("<SGF type=\"" + key + "\">");
-            return key;
-        }).map((key) -> {
             int numberValues = sgfProps.getNumberValues(key);
             for (int i = 0; i < numberValues; ++i)
                 m_out.print("<Arg>" +
-                        XmlUtil.escapeText(sgfProps.getValue(key, i))
-                        + "</Arg>");
-            return key;
-        }).forEachOrdered((_item) -> {
+                            XmlUtil.escapeText(sgfProps.getValue(key, i))
+                            + "</Arg>");
             m_out.print("</SGF>\n");
-        });
+        }
     }
 
     private void printSetup(ConstNode node)

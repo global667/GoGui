@@ -17,7 +17,6 @@ public class Histogram
         m_array = new int[m_size];
     }
 
-    @Override
     public void add(double value)
     {
         super.add(value);
@@ -44,8 +43,7 @@ public class Histogram
         return m_max;
     }
 
-    /** Return number of intervals.
-     * @return  */
+    /** Return number of intervals. */
     public int getSize()
     {
         return m_size;
@@ -61,7 +59,6 @@ public class Histogram
         return m_min + i * m_step;
     }
 
-    @SuppressWarnings("empty-statement")
     public void printHtml(PrintStream out)
     {
         out.print("<p>\n" +
@@ -101,5 +98,5 @@ public class Histogram
 
     private final double m_step;
 
-    private final int[] m_array;
+    private int[] m_array;
 }

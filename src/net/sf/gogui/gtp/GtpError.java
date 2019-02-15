@@ -13,8 +13,8 @@ public class GtpError
         super(s);
     }
 
-    /** *  The command that caused the error.Can return null, if the command is not known.
-     * @return  */
+    /** The command that caused the error.
+        Can return null, if the command is not known. */
     public String getCommand()
     {
         return m_command;

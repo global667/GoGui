@@ -34,9 +34,7 @@ public class Options
         parseArgs(args);
     }
 
-    /** Check if option is present.
-     * @param option
-     * @return  */
+    /** Check if option is present. */
     public boolean contains(String option)
     {
         String value = get(option, null);
@@ -271,9 +269,9 @@ public class Options
         return opt;
     }
 
-    private final ArrayList<String> m_args = new ArrayList<>();
+    private final ArrayList<String> m_args = new ArrayList<String>();
 
-    private final Map<String,String> m_map = new TreeMap<>();
+    private final Map<String,String> m_map = new TreeMap<String,String>();
 
     private String getSpec(String option) throws ErrorMessage
     {

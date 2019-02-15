@@ -10,7 +10,6 @@ import net.sf.gogui.util.FileUtil;
 public class TexFilter
     extends FileFilter
 {
-    @Override
     public boolean accept(File file)
     {
         if (file.isDirectory())
@@ -18,7 +17,6 @@ public class TexFilter
         return FileUtil.hasExtension(file, "tex");
     }
 
-    @Override
     public String getDescription()
     {
         return "LaTex files (*.tex)";

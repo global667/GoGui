@@ -27,11 +27,11 @@ public final class PrefUtil
     {
         Preferences prefs = getNode(path);
         if (prefs == null)
-            return new ArrayList<>();
+            return new ArrayList<String>();
         int size = prefs.getInt("size", 0);
         if (size <= 0)
-            return new ArrayList<>();
-        ArrayList<String> result = new ArrayList<>(size);
+            return new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<String>(size);
         for (int i = 0; i < size; ++i)
         {
             String element = prefs.get("element_" + i, null);

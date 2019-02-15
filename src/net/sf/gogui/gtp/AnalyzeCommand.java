@@ -64,10 +64,11 @@ public class AnalyzeCommand
         }
         else if (needsPointListArg())
         {
-            m_pointListArg.forEach((p) -> {
+            for (GoPoint p : m_pointListArg)
+            {
                 buffer.append(' ');
                 buffer.append(p);
-            });
+            }
         }
         if (needsStringArg() && m_stringArg != null)
         {

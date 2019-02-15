@@ -25,68 +25,46 @@ public class AnalyzeDefinition
     {
         String array[] = line.split("/");
         String typeStr = array[0];
-        switch (typeStr) {
-            case "bwboard":
-                m_type = AnalyzeType.BWBOARD;
-                break;
-            case "cboard":
-                m_type = AnalyzeType.CBOARD;
-                break;
-            case "dboard":
-                m_type = AnalyzeType.DBOARD;
-                break;
-            case "eplist":
-                m_type = AnalyzeType.EPLIST;
-                break;
-            case "gfx":
-                m_type = AnalyzeType.GFX;
-                break;
-            case "hstring":
-                m_type = AnalyzeType.HSTRING;
-                break;
-            case "hpstring":
-                m_type = AnalyzeType.HPSTRING;
-                break;
-            case "param":
-                m_type = AnalyzeType.PARAM;
-                break;
-            case "plist":
-                m_type = AnalyzeType.PLIST;
-                break;
-            case "pspairs":
-                m_type = AnalyzeType.PSPAIRS;
-                break;
-            case "pstring":
-                m_type = AnalyzeType.PSTRING;
-                break;
-            case "string":
-                m_type = AnalyzeType.STRING;
-                break;
-            case "sboard":
-                m_type = AnalyzeType.SBOARD;
-                break;
-            case "var":
-                m_type = AnalyzeType.VAR;
-                break;
-            case "varb":
-                m_type = AnalyzeType.VARB;
-                break;
-            case "varc":
-                m_type = AnalyzeType.VARC;
-                break;
-            case "varp":
-                m_type = AnalyzeType.VARP;
-                break;
-            case "varpo":
-                m_type = AnalyzeType.VARPO;
-                break;
-            case "varw":
-                m_type = AnalyzeType.VARW;
-                break;
-            default:
-                m_type = AnalyzeType.NONE;
-                break;
-        }
+        if (typeStr.equals("bwboard"))
+            m_type = AnalyzeType.BWBOARD;
+        else if (typeStr.equals("cboard"))
+            m_type = AnalyzeType.CBOARD;
+        else if (typeStr.equals("dboard"))
+            m_type = AnalyzeType.DBOARD;
+        else if (typeStr.equals("eplist"))
+            m_type = AnalyzeType.EPLIST;
+        else if (typeStr.equals("gfx"))
+            m_type = AnalyzeType.GFX;
+        else if (typeStr.equals("hstring"))
+            m_type = AnalyzeType.HSTRING;
+        else if (typeStr.equals("hpstring"))
+            m_type = AnalyzeType.HPSTRING;
+        else if (typeStr.equals("param"))
+            m_type = AnalyzeType.PARAM;
+        else if (typeStr.equals("plist"))
+            m_type = AnalyzeType.PLIST;
+        else if (typeStr.equals("pspairs"))
+            m_type = AnalyzeType.PSPAIRS;
+        else if (typeStr.equals("pstring"))
+            m_type = AnalyzeType.PSTRING;
+        else if (typeStr.equals("string"))
+            m_type = AnalyzeType.STRING;
+        else if (typeStr.equals("sboard"))
+            m_type = AnalyzeType.SBOARD;
+        else if (typeStr.equals("var"))
+            m_type = AnalyzeType.VAR;
+        else if (typeStr.equals("varb"))
+            m_type = AnalyzeType.VARB;
+        else if (typeStr.equals("varc"))
+            m_type = AnalyzeType.VARC;
+        else if (typeStr.equals("varp"))
+            m_type = AnalyzeType.VARP;
+        else if (typeStr.equals("varpo"))
+            m_type = AnalyzeType.VARPO;
+        else if (typeStr.equals("varw"))
+            m_type = AnalyzeType.VARW;
+        else
+            m_type = AnalyzeType.NONE;
         m_label = array[1];
         m_command = array[2];
     }
@@ -113,10 +91,10 @@ public class AnalyzeDefinition
         return m_type;
     }
 
-    /** *  Should the response be shown as text.Returns true for types that should be shown (not necessarily only)
+    /** Should the response be shown as text.
+        Returns true for types that should be shown (not necessarily only)
         as text to the user.
-        That is string and variation commands.
-     * @return  */
+        That is string and variation commands. */
     public boolean isTextType()
     {
         return m_type == AnalyzeType.STRING
@@ -133,22 +111,22 @@ public class AnalyzeDefinition
 
     public boolean needsColorArg()
     {
-        return (m_command.contains("%c"));
+        return (m_command.indexOf("%c") >= 0);
     }
 
     public boolean needsFileArg()
     {
-        return (m_command.contains("%f"));
+        return (m_command.indexOf("%f") >= 0);
     }
 
     public boolean needsFileOpenArg()
     {
-        return (m_command.contains("%r"));
+        return (m_command.indexOf("%r") >= 0);
     }
 
     public boolean needsFileSaveArg()
     {
-        return (m_command.contains("%w"));
+        return (m_command.indexOf("%w") >= 0);
     }
 
     public boolean needsOnlyPointArg()
@@ -176,22 +154,22 @@ public class AnalyzeDefinition
 
     public boolean needsPointArg()
     {
-        return (m_command.contains("%p"));
+        return (m_command.indexOf("%p") >= 0);
     }
 
     public boolean needsPointListArg()
     {
-        return (m_command.contains("%P") || m_type == AnalyzeType.EPLIST);
+        return (m_command.indexOf("%P") >= 0 || m_type == AnalyzeType.EPLIST);
     }
 
     public boolean needsStringArg()
     {
-        return (m_command.contains("%s"));
+        return (m_command.indexOf("%s") >= 0);
     }
 
     public boolean needsOptStringArg()
     {
-        return (m_command.contains("%o"));
+        return (m_command.indexOf("%o") >= 0);
     }
 
     public static ArrayList<AnalyzeDefinition>
@@ -226,7 +204,7 @@ public class AnalyzeDefinition
             String resource = "net/sf/gogui/gui/analyze-commands";
             URL url = ClassLoader.getSystemClassLoader().getResource(resource);
             if (url == null)
-                return new ArrayList<>();
+                return new ArrayList<AnalyzeDefinition>();
             try
             {
                 InputStream inputStream = url.openStream();
@@ -253,8 +231,8 @@ public class AnalyzeDefinition
                    ArrayList<String> supportedCommands) throws ErrorMessage
     {
         ArrayList<AnalyzeDefinition> result
-            = new ArrayList<>();
-        ArrayList<String> labels = new ArrayList<>();
+            = new ArrayList<AnalyzeDefinition>();
+        ArrayList<String> labels = new ArrayList<String>();
         try
         {
             String line;
