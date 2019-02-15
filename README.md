@@ -4,7 +4,7 @@ A graphical user interface for the asien boardgame of Go. Follow the instruction
 ## On macOS
 ### Presettings
 First make sure you have installed:
-* Java 6: https://support.apple.com/kb/DL1572?viewlocale=en_US&locale=de_DE
+* Java 6: https://support.apple.com/kb/DL1572
 * Ant 1.9: https://ant.apache.org/bindownload.cgi
 
 For documentations you need also:
