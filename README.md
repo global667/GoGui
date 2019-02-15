@@ -1,9 +1,10 @@
 # GoGui
 A graphical user interface for the asien boardgame of Go. Follow the instructions below to build on your computer.
-
-## Presettings
+ 
+## On macOS
+### Presettings
 First make sure you have installed:
-* Java 8: https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+* Java 6: https://support.apple.com/kb/DL1572?locale=de_DE&viewlocale=de_DE
 * Ant 1.9: https://ant.apache.org/bindownload.cgi
 
 For documentations you need also:
@@ -11,12 +12,17 @@ For documentations you need also:
 
 The developing works with Netbeans 7.4 and Java 6 on a macOS system.
 
-## Build
+### Build
 Clone the GoGui package from this site and uncompress it. Then type 
 
     cd /path/of/the/goguipackage
     ant
     java -jar ./lib/gogui.jar
+or
+
+    cd /path/of/the/goguipackage
+    ant gogui.app
+    open ./build/gogui.app
 
 on the console.
 
