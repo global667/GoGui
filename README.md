@@ -6,6 +6,9 @@ First make sure you have installed:
 * Java 8: https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
 * Ant 1.9: https://ant.apache.org/bindownload.cgi
 
+For documentations you need also:
+* docbook xsl: https://sourceforge.net/projects/docbook/files/#files
+
 The developing works with Netbeans 10 and Java 8 on a macOS system.
 
 ## Build
