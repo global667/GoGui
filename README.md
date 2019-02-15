@@ -9,7 +9,7 @@ First make sure you have installed:
 For documentations you need also:
 * docbook xsl: https://sourceforge.net/projects/docbook/files/#files
 
-The developing works with Netbeans 10 and Java 8 on a macOS system.
+The developing works with Netbeans 7.4 and Java 6 on a macOS system.
 
 ## Build
 Clone the GoGui package from this site and uncompress it. Then type 
