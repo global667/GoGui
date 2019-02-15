@@ -27,4 +27,4 @@ or
 on the console.
 
 That's it.
-If you got problems, send a mail. This project is licensed under the terms of the gpl-3.0 license.
+If you got problems, send a mail or put a ticket on [issues](https://github.com/global667/GoGui/issues). This project is licensed under the terms of the gpl-3.0 license.
