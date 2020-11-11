@@ -159,8 +159,9 @@ public final class GuiBoardUtil
         if (c == EMPTY)
             return;
         PointList stones = countScore.changeStatus(p);
-        for (GoPoint stone : stones)
+        stones.forEach((stone) -> {
             guiBoard.setCrossHair(stone, countScore.isDead(stone));
+        });
         computeScore(guiBoard, countScore, board);
     }
 
@@ -171,17 +172,26 @@ public final class GuiBoardUtil
             {
                 GoPoint point = GoPoint.get(x, y);
                 String s = board[x][y].toLowerCase(Locale.ENGLISH);
-                if (s.equals("b") || s.equals("black"))
+            switch (s) {
+                case "b":
+                case "black":
                     guiBoard.setTerritory(point, BLACK);
-                else if (s.equals("w") || s.equals("white"))
+                    break;
+                case "w":
+                case "white":
                     guiBoard.setTerritory(point, WHITE);
-                else
+                    break;
+                default:
                     guiBoard.setTerritory(point, EMPTY);
+                    break;
+            }
             }
     }
 
-    /** @deprecated This function was renamed to showMoves(). The forwarding
-        functions may be removed in the future */
+    /**
+     * @param guiBoard *  @deprecated This function was renamed to showMoves(). The forwarding
+        functions may be removed in the future
+     * @param childrenMoves */
     public static void showChildrenMoves(GuiBoard guiBoard,
                                          ConstPointList childrenMoves)
     {
@@ -216,8 +226,9 @@ public final class GuiBoardUtil
             }
     }
 
-    /** Shows markup on board.
-        Existing markup is not cleared (but may be overwritten. */
+    /** *  Shows markup on board.Existing markup is not cleared (but may be overwritten.
+     * @param guiBoard
+     * @param node */
     public static void showMarkup(GuiBoard guiBoard, ConstNode node)
     {
         ConstPointList mark = node.getMarkedConst(MarkType.MARK);
@@ -249,19 +260,18 @@ public final class GuiBoardUtil
         Map<GoPoint,String> labels = node.getLabelsUnmodifiable();
         if (labels != null)
         {
-            for (Map.Entry<GoPoint,String> entry : labels.entrySet())
-            {
+            labels.entrySet().forEach((entry) -> {
                 GoPoint point = entry.getKey();
                 String value = entry.getValue();
                 guiBoard.setLabel(point, value);
-            }
+            });
         }
     }
 
-    /** Show a list of moves with labels 'A', 'B', 'C' ...
-        If the list contains more than 26 unique moves, the label '*' is used.
-        If a move appears more than once in the list, the character '&gt;'
-        will be appended to the label. */
+    /** *  Show a list of moves with labels 'A', 'B', 'C' ...If the list contains more than 26 unique moves, the label '*' is used.If a move appears more than once in the list, the character '&gt;'
+        will be appended to the label.
+     * @param guiBoard
+     * @param childrenMoves */
     public static void showMoves(GuiBoard guiBoard,
                                  ConstPointList childrenMoves)
     {
@@ -310,10 +320,11 @@ public final class GuiBoardUtil
         }
     }
 
-    /** Shows moves in variation as stones with move number labels on board.
-        If there are several moves on the same point then the only first move
+    /** *  Shows moves in variation as stones with move number labels on board.If there are several moves on the same point then the only first move
         is shown for short variations (less/equal ten moves); and only the
-        last move for long variations. */
+        last move for long variations.
+     * @param guiBoard
+     * @param variation */
     public static void showVariation(GuiBoard guiBoard, Move[] variation)
     {
         guiBoard.clearAllLabels();

@@ -13,16 +13,19 @@ public final class PointList
     public class ConstIterator
         implements Iterator<GoPoint>
     {
+        @Override
         public boolean hasNext()
         {
             return (m_index < size());
         }
 
+        @Override
         public GoPoint next()
         {
             return get(m_index++);
         }
 
+        @Override
         public void remove()
         {
             throw new UnsupportedOperationException();
@@ -59,31 +62,33 @@ public final class PointList
         super((PointList)list);
     }
 
-    /** Add points of another list  at the end of this list. */
+    /** Add points of another list  at the end of this list.
+     * @param list */
     public void addAllFromConst(ConstPointList list)
     {
         addAll((PointList)list);
     }
 
-    /** Get an empty constant point list.
-        Can be used at places where an empty temporary point list is needed
-        that is never modified to avoid memory allocation. */
+    /** *  Get an empty constant point list.Can be used at places where an empty temporary point list is needed
+        that is never modified to avoid memory allocation.
+     * @return  */
     public static ConstPointList getEmptyList()
     {
         return EMPTY_LIST;
     }
 
-    /** Returns an iterator over the points elements in this list.
-        An iterator of type PointList.ConstIterator is returned, which
+    /** *  Returns an iterator over the points elements in this list.An iterator of type PointList.ConstIterator is returned, which
         does not support Iterator.remove(), to allow for-each-loops for
-        ConstPointList references. */
+        ConstPointList references.
+     * @return  */
+    @Override
     public Iterator<GoPoint> iterator()
     {
         return new ConstIterator();
     }
 
-    /** Remove and return last element.
-        Requires that list is not empty. */
+    /** *  Remove and return last element.Requires that list is not empty.
+     * @return  */
     public GoPoint pop()
     {
         int index = size() - 1;
@@ -97,6 +102,7 @@ public final class PointList
         return p;
     }
 
+    @Override
     public String toString()
     {
         StringBuilder buffer = new StringBuilder();
@@ -109,8 +115,9 @@ public final class PointList
         return buffer.toString();
     }
 
-    /** Convert point list to string.
-        Null arguments will be converted to an empty string. */
+    /** *  Convert point list to string.Null arguments will be converted to an empty string.
+     * @param list
+     * @return  */
     public static String toString(ConstPointList list)
     {
         if (list == null)

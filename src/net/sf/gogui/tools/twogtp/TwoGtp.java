@@ -2,6 +2,7 @@
 
 package net.sf.gogui.tools.twogtp;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import net.sf.gogui.game.ConstNode;
 import net.sf.gogui.game.ConstGameTree;
@@ -23,6 +24,7 @@ import net.sf.gogui.gtp.GtpEngine;
 import net.sf.gogui.gtp.GtpError;
 import net.sf.gogui.gtp.GtpResponseFormatError;
 import net.sf.gogui.gtp.GtpUtil;
+import net.sf.gogui.sgf.SgfError;
 import net.sf.gogui.util.ErrorMessage;
 import net.sf.gogui.util.ObjectUtil;
 import net.sf.gogui.util.Platform;
@@ -34,8 +36,21 @@ public class TwoGtp
     extends GtpEngine
 {
     /** Constructor.
+     * @param black
+     * @param white
         @param komi The fixed komi. See TwoGtp documentation for option
-        -komi */
+        -komi
+     * @param observer
+     * @param size
+     * @param referee
+     * @param numberGames
+     * @param alternate
+     * @param filePrefix
+     * @param verbose
+     * @param openings
+     * @param timeSettings
+     * @param resultFile
+     * @throws java.lang.Exception */
     public TwoGtp(Program black, Program white, Program referee,
                   String observer, int size, Komi komi, int numberGames,
                   boolean alternate, String filePrefix, boolean verbose,
@@ -44,11 +59,15 @@ public class TwoGtp
         throws Exception
     {
         super(null);
+        this.m_debugToCommentBuffer = new BlackWhiteSet<>(new StringBuilder(),
+                new StringBuilder());
+        this.m_games = new ArrayList<>(100);
+        this.m_realTime = new BlackWhiteSet<>(0., 0.);
         assert size > 0;
         assert size <= GoPoint.MAX_SIZE;
         assert komi != null;
         m_filePrefix = filePrefix;
-        m_allPrograms = new ArrayList<Program>();
+        m_allPrograms = new ArrayList<>();
         m_black = black;
         m_allPrograms.add(m_black);
         m_white = white;
@@ -63,8 +82,9 @@ public class TwoGtp
             m_observer = new Program(observer, "Observer", "O", verbose);
             m_allPrograms.add(m_observer);
         }
-        for (Program program : m_allPrograms)
+        m_allPrograms.forEach((program) -> {
             program.setLabel(m_allPrograms);
+        });
         m_size = size;
         m_komi = komi;
         m_alternate = alternate;
@@ -105,10 +125,12 @@ public class TwoGtp
 
     public void close()
     {
-        for (Program program : m_allPrograms)
+        m_allPrograms.forEach((program) -> {
             program.close();
+        });
     }
 
+    @Override
     public void handleCommand(GtpCommand cmd) throws GtpError
     {
         String command = cmd.getCommand();
@@ -212,13 +234,16 @@ public class TwoGtp
         }
     }
 
+    @Override
     public void interruptCommand()
     {
-        for (Program program : m_allPrograms)
+        m_allPrograms.forEach((program) -> {
             program.interruptProgram();
+        });
     }
 
-    /** Store stderr of programs during move generation in SGF comments. */
+    /** Store stderr of programs during move generation in SGF comments.
+     * @param enable */
     public void setDebugToComment(boolean enable)
     {
         m_black.setIOCallback(null);
@@ -228,28 +253,36 @@ public class TwoGtp
         {
             m_black.setIOCallback(new GtpClient.IOCallback()
                 {
+                    @Override
                     public void receivedInvalidResponse(String s) { }
 
+                    @Override
                     public void receivedResponse(boolean error, String s) { }
 
+                    @Override
                     public void receivedStdErr(String s)
                     {
                         appendDebugToCommentBuffer(BLACK, s);
                     }
 
+                    @Override
                     public void sentCommand(String s) { }
                 });
             m_white.setIOCallback(new GtpClient.IOCallback()
                 {
+                    @Override
                     public void receivedInvalidResponse(String s) { }
 
+                    @Override
                     public void receivedResponse(boolean error, String s) { }
 
+                    @Override
                     public void receivedStdErr(String s)
                     {
                         appendDebugToCommentBuffer(WHITE, s);
                     }
 
+                    @Override
                     public void sentCommand(String s) { }
                 });
         }
@@ -300,28 +333,23 @@ public class TwoGtp
 
     private final ArrayList<Program> m_allPrograms;
 
-    private final BlackWhiteSet<Double> m_realTime =
-        new BlackWhiteSet<Double>(0., 0.);
+    private final BlackWhiteSet<Double> m_realTime;
 
     private String m_openingFile;
 
     private final String m_filePrefix;
 
-    private final ArrayList<ArrayList<Compare.Placement>> m_games
-        = new ArrayList<ArrayList<Compare.Placement>>(100);
+    private final ArrayList<ArrayList<Compare.Placement>> m_games;
 
-    private ResultFile m_resultFile;
+    private final ResultFile m_resultFile;
 
     private final TimeSettings m_timeSettings;
 
     private ConstNode m_lastOpeningNode;
-
     /** Buffers for stderr of programs if setDebugToComment() is used.
-        This member is used by two threads. Access only through synchronized
-        functions. */
-    private BlackWhiteSet<StringBuilder> m_debugToCommentBuffer =
-        new BlackWhiteSet<StringBuilder>(new StringBuilder(),
-                                         new StringBuilder());
+    This member is used by two threads. Access only through synchronized
+    functions. */
+    private final BlackWhiteSet<StringBuilder> m_debugToCommentBuffer;
 
     private synchronized void appendDebugToCommentBuffer(GoColor c, String s)
     {
@@ -590,7 +618,7 @@ public class TwoGtp
             {
                 m_openings.loadFile(openingFileIndex);
             }
-            catch (Exception e)
+            catch (IOException | SgfError e)
             {
                 throw new GtpError(e.getMessage());
             }
@@ -765,8 +793,9 @@ public class TwoGtp
 
     private void sendIfSupported(String cmd, String cmdLine)
     {
-        for (Program program : m_allPrograms)
+        m_allPrograms.forEach((program) -> {
             program.sendIfSupported(cmd, cmdLine);
+        });
     }
 
     private void synchronize() throws GtpError

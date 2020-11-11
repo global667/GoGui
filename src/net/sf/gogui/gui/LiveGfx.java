@@ -61,17 +61,14 @@ public class LiveGfx
 
     private boolean m_duringMultiLineResponse;
 
-    private Listener m_listener;
+    private final Listener m_listener;
 
     private final StringBuilder m_response = new StringBuilder(1024);
 
     private void showGfx(final String text)
     {
-        SwingUtilities.invokeLater(new Runnable() {
-                public void run()
-                {
-                    m_listener.showLiveGfx(text);
-                }
-            });
+        SwingUtilities.invokeLater(() -> {
+            m_listener.showLiveGfx(text);
+        });
     }
 }

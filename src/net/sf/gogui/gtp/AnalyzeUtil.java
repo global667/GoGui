@@ -21,8 +21,11 @@ public final class AnalyzeUtil
         public String m_value;
     }
 
-    /** Get command for setting a parameter.
-        See chapter "Analyze Commands" of the GoGui documentation. */
+    /** *  Get command for setting a parameter.See chapter "Analyze Commands" of the GoGui documentation.
+     * @param command
+     * @param key
+     * @param value
+     * @return  */
     public static String getParameterCommand(String command, String key,
                                              String value)
     {
@@ -32,14 +35,11 @@ public final class AnalyzeUtil
     public static boolean
         hasParameterCommands(ArrayList<AnalyzeDefinition> analyzeCommands)
     {
-        for (AnalyzeDefinition definition : analyzeCommands)
-            if (definition.getType() == AnalyzeType.PARAM)
-                return true;
-        return false;
+        return analyzeCommands.stream().anyMatch((definition) -> (definition.getType() == AnalyzeType.PARAM));
     }
 
-    /** Parse a line in the response of an analyze command of type "param".
-        See chapter "Analyze Commands" of the GoGui documentation.
+    /** *  Parse a line in the response of an analyze command of type "param".See chapter "Analyze Commands" of the GoGui documentation.
+     * @param line
         @return The result or null, if line could not be parsed. */
     public static Result parseParameterLine(String line)
     {

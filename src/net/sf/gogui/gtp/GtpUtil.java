@@ -28,7 +28,8 @@ public final class GtpUtil
         a GTP command for "no time limit" ("time_settings 0 1 0" with zero
         byoyomi stones), which could confuse some programs, so it should be
         only sent if necessary (when changing from a state with time settings
-        to a state with no time settings). */
+        to a state with no time settings).
+     * @return  */
     public static String getTimeSettingsCommand(TimeSettings settings)
     {
         if (settings == null)
@@ -46,6 +47,7 @@ public final class GtpUtil
     }
 
     /** Check if command line contains a command.
+     * @param line
         @return false if command line contains only whitespaces or only a
         comment */
     public static boolean isCommand(String line)
@@ -135,13 +137,18 @@ public final class GtpUtil
         }
     }
 
-    /** Find all points contained in string. */
+    /** Find all points contained in string.
+     * @param text
+     * @return  */
     public static PointList parsePointString(String text)
     {
         return parsePointString(text, GoPoint.MAX_SIZE);
     }
 
-    /** Find all points contained in string. */
+    /** Find all points contained in string.
+     * @param text
+     * @param boardSize
+     * @return  */
     public static PointList parsePointString(String text, int boardSize)
     {
         String regex = "\\b([Pp][Aa][Ss][Ss]|[A-Ta-t](1\\d|[1-9]))\\b";
@@ -227,41 +234,45 @@ public final class GtpUtil
         return result;
     }
 
-    /** Find all moves contained in string. */
+    /** Find all moves contained in string.
+     * @param s
+     * @param toMove
+     * @param boardSize
+     * @return  */
     public static Move[] parseVariation(String s, GoColor toMove,
                                         int boardSize)
     {
-        ArrayList<Move> list = new ArrayList<Move>(32);
+        ArrayList<Move> list = new ArrayList<>(32);
         String token[] = StringUtil.splitArguments(s);
         boolean isColorSet = true;
         for (int i = 0; i < token.length; ++i)
         {
             String t = token[i].toLowerCase(Locale.ENGLISH);
-            if (t.equals("b") || t.equals("black"))
-            {
-                toMove = BLACK;
-                isColorSet = true;
-            }
-            else if (t.equals("w") || t.equals("white"))
-            {
-                toMove = WHITE;
-                isColorSet = true;
-            }
-            else
-            {
-                GoPoint point;
-                try
-                {
-                    point = parsePoint(t, boardSize);
-                }
-                catch (GtpResponseFormatError e)
-                {
-                    continue;
-                }
-                if (! isColorSet)
-                    toMove = toMove.otherColor();
-                list.add(Move.get(toMove, point));
-                isColorSet = false;
+            switch (t) {
+                case "b":
+                case "black":
+                    toMove = BLACK;
+                    isColorSet = true;
+                    break;
+                case "w":
+                case "white":
+                    toMove = WHITE;
+                    isColorSet = true;
+                    break;
+                default:
+                    GoPoint point;
+                    try
+                    {
+                        point = parsePoint(t, boardSize);
+                    }
+                    catch (GtpResponseFormatError e)
+                    {
+                        continue;
+                    }   if (! isColorSet)
+                        toMove = toMove.otherColor();
+                    list.add(Move.get(toMove, point));
+                    isColorSet = false;
+                    break;
             }
         }
         Move result[] = new Move[list.size()];
@@ -270,10 +281,12 @@ public final class GtpUtil
         return result;
     }
 
-    /** Inform a GTP engine about the clock state.
-        Sends the clock state to the engine, if the clock is initialized and
-        the engine supports the time_left standard GTP command. Otherwise,
-        does nothing. */
+    /** *  Inform a GTP engine about the clock state.Sends the clock state to the engine, if the clock is initialized and
+        the engine supports the time_left standard GTP command.Otherwise,
+        does nothing.
+     * @param gtp
+     * @param clock
+     * @param c */
     public static void sendTimeLeft(GtpClientBase gtp, ConstClock clock,
                                     GoColor c)
     {

@@ -56,8 +56,10 @@ import net.sf.gogui.util.ProgressShow;
 public final class XmlReader
 {
     /** Construct reader and read.
+     * @param in
         @param progressShow Callback to show progress, can be null
-        @param streamSize Size of stream if progressShow != null */
+        @param streamSize Size of stream if progressShow != null
+     * @throws net.sf.gogui.util.ErrorMessage */
     public XmlReader(InputStream in, ProgressShow progressShow,
                      long streamSize)
         throws ErrorMessage
@@ -134,17 +136,19 @@ public final class XmlReader
         if (m_warnings.isEmpty())
             return null;
         StringBuilder result = new StringBuilder(m_warnings.size() * 80);
-        for (String s : m_warnings)
-        {
+        m_warnings.stream().map((s) -> {
             result.append(s);
+            return s;
+        }).forEachOrdered((_item) -> {
             result.append('\n');
-        }
+        });
         return result.toString();
     }
 
     private class Handler
         extends DefaultHandler
     {
+        @Override
         public void startElement(String namespaceURI, String name,
                                  String qualifiedName, Attributes atts)
             throws SAXException
@@ -160,178 +164,264 @@ public final class XmlReader
                     throw new SAXException("Not a Go game");
                 m_isFirstElement = false;
             }
-            if (name.equals("Annotation"))
-                startInfoElemWithoutFormat();
-            else if (name.equals("Application"))
-                startInfoElemWithFormat();
-            else if (name.equals("AddBlack"))
-                startSetup(BLACK);
-            else if (name.equals("AddWhite"))
-                startSetup(WHITE);
-            else if (name.equals("Arg"))
-                checkParent("SGF");
-            else if (name.equals("at"))
-                checkParent("Black", "White", "AddBlack", "AddWhite", "Delete",
+            switch (name) {
+                case "Annotation":
+                    startInfoElemWithoutFormat();
+                    break;
+                case "Application":
+                    startInfoElemWithFormat();
+                    break;
+                case "AddBlack":
+                    startSetup(BLACK);
+                    break;
+                case "AddWhite":
+                    startSetup(WHITE);
+                    break;
+                case "Arg":
+                    checkParent("SGF");
+                    break;
+                case "at":
+                    checkParent("Black", "White", "AddBlack", "AddWhite", "Delete",
                             "Mark");
-            else if (name.equals("Black"))
-                startMove(BLACK);
-            else if (name.equals("BlackPlayer"))
-                startInfoElemWithFormat();
-            else if (name.equals("BlackRank"))
-                startInfoElemWithFormat();
-            else if (name.equals("BlackTeam"))
-                startInfoElemWithoutFormat();
-            else if (name.equals("BlackToPlay"))
-                startToPlay(BLACK);
-            else if (name.equals("BoardSize"))
-                startInfoElemWithFormat();
-            else if (name.equals("Comment"))
-                startComment();
-            else if (name.equals("Copyright"))
-                startCopyright();
-            else if (name.equals("Date"))
-                startInfoElemWithFormat();
-            else if (name.equals("Delete"))
-                startSetup(EMPTY);
-            else if (name.equals("Go"))
-                startGo();
-            else if (name.equals("GoGame"))
-                startGoGame();
-            else if (name.equals("Handicap"))
-                startInfoElemWithFormat();
-            else if (name.equals("Information"))
-                startInformation();
-            else if (name.equals("Line"))
-                startLine();
-            else if (name.equals("Komi"))
-                startInfoElemWithFormat();
-            else if (name.equals("Mark"))
-                startMark();
-            else if (name.equals("Node"))
-                startNode();
-            else if (name.equals("Nodes"))
-                startNodes();
-            else if (name.equals("P"))
-                startP();
-            else if (name.equals("Result"))
-                startInfoElemWithFormat();
-            else if (name.equals("Round"))
-                startInfoElemWithoutFormat();
-            else if (name.equals("Rules"))
-                startInfoElemWithFormat();
-            else if (name.equals("Source"))
-                startInfoElemWithFormat();
-            else if (name.equals("SGF"))
-                startSGF();
-            else if (name.equals("Time"))
-                startInfoElemWithFormat();
-            else if (name.equals("User"))
-                startInfoElemWithoutFormat();
-            else if (name.equals("Variation"))
-                startVariation();
-            else if (name.equals("White"))
-                startMove(WHITE);
-            else if (name.equals("WhitePlayer"))
-                startInfoElemWithFormat();
-            else if (name.equals("WhiteRank"))
-                startInfoElemWithFormat();
-            else if (name.equals("WhiteTeam"))
-                startInfoElemWithoutFormat();
-            else if (name.equals("WhiteToPlay"))
-                startToPlay(WHITE);
-            else
-                setWarning("Ignoring unknown element: " + name);
+                    break;
+                case "Black":
+                    startMove(BLACK);
+                    break;
+                case "BlackPlayer":
+                    startInfoElemWithFormat();
+                    break;
+                case "BlackRank":
+                    startInfoElemWithFormat();
+                    break;
+                case "BlackTeam":
+                    startInfoElemWithoutFormat();
+                    break;
+                case "BlackToPlay":
+                    startToPlay(BLACK);
+                    break;
+                case "BoardSize":
+                    startInfoElemWithFormat();
+                    break;
+                case "Comment":
+                    startComment();
+                    break;
+                case "Copyright":
+                    startCopyright();
+                    break;
+                case "Date":
+                    startInfoElemWithFormat();
+                    break;
+                case "Delete":
+                    startSetup(EMPTY);
+                    break;
+                case "Go":
+                    startGo();
+                    break;
+                case "GoGame":
+                    startGoGame();
+                    break;
+                case "Handicap":
+                    startInfoElemWithFormat();
+                    break;
+                case "Information":
+                    startInformation();
+                    break;
+                case "Line":
+                    startLine();
+                    break;
+                case "Komi":
+                    startInfoElemWithFormat();
+                    break;
+                case "Mark":
+                    startMark();
+                    break;
+                case "Node":
+                    startNode();
+                    break;
+                case "Nodes":
+                    startNodes();
+                    break;
+                case "P":
+                    startP();
+                    break;
+                case "Result":
+                    startInfoElemWithFormat();
+                    break;
+                case "Round":
+                    startInfoElemWithoutFormat();
+                    break;
+                case "Rules":
+                    startInfoElemWithFormat();
+                    break;
+                case "Source":
+                    startInfoElemWithFormat();
+                    break;
+                case "SGF":
+                    startSGF();
+                    break;
+                case "Time":
+                    startInfoElemWithFormat();
+                    break;
+                case "User":
+                    startInfoElemWithoutFormat();
+                    break;
+                case "Variation":
+                    startVariation();
+                    break;
+                case "White":
+                    startMove(WHITE);
+                    break;
+                case "WhitePlayer":
+                    startInfoElemWithFormat();
+                    break;
+                case "WhiteRank":
+                    startInfoElemWithFormat();
+                    break;
+                case "WhiteTeam":
+                    startInfoElemWithoutFormat();
+                    break;
+                case "WhiteToPlay":
+                    startToPlay(WHITE);
+                    break;
+                default:
+                    setWarning("Ignoring unknown element: " + name);
+                    break;
+            }
             m_elementStack.push(name);
             m_characters.setLength(0);
         }
 
+        @Override
         public void endElement(String namespaceURI, String name,
                                String qualifiedName) throws SAXException
         {
             m_element = m_elementStack.pop();
-            if (name.equals("AddBlack"))
-                endSetup(BLACK);
-            else if (name.equals("AddWhite"))
-                endSetup(WHITE);
-            else if (name.equals("Annotation"))
-                m_info.set(StringInfo.ANNOTATION, getCharacters());
-            else if (name.equals("Arg"))
-                m_sgfArgs.add(getCharacters());
-            else if (name.equals("at"))
-                endAt();
-            else if (name.equals("Black"))
-                endMove(BLACK);
-            else if (name.equals("BlackPlayer"))
-                m_info.set(StringInfoColor.NAME, BLACK, getCharacters());
-            else if (name.equals("BlackRank"))
-                m_info.set(StringInfoColor.RANK, BLACK, getCharacters());
-            else if (name.equals("BlackTeam"))
-                m_info.set(StringInfoColor.TEAM, BLACK, getCharacters());
-            else if (name.equals("BlackToPlay"))
-                endToPlay();
-            else if (name.equals("BoardSize"))
-                endBoardSize();
-            else if (name.equals("Comment"))
-                endComment();
-            else if (name.equals("Copyright"))
-                endCopyright();
-            else if (name.equals("Date"))
-                m_info.set(StringInfo.DATE, getCharacters());
-            else if (name.equals("Delete"))
-                endSetup(EMPTY);
-            else if (name.equals("Go"))
-                checkNoCharacters();
-            else if (name.equals("GoGame"))
-                checkNoCharacters();
-            else if (name.equals("Handicap"))
-                endHandicap();
-            else if (name.equals("Information"))
-                checkNoCharacters();
-            else if (name.equals("Komi"))
-                endKomi();
-            else if (name.equals("Mark"))
-                endMark();
-            else if (name.equals("Node"))
-                endNode();
-            else if (name.equals("Nodes"))
-                checkNoCharacters();
-            else if (name.equals("P"))
-                endP();
-            else if (name.equals("Result"))
-                m_info.set(StringInfo.RESULT, getCharacters());
-            else if (name.equals("Round"))
-                m_info.set(StringInfo.ROUND, getCharacters());
-            else if (name.equals("Rules"))
-                m_info.set(StringInfo.RULES, getCharacters());
-            else if (name.equals("SGF"))
-                endSgf();
-            else if (name.equals("Source"))
-                m_info.set(StringInfo.SOURCE, getCharacters());
-            else if (name.equals("Time"))
-                endTime();
-            else if (name.equals("User"))
-                m_info.set(StringInfo.USER, getCharacters());
-            else if (name.equals("White"))
-                endMove(WHITE);
-            else if (name.equals("WhitePlayer"))
-                m_info.set(StringInfoColor.NAME, WHITE, getCharacters());
-            else if (name.equals("WhiteRank"))
-                m_info.set(StringInfoColor.RANK, WHITE, getCharacters());
-            else if (name.equals("WhiteTeam"))
-                m_info.set(StringInfoColor.TEAM, WHITE, getCharacters());
-            else if (name.equals("WhiteToPlay"))
-                endToPlay();
-            else if (name.equals("Variation"))
-                endVariation();
+            switch (name) {
+                case "AddBlack":
+                    endSetup(BLACK);
+                    break;
+                case "AddWhite":
+                    endSetup(WHITE);
+                    break;
+                case "Annotation":
+                    m_info.set(StringInfo.ANNOTATION, getCharacters());
+                    break;
+                case "Arg":
+                    m_sgfArgs.add(getCharacters());
+                    break;
+                case "at":
+                    endAt();
+                    break;
+                case "Black":
+                    endMove(BLACK);
+                    break;
+                case "BlackPlayer":
+                    m_info.set(StringInfoColor.NAME, BLACK, getCharacters());
+                    break;
+                case "BlackRank":
+                    m_info.set(StringInfoColor.RANK, BLACK, getCharacters());
+                    break;
+                case "BlackTeam":
+                    m_info.set(StringInfoColor.TEAM, BLACK, getCharacters());
+                    break;
+                case "BlackToPlay":
+                    endToPlay();
+                    break;
+                case "BoardSize":
+                    endBoardSize();
+                    break;
+                case "Comment":
+                    endComment();
+                    break;
+                case "Copyright":
+                    endCopyright();
+                    break;
+                case "Date":
+                    m_info.set(StringInfo.DATE, getCharacters());
+                    break;
+                case "Delete":
+                    endSetup(EMPTY);
+                    break;
+                case "Go":
+                    checkNoCharacters();
+                    break;
+                case "GoGame":
+                    checkNoCharacters();
+                    break;
+                case "Handicap":
+                    endHandicap();
+                    break;
+                case "Information":
+                    checkNoCharacters();
+                    break;
+                case "Komi":
+                    endKomi();
+                    break;
+                case "Mark":
+                    endMark();
+                    break;
+                case "Node":
+                    endNode();
+                    break;
+                case "Nodes":
+                    checkNoCharacters();
+                    break;
+                case "P":
+                    endP();
+                    break;
+                case "Result":
+                    m_info.set(StringInfo.RESULT, getCharacters());
+                    break;
+                case "Round":
+                    m_info.set(StringInfo.ROUND, getCharacters());
+                    break;
+                case "Rules":
+                    m_info.set(StringInfo.RULES, getCharacters());
+                    break;
+                case "SGF":
+                    endSgf();
+                    break;
+                case "Source":
+                    m_info.set(StringInfo.SOURCE, getCharacters());
+                    break;
+                case "Time":
+                    endTime();
+                    break;
+                case "User":
+                    m_info.set(StringInfo.USER, getCharacters());
+                    break;
+                case "White":
+                    endMove(WHITE);
+                    break;
+                case "WhitePlayer":
+                    m_info.set(StringInfoColor.NAME, WHITE, getCharacters());
+                    break;
+                case "WhiteRank":
+                    m_info.set(StringInfoColor.RANK, WHITE, getCharacters());
+                    break;
+                case "WhiteTeam":
+                    m_info.set(StringInfoColor.TEAM, WHITE, getCharacters());
+                    break;
+                case "WhiteToPlay":
+                    endToPlay();
+                    break;
+                case "Variation":
+                    endVariation();
+                    break;
+                default:
+                    break;
+            }
             m_characters.setLength(0);
         }
 
+        @Override
         public void characters(char[] ch, int start, int length)
             throws SAXException
         {
             m_characters.append(ch, start, length);
         }
 
+        @Override
         public void fatalError(SAXParseException e) throws SAXException
         {
             throwError(e.getMessage());
@@ -341,6 +431,7 @@ public final class XmlReader
             GoGui does not validate the document anyway, but this avoids a
             missing entity error message, if an XML file references go.dtd,
             but it is not found. */
+        @Override
         public InputSource resolveEntity(String publicId, String systemId)
         {
             if (systemId == null)
@@ -363,16 +454,19 @@ public final class XmlReader
             return new InputSource(new ByteArrayInputStream(text.getBytes()));
         }
 
+        @Override
         public void setDocumentLocator(Locator locator)
         {
             m_locator = locator;
         }
 
+        @Override
         public void error(SAXParseException e)
         {
             setWarning(e.getMessage());
         }
 
+        @Override
         public void warning(SAXParseException e)
         {
             setWarning(e.getMessage());
@@ -401,12 +495,12 @@ public final class XmlReader
     private final long m_streamSize;
 
     /** Element stack. */
-    private Stack<String> m_elementStack = new Stack<String>();
+    private Stack<String> m_elementStack = new Stack<>();
 
     /** Current node. */
     private Node m_node;
 
-    private Stack<Node> m_variation = new Stack<Node>();
+    private Stack<Node> m_variation = new Stack<>();
 
     private GameInfo m_info = new GameInfo();
 
@@ -424,13 +518,13 @@ public final class XmlReader
     private String m_sgfType;
 
     /** Arguments of current SGF element. */
-    private ArrayList<String> m_sgfArgs = new ArrayList<String>();
+    private ArrayList<String> m_sgfArgs = new ArrayList<>();
 
     /** Characters in current element. */
     private StringBuilder m_characters = new StringBuilder();
 
     /** Contains strings with warnings. */
-    private final Set<String> m_warnings = new TreeSet<String>();
+    private final Set<String> m_warnings = new TreeSet<>();
 
     private Locator m_locator;
 
@@ -514,22 +608,30 @@ public final class XmlReader
     {
         GoPoint p = getPoint(getCharacters());
         String parent = parentElement();
-        if (parent.equals("Black"))
-            m_node.setMove(Move.get(BLACK, p));
-        else if (parent.equals("White"))
-            m_node.setMove(Move.get(WHITE, p));
-        else if (parent.equals("AddBlack"))
-            m_node.addStone(BLACK, p);
-        else if (parent.equals("AddWhite"))
-            m_node.addStone(WHITE, p);
-        else if (parent.equals("Delete"))
-            m_node.addStone(EMPTY, p);
-        else if (parent.equals("Mark"))
-        {
-            if (m_markType != null)
-                m_node.addMarked(p, m_markType);
-            if (m_label != null)
-                m_node.setLabel(p, m_label);
+        switch (parent) {
+            case "Black":
+                m_node.setMove(Move.get(BLACK, p));
+                break;
+            case "White":
+                m_node.setMove(Move.get(WHITE, p));
+                break;
+            case "AddBlack":
+                m_node.addStone(BLACK, p);
+                break;
+            case "AddWhite":
+                m_node.addStone(WHITE, p);
+                break;
+            case "Delete":
+                m_node.addStone(EMPTY, p);
+                break;
+            case "Mark":
+                if (m_markType != null)
+                    m_node.addMarked(p, m_markType);
+                if (m_label != null)
+                    m_node.setLabel(p, m_label);
+                break;
+            default:
+                break;
         }
     }
 
@@ -627,69 +729,97 @@ public final class XmlReader
         checkNoCharacters();
         if (m_sgfType == null)
             return;
-        if (m_sgfType.equals("AN"))
-            endSgfInfo(StringInfo.ANNOTATION);
-        else if (m_sgfType.equals("BL"))
-            endSgfTimeLeft(BLACK);
-        else if (m_sgfType.equals("BR"))
-            endSgfInfo(StringInfoColor.RANK, BLACK);
-        else if (m_sgfType.equals("BT"))
-            endSgfInfo(StringInfoColor.TEAM, BLACK);
-        else if (m_sgfType.equals("CP"))
-            endSgfInfo(StringInfo.COPYRIGHT);
-        else if (m_sgfType.equals("DT"))
-            endSgfInfo(StringInfo.DATE);
-        else if (m_sgfType.equals("HA"))
-            endSgfHandicap();
-        else if (m_sgfType.equals("OB"))
-            endSgfMovesLeft(BLACK);
-        else if (m_sgfType.equals("OM"))
-            endSgfOvertimeMoves();
-        else if (m_sgfType.equals("OP"))
-            endSgfOvertimePeriod();
-        else if (m_sgfType.equals("OT"))
-            endSgfOvertime();
-        else if (m_sgfType.equals("OW"))
-            endSgfMovesLeft(WHITE);
-        else if (m_sgfType.equals("KM"))
-            endSgfKomi();
-        else if (m_sgfType.equals("PB"))
-            endSgfInfo(StringInfoColor.NAME, BLACK);
-        else if (m_sgfType.equals("PW"))
-            endSgfInfo(StringInfoColor.NAME, WHITE);
-        else if (m_sgfType.equals("PL"))
-            endSgfPlayer();
-        else if (m_sgfType.equals("RE"))
-            endSgfInfo(StringInfo.RESULT);
-        else if (m_sgfType.equals("RO"))
-            endSgfInfo(StringInfo.ROUND);
-        else if (m_sgfType.equals("RU"))
-            endSgfInfo(StringInfo.RULES);
-        else if (m_sgfType.equals("SL"))
-            endSgfSelect();
-        else if (m_sgfType.equals("WL"))
-            endSgfTimeLeft(WHITE);
-        else if (m_sgfType.equals("TM"))
-            endSgfTime();
-        else if (m_sgfType.equals("WR"))
-            endSgfInfo(StringInfoColor.RANK, WHITE);
-        else if (m_sgfType.equals("WT"))
-            endSgfInfo(StringInfoColor.TEAM, WHITE);
-        else if (m_sgfType.equals("US"))
-            endSgfInfo(StringInfo.USER);
-        else
-            m_node.addSgfProperty(m_sgfType, m_sgfArgs);
+        switch (m_sgfType) {
+            case "AN":
+                endSgfInfo(StringInfo.ANNOTATION);
+                break;
+            case "BL":
+                endSgfTimeLeft(BLACK);
+                break;
+            case "BR":
+                endSgfInfo(StringInfoColor.RANK, BLACK);
+                break;
+            case "BT":
+                endSgfInfo(StringInfoColor.TEAM, BLACK);
+                break;
+            case "CP":
+                endSgfInfo(StringInfo.COPYRIGHT);
+                break;
+            case "DT":
+                endSgfInfo(StringInfo.DATE);
+                break;
+            case "HA":
+                endSgfHandicap();
+                break;
+            case "OB":
+                endSgfMovesLeft(BLACK);
+                break;
+            case "OM":
+                endSgfOvertimeMoves();
+                break;
+            case "OP":
+                endSgfOvertimePeriod();
+                break;
+            case "OT":
+                endSgfOvertime();
+                break;
+            case "OW":
+                endSgfMovesLeft(WHITE);
+                break;
+            case "KM":
+                endSgfKomi();
+                break;
+            case "PB":
+                endSgfInfo(StringInfoColor.NAME, BLACK);
+                break;
+            case "PW":
+                endSgfInfo(StringInfoColor.NAME, WHITE);
+                break;
+            case "PL":
+                endSgfPlayer();
+                break;
+            case "RE":
+                endSgfInfo(StringInfo.RESULT);
+                break;
+            case "RO":
+                endSgfInfo(StringInfo.ROUND);
+                break;
+            case "RU":
+                endSgfInfo(StringInfo.RULES);
+                break;
+            case "SL":
+                endSgfSelect();
+                break;
+            case "WL":
+                endSgfTimeLeft(WHITE);
+                break;
+            case "TM":
+                endSgfTime();
+                break;
+            case "WR":
+                endSgfInfo(StringInfoColor.RANK, WHITE);
+                break;
+            case "WT":
+                endSgfInfo(StringInfoColor.TEAM, WHITE);
+                break;
+            case "US":
+                endSgfInfo(StringInfo.USER);
+                break;
+            default:
+                m_node.addSgfProperty(m_sgfType, m_sgfArgs);
+                break;
+        }
     }
 
     /** Handle non-root handicap info from SGF properties. */
     private void endSgfHandicap()
     {
-        if (m_sgfArgs.size() == 0)
+        if (m_sgfArgs.isEmpty())
             return;
         try
         {
             int handicap = Integer.parseInt(m_sgfArgs.get(0));
-            GameInfo info = m_node.createGameInfo();;
+            GameInfo info = m_node.createGameInfo();
             info.setHandicap(handicap);
         }
         catch (NumberFormatException e)
@@ -700,30 +830,30 @@ public final class XmlReader
     /** Handle non-root game info from SGF properties. */
     private void endSgfInfo(StringInfo type)
     {
-        if (m_sgfArgs.size() == 0)
+        if (m_sgfArgs.isEmpty())
             return;
-        GameInfo info = m_node.createGameInfo();;
+        GameInfo info = m_node.createGameInfo();
         info.set(type, m_sgfArgs.get(0));
     }
 
     /** Handle non-root game info from SGF properties. */
     private void endSgfInfo(StringInfoColor type, GoColor c)
     {
-        if (m_sgfArgs.size() == 0)
+        if (m_sgfArgs.isEmpty())
             return;
-        GameInfo info = m_node.createGameInfo();;
+        GameInfo info = m_node.createGameInfo();
         info.set(type, c, m_sgfArgs.get(0));
     }
 
     /** Handle non-root komi from SGF properties. */
     private void endSgfKomi()
     {
-        if (m_sgfArgs.size() == 0)
+        if (m_sgfArgs.isEmpty())
             return;
         try
         {
             Komi komi = Komi.parseKomi(m_sgfArgs.get(0));
-            GameInfo info = m_node.createGameInfo();;
+            GameInfo info = m_node.createGameInfo();
             info.setKomi(komi);
         }
         catch (InvalidKomiException e)
@@ -733,7 +863,7 @@ public final class XmlReader
 
     private void endSgfMovesLeft(GoColor c)
     {
-        if (m_sgfArgs.size() == 0)
+        if (m_sgfArgs.isEmpty())
             return;
         try
         {
@@ -749,7 +879,7 @@ public final class XmlReader
     /** FF4 OT property */
     private void endSgfOvertime()
     {
-        if (m_sgfArgs.size() == 0)
+        if (m_sgfArgs.isEmpty())
             return;
         String value = m_sgfArgs.get(0).trim();
         if (value.equals("") || value.equals("-"))
@@ -770,7 +900,7 @@ public final class XmlReader
     /** FF3 OM property */
     private void endSgfOvertimeMoves()
     {
-        if (m_sgfArgs.size() == 0)
+        if (m_sgfArgs.isEmpty())
             return;
         try
         {
@@ -786,7 +916,7 @@ public final class XmlReader
     /** FF3 OP property */
     private void endSgfOvertimePeriod()
     {
-        if (m_sgfArgs.size() == 0)
+        if (m_sgfArgs.isEmpty())
             return;
         try
         {
@@ -801,16 +931,22 @@ public final class XmlReader
 
     private void endSgfPlayer()
     {
-        if (m_sgfArgs.size() == 0)
+        if (m_sgfArgs.isEmpty())
             return;
         String value = m_sgfArgs.get(0).trim().toLowerCase(Locale.ENGLISH);
         GoColor c;
-        if (value.equals("b") || value.equals("black"))
-            c = BLACK;
-        else if (value.equals("w") || value.equals("white"))
-            c = WHITE;
-        else
-            return;
+        switch (value) {
+            case "b":
+            case "black":
+                c = BLACK;
+                break;
+            case "w":
+            case "white":
+                c = WHITE;
+                break;
+            default:
+                return;
+        }
         m_node.setPlayer(c);
     }
 
@@ -828,7 +964,7 @@ public final class XmlReader
         go.dtd (2007) */
     private void endSgfTimeLeft(GoColor c)
     {
-        if (m_sgfArgs.size() == 0)
+        if (m_sgfArgs.isEmpty())
             return;
         try
         {
@@ -842,7 +978,7 @@ public final class XmlReader
 
     private void endSgfTime()
     {
-        if (m_sgfArgs.size() == 0)
+        if (m_sgfArgs.isEmpty())
             return;
         String value = m_sgfArgs.get(0).trim();
         if (value.equals("") || value.equals("-"))
@@ -1109,23 +1245,34 @@ public final class XmlReader
         String territory = m_atts.getValue("territory");
         if (type != null)
         {
-            if (type.equals("triangle"))
-                m_markType = MarkType.TRIANGLE;
-            else if (type.equals("circle"))
-                m_markType = MarkType.CIRCLE;
-            else if (type.equals("square"))
-                m_markType = MarkType.SQUARE;
-            else
-                setWarning("Unknown mark type " + type);
+            switch (type) {
+                case "triangle":
+                    m_markType = MarkType.TRIANGLE;
+                    break;
+                case "circle":
+                    m_markType = MarkType.CIRCLE;
+                    break;
+                case "square":
+                    m_markType = MarkType.SQUARE;
+                    break;
+                default:
+                    setWarning("Unknown mark type " + type);
+                    break;
+            }
         }
         if (territory != null)
         {
-            if (territory.equals("black"))
-                m_markType = MarkType.TERRITORY_BLACK;
-            else if (territory.equals("white"))
-                m_markType = MarkType.TERRITORY_WHITE;
-            else
-                setWarning("Unknown territory type " + territory);
+            switch (territory) {
+                case "black":
+                    m_markType = MarkType.TERRITORY_BLACK;
+                    break;
+                case "white":
+                    m_markType = MarkType.TERRITORY_WHITE;
+                    break;
+                default:
+                    setWarning("Unknown territory type " + territory);
+                    break;
+            }
         }
         if (type == null && territory == null && m_label == null)
             m_markType = MarkType.MARK;

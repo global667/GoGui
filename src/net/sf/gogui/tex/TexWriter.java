@@ -133,7 +133,7 @@ public class TexWriter
         StringBuilder comment = new StringBuilder();
         int size = tree.getBoardSize();
         ConstNode firstMoveAtPoint[][] = new ConstNode[size][size];
-        ArrayList<ConstNode> needsComment = new ArrayList<ConstNode>();
+        ArrayList<ConstNode> needsComment = new ArrayList<>();
         boolean blackToMove = true;
         m_out.println("\\setcounter{gomove}{0}");
         ConstNode node = tree.getRootConst();

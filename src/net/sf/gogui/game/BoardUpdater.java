@@ -18,7 +18,7 @@ public class BoardUpdater
 {
     public BoardUpdater()
     {
-        m_nodes = new ArrayList<ConstNode>(400);
+        m_nodes = new ArrayList<>(400);
     }
 
     public void update(ConstGameTree tree, ConstNode currentNode, Board board)

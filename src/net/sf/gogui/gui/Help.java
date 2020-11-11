@@ -74,20 +74,27 @@ public class Help
         appendHistory(m_contents);
     }
 
+    @Override
     public void actionPerformed(ActionEvent event)
     {
         String command = event.getActionCommand();
-        if (command.equals("back"))
-            back();
-        else if (command.equals("close"))
-            m_window.setVisible(false);
-        else if (command.equals("contents"))
-        {
-            loadURL(m_contents);
-            appendHistory(m_contents);
+        switch (command) {
+            case "back":
+                back();
+                break;
+            case "close":
+                m_window.setVisible(false);
+                break;
+            case "contents":
+                loadURL(m_contents);
+                appendHistory(m_contents);
+                break;
+            case "forward":
+                forward();
+                break;
+            default:
+                break;
         }
-        else if (command.equals("forward"))
-            forward();
     }
 
     public Window getWindow()
@@ -95,6 +102,7 @@ public class Help
         return m_window;
     }
 
+    @Override
     public void hyperlinkUpdate(HyperlinkEvent e)
     {
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED)
@@ -119,7 +127,7 @@ public class Help
 
     private final JEditorPane m_editorPane;
 
-    private java.util.List<URL> m_history = new ArrayList<URL>();
+    private java.util.List<URL> m_history = new ArrayList<>();
 
     private final URL m_contents;
 

@@ -325,11 +325,7 @@ public class Plot
                     m_graphics2D.fillRect(point.x - 1, point.y - 1, 3, 3);
                 last = point;
             }
-            catch (Table.InvalidElement e)
-            {
-                last = null;
-            }
-            catch (Table.InvalidLocation e)
+            catch (Table.InvalidElement | Table.InvalidLocation e)
             {
                 last = null;
             }

@@ -50,13 +50,13 @@ public final class Main
                 System.exit(2);
             }
             String program = arguments.get(0);
-            ArrayList<String> tests = new ArrayList<String>(arguments);
+            ArrayList<String> tests = new ArrayList<>(arguments);
             tests.remove(0);
             Regress regress = new Regress(program, tests, output, longOutput,
                                           verbose, gtpFile);
             System.exit(regress.getResult() ? 0 : 1);
         }
-        catch (Throwable t)
+        catch (Exception t)
         {
             StringUtil.printException(t);
             System.exit(2);

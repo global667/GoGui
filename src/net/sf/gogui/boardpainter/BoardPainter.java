@@ -101,13 +101,15 @@ public class BoardPainter
         return null;
     }
 
-    /** Get preferred board size given a preferred field size.
-        The drawer can draw any board size. The border has a variable size
-        to ensure that all fields have exactly the same size (in pixels).
-        If a preferred field size is known (e.g. from a different board size,
+    /** *  Get preferred board size given a preferred field size.The drawer can draw any board size.The border has a variable size
+        to ensure that all fields have exactly the same size (in pixels).If a preferred field size is known (e.g.from a different board size,
         or from the last settings), then using the board size returned by this
         function will draw the board such that the field size is exactly the
-        preferred one. */
+        preferred one.
+     * @param preferredFieldSize
+     * @param boardSize
+     * @param showGrid
+     * @return  */
     public static Dimension getPreferredSize(int preferredFieldSize,
                                              int boardSize, boolean showGrid)
     {

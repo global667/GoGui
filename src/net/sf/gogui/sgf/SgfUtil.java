@@ -16,10 +16,10 @@ public final class SgfUtil
         public int m_byoyomiMoves;
     }
 
-    /** Format byoyomi information for OT property.
-        The format is "N moves / S min" or "N moves / S sec"
-        This format is also recognized by parseOvertime.
-        Returns null, if timeSettings does not define byoyomi */
+    /** *  Format byoyomi information for OT property.The format is "N moves / S min" or "N moves / S sec"
+        This format is also recognized by parseOvertime.Returns null, if timeSettings does not define byoyomi
+     * @param timeSettings
+     * @return  */
     public static String getOvertime(TimeSettings timeSettings)
     {
         if (! timeSettings.getUseByoyomi())
@@ -70,10 +70,11 @@ public final class SgfUtil
         return result;
     }
 
-    /** Parse value of TM property.
-        According to FF4, TM needs to be a real value, but older SGF versions
-        allow a string with unspecified content. We try to parse a few known
+    /** *  Parse value of TM property.According to FF4, TM needs to be a real value, but older SGF versions
+        allow a string with unspecified content.
+        We try to parse a few known
         formats.
+     * @param value
         @return The (pre-byoyomi-)time in milliseconds or -1, if the
         format was not recognized */
     public static long parseTime(String value)

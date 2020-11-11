@@ -32,12 +32,7 @@ public final class MainWrapper
             if (settings.m_noStartup)
                 return;
         }
-        catch (ErrorMessage e)
-        {
-            System.err.println(e.getMessage());
-            return;
-        }
-        catch (ClassNotFoundException e)
+        catch (ErrorMessage | ClassNotFoundException e)
         {
             System.err.println(e.getMessage());
             return;

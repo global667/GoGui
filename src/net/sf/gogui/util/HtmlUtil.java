@@ -7,10 +7,11 @@ import  net.sf.gogui.version.Version;
 /** Static utility functions related to HTML writing. */
 public final class HtmlUtil
 {
-    /** Return a footer.
-        Contains a horizontal line followed by an address element containing
+    /** *  Return a footer.Contains a horizontal line followed by an address element containing
         the generation (current) date, the generator (applicationName) and
-        a link to the GoGui website. */
+        a link to the GoGui website.
+     * @param applicationName
+     * @return  */
     public static String getFooter(String applicationName)
     {
         StringBuilder buffer = new StringBuilder(512);
@@ -28,7 +29,9 @@ public final class HtmlUtil
         return buffer.toString();
     }
 
-    /** Return meta tags for character set and generator. */
+    /** Return meta tags for character set and generator.
+     * @param applicationName
+     * @return  */
     public static String getMeta(String applicationName)
     {
         String charset = StringUtil.getDefaultEncoding();

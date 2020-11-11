@@ -80,15 +80,18 @@ public class Terminal
         }
     }
 
+    @Override
     public void receivedInvalidResponse(String s)
     {
         System.out.print(s);
     }
 
+    @Override
     public void receivedResponse(boolean error, String s)
     {
     }
 
+    @Override
     public void receivedStdErr(String s)
     {
         // If m_verbose, logging is already done by Gtp
@@ -96,11 +99,13 @@ public class Terminal
             System.err.print(s);
     }
 
+    @Override
     public void sentCommand(String s)
     {
     }
 
     /** Colorize go board text output.
+     * @param enable
         @see Argument color in
         net.sf.gogui.go.Board.toString(ConstBoard,boolean,boolean) */
     public void setColor(boolean enable)
@@ -362,7 +367,6 @@ public class Terminal
         catch (FileNotFoundException e)
         {
             System.out.println("Write error");
-            return;
         }
     }
 

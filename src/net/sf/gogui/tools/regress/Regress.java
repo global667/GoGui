@@ -28,12 +28,19 @@ public class Regress
     implements GtpClient.IOCallback
 {
     /** Constructor.
+     * @param program
+     * @param tests
+     * @param output
+     * @param longOutput
+     * @param verbose
         @param gtpFile File with GTP commands to send at startup or
-        <code>null</code> for no file. */
+        <code>null</code> for no file.
+     * @throws java.lang.Exception */
     public Regress(String program, ArrayList<String> tests, String output,
                    boolean longOutput, boolean verbose, File gtpFile)
         throws Exception
     {
+        this.m_testSummaries = new ArrayList<TestSummary>();
         tests = RegressUtil.expandTestSuites(tests);
         RegressUtil.checkFiles(tests);
         m_result = true;
@@ -66,26 +73,31 @@ public class Regress
         writeData();
     }
 
-    /** Return true if tests completed with no unexpected failures. */
+    /** Return true if tests completed with no unexpected failures.
+     * @return  */
     public boolean getResult()
     {
         return m_result;
     }
 
+    @Override
     public void receivedInvalidResponse(String s)
     {
         printOutLine("invalid", "Invalid response: " + s);
     }
 
+    @Override
     public void receivedResponse(boolean error, String s)
     {
     }
 
+    @Override
     public void receivedStdErr(String s)
     {
         printOut("stderr", s, -1);
     }
 
+    @Override
     public void sentCommand(String s)
     {
     }
@@ -94,6 +106,7 @@ public class Regress
     private static class ProgramIsDeadException
         extends Exception
     {
+        @Override
         public String getMessage()
         {
             return "Program died";
@@ -237,10 +250,9 @@ public class Regress
         and file extension for the all tests. */
     private TreeMap<String,String> m_outNames;
 
-    private final ArrayList<Test> m_tests = new ArrayList<Test>();
+    private final ArrayList<Test> m_tests = new ArrayList<>();
 
-    private final ArrayList<TestSummary> m_testSummaries
-        = new ArrayList<TestSummary>();
+    private final ArrayList<TestSummary> m_testSummaries;
 
     private GtpClient m_gtp;
 
@@ -524,7 +536,7 @@ public class Regress
         exist. */
     private void initOutNames(ArrayList<String> tests)
     {
-        m_outNames = new TreeMap<String,String>();
+        m_outNames = new TreeMap<>();
         for (int i = 0; i < tests.size(); ++i)
         {
             String test = tests.get(i);
@@ -679,11 +691,7 @@ public class Regress
         {
             return Double.parseDouble(send("cputime"));
         }
-        catch (GtpError e)
-        {
-            return 0;
-        }
-        catch (NumberFormatException e)
+        catch (GtpError | NumberFormatException e)
         {
             return 0;
         }
@@ -752,9 +760,8 @@ public class Regress
         if (! m_relativePath.equals("") && ! m_relativePath.endsWith("/"))
             m_relativePath = m_relativePath + "/";
         FileReader fileReader = new FileReader(m_testFile);
-        BufferedReader reader = new BufferedReader(fileReader);
         try
-        {
+        (BufferedReader reader = new BufferedReader(fileReader)) {
             m_gtp = new GtpClient(m_program, testFileDir, m_verbose, this);
             if (m_gtpFile != null)
                 sendGtpFile();
@@ -794,10 +801,6 @@ public class Regress
             TestSummary testSummary = getTestSummary(timeMillis, cpuTime);
             m_testSummaries.add(testSummary);
             writeTestSummary(testSummary);
-        }
-        finally
-        {
-            reader.close();
         }
     }
 
@@ -886,87 +889,87 @@ public class Regress
     private void writeData() throws FileNotFoundException
     {
         File file = new File(m_prefix + "summary.dat");
-        PrintStream out = new PrintStream(file);
-        NumberFormat format1 = StringUtil.getNumberFormat(1);
-        TestSummary s = getTotalSummary();
-        double time = ((double)s.m_timeMillis) / 1000F;
-        out.print("#Tests\tFAIL\tfail\tPASS\tpass\tError\tTime\tCpuTime\n" +
-                  + s.m_numberTests + "\t"
-                  + s.m_unexpectedFails + "\t"
-                  + s.m_expectedFails + "\t"
-                  + s.m_unexpectedPasses + "\t"
-                  + s.m_expectedPasses + "\t"
-                  + s.m_otherErrors + "\t"
-                  + format1.format(time) + "\t"
-                  + format1.format(s.m_cpuTime) + "\t"
-                  + "\n");
-        out.close();
+        try (PrintStream out = new PrintStream(file)) {
+            NumberFormat format1 = StringUtil.getNumberFormat(1);
+            TestSummary s = getTotalSummary();
+            double time = ((double)s.m_timeMillis) / 1000F;
+            out.print("#Tests\tFAIL\tfail\tPASS\tpass\tError\tTime\tCpuTime\n" +
+                    + s.m_numberTests + "\t"
+                    + s.m_unexpectedFails + "\t"
+                    + s.m_expectedFails + "\t"
+                    + s.m_unexpectedPasses + "\t"
+                    + s.m_expectedPasses + "\t"
+                    + s.m_otherErrors + "\t"
+                    + format1.format(time) + "\t"
+                    + format1.format(s.m_cpuTime) + "\t"
+                            + "\n");
+        }
     }
 
     private void writeSummary()
         throws FileNotFoundException
     {
         File file = new File(m_prefix + "index.html");
-        PrintStream out = new PrintStream(file);
-        out.print("<html>\n" +
-                  "<head>\n" +
-                  "<title>Regression Test Summary</title>\n" +
-                  HtmlUtil.getMeta("gogui-regress") +
-                  "<style type=\"text/css\">\n" +
-                  "<!--\n" +
-                  "body { margin:0; }\n" +
-                  "-->\n" +
-                  "</style>\n" +
-                  "</head>\n" +
-                  "<body bgcolor=\"white\" text=\"black\" link=\"blue\""
-                  + " vlink=\"purple\" alink=\"red\">\n" +
-                  "<table border=\"0\" width=\"100%\" bgcolor=\""
-                  + COLOR_HEADER + "\">\n" +
-                  "<tr><td>\n" +
-                  "<h1>Regression Test Summary</h1>\n" +
-                  "</td></tr>\n" +
-                  "</table>\n" +
-                  "<table width=\"100%\" bgcolor=\"" + COLOR_INFO
-                  + "\">\n");
-        writeInfo(out, true);
-        out.print("</table>\n" +
-                  "<table width=\"100%\" border=\"0\" cellpadding=\"0\""
-                  + "cellspacing=\"1\">\n" +
-                  "<colgroup>\n" +
-                  "<col width=\"20%\">\n" +
-                  "<col width=\"10%\">\n" +
-                  "<col width=\"10%\">\n" +
-                  "<col width=\"10%\">\n" +
-                  "<col width=\"10%\">\n" +
-                  "<col width=\"10%\">\n" +
-                  "<col width=\"10%\">\n" +
-                  "<col width=\"10%\">\n" +
-                  "<col width=\"10%\">\n" +
-                  "</colgroup>\n" +
-                  "<thead align=\"center\">\n" +
-                  "<tr bgcolor = \"" + COLOR_HEADER + "\">\n" +
-                  "<th>File</th>\n" +
-                  "<th>Tests</th>\n" +
-                  "<th>FAIL</th>\n" +
-                  "<th>fail</th>\n" +
-                  "<th>PASS</th>\n" +
-                  "<th>pass</th>\n" +
-                  "<th>Error</th>\n" +
-                  "<th>Time</th>\n" +
-                  "<th>CpuTime</th>\n" +
-                  "</tr>\n" +
-                  "</thead>\n");
-        for (int i = 0; i < m_testSummaries.size(); ++i)
-        {
-            TestSummary summary = m_testSummaries.get(i);
-            writeSummaryRow(out, summary, true, false);
+        try (PrintStream out = new PrintStream(file)) {
+            out.print("<html>\n" +
+                    "<head>\n" +
+                    "<title>Regression Test Summary</title>\n" +
+                    HtmlUtil.getMeta("gogui-regress") +
+                    "<style type=\"text/css\">\n" +
+                            "<!--\n" +
+                            "body { margin:0; }\n" +
+                            "-->\n" +
+                            "</style>\n" +
+                            "</head>\n" +
+                            "<body bgcolor=\"white\" text=\"black\" link=\"blue\""
+                            + " vlink=\"purple\" alink=\"red\">\n" +
+                            "<table border=\"0\" width=\"100%\" bgcolor=\""
+                    + COLOR_HEADER + "\">\n" +
+                            "<tr><td>\n" +
+                            "<h1>Regression Test Summary</h1>\n" +
+                            "</td></tr>\n" +
+                            "</table>\n" +
+                            "<table width=\"100%\" bgcolor=\"" + COLOR_INFO
+                    + "\">\n");
+            writeInfo(out, true);
+            out.print("</table>\n" +
+                    "<table width=\"100%\" border=\"0\" cellpadding=\"0\""
+                    + "cellspacing=\"1\">\n" +
+                    "<colgroup>\n" +
+                    "<col width=\"20%\">\n" +
+                    "<col width=\"10%\">\n" +
+                    "<col width=\"10%\">\n" +
+                    "<col width=\"10%\">\n" +
+                    "<col width=\"10%\">\n" +
+                    "<col width=\"10%\">\n" +
+                    "<col width=\"10%\">\n" +
+                    "<col width=\"10%\">\n" +
+                    "<col width=\"10%\">\n" +
+                    "</colgroup>\n" +
+                    "<thead align=\"center\">\n" +
+                    "<tr bgcolor = \"" + COLOR_HEADER + "\">\n" +
+                            "<th>File</th>\n" +
+                            "<th>Tests</th>\n" +
+                            "<th>FAIL</th>\n" +
+                            "<th>fail</th>\n" +
+                            "<th>PASS</th>\n" +
+                            "<th>pass</th>\n" +
+                            "<th>Error</th>\n" +
+                            "<th>Time</th>\n" +
+                            "<th>CpuTime</th>\n" +
+                            "</tr>\n" +
+                            "</thead>\n");
+            for (int i = 0; i < m_testSummaries.size(); ++i)
+            {
+                TestSummary summary = m_testSummaries.get(i);
+                writeSummaryRow(out, summary, true, false);
+            }
+            writeSummaryRow(out, getTotalSummary(), true, true);
+            out.print("</table>\n" +
+                    HtmlUtil.getFooter("gogui-regress") +
+                    "</body>\n" +
+                            "</html>\n");
         }
-        writeSummaryRow(out, getTotalSummary(), true, true);
-        out.print("</table>\n" +
-                  HtmlUtil.getFooter("gogui-regress") +
-                  "</body>\n" +
-                  "</html>\n");
-        out.close();
     }
 
     private void writeSummaryRow(PrintStream out, TestSummary summary,
@@ -1031,122 +1034,122 @@ public class Regress
                                + " unexpected failures");
         }
         File file = new File(m_prefix + m_outName + ".html");
-        PrintStream out = new PrintStream(file);
-        out.print("<html>\n" +
-                  "<head>\n" +
-                  "<title>Summary: " + m_testFile + "</title>\n" +
-                  HtmlUtil.getMeta("gogui-regress") +
-                  "<style type=\"text/css\">\n" +
-                  "<!--\n" +
-                  "body { margin:0; }\n" +
-                  "-->\n" +
-                  "</style>\n" +
-                  "</head>\n" +
-                  "<body bgcolor=\"white\" text=\"black\" link=\"blue\""
-                  + " vlink=\"purple\" alink=\"red\">\n" +
-                  "<table border=\"0\" width=\"100%\" bgcolor=\""
-                  + COLOR_HEADER + "\">\n" +
-                  "<tr><td>\n" +
-                  "<h1>Summary: " + m_testFile + "</h1>\n" +
-                  "</td></tr>\n" +
-                  "</table>\n" +
-                  "<table width=\"100%\" bgcolor=\"" + COLOR_INFO
-                  + "\">\n");
-        writeInfo(out, true);
-        out.print("<tr><th align=\"left\">Output:</th><td><a href=\""
-                  + m_outFileRelativeName + "\">"
-                  + m_outFileRelativeName + "</a></td></tr>\n" +
-                  "</table>\n" +
-                  "<table width=\"100%\" border=\"0\" cellpadding=\"0\""
-                  + " cellspacing=\"1\">\n" +
-                  "<colgroup>\n" +
-                  "<col width=\"12%\">\n" +
-                  "<col width=\"12%\">\n" +
-                  "<col width=\"12%\">\n" +
-                  "<col width=\"12%\">\n" +
-                  "<col width=\"12%\">\n" +
-                  "<col width=\"12%\">\n" +
-                  "<col width=\"12%\">\n" +
-                  "<col width=\"12%\">\n" +
-                  "</colgroup>\n" +
-                  "<thead align=\"center\">\n" +
-                  "<tr bgcolor=\"" + COLOR_HEADER + "\">\n" +
-                  "<th>Tests</th>\n" +
-                  "<th>FAIL</th>\n" +
-                  "<th>fail</th>\n" +
-                  "<th>PASS</th>\n" +
-                  "<th>pass</th>\n" +
-                  "<th>Error</th>\n" +
-                  "<th>Time</th>\n" +
-                  "<th>CpuTime</th>\n" +
-                  "</tr>\n" +
-                  "</thead>\n");
-        writeSummaryRow(out, summary, false, false);
-        out.print("</table>\n" +
-                  "<table width=\"100%\" border=\"0\" cellpadding=\"0\""
-                  + " cellspacing=\"1\">\n" +
-                  "<thead>\n" +
-                  "<tr bgcolor=\"" + COLOR_HEADER + "\">\n" +
-                  "<th>ID</th>\n" +
-                  "<th>Status</th>\n" +
-                  "<th>Command</th>\n" +
-                  "<th>Output</th>\n" +
-                  "<th>Required</th>\n" +
-                  "<th>Last SGF</th>\n" +
-                  "</tr>\n" +
-                  "</thead>\n");
-        for (int i = 0; i < m_tests.size(); ++i)
-        {
-            Test t = m_tests.get(i);
-            String rowBackground = COLOR_BG_LIGHT;
-            String statusColor = rowBackground;
-            String status = null;
-            if (t.m_fail && t.m_expectedFail)
+        try (PrintStream out = new PrintStream(file)) {
+            out.print("<html>\n" +
+                    "<head>\n" +
+                    "<title>Summary: " + m_testFile + "</title>\n" +
+                    HtmlUtil.getMeta("gogui-regress") +
+                    "<style type=\"text/css\">\n" +
+                            "<!--\n" +
+                            "body { margin:0; }\n" +
+                            "-->\n" +
+                            "</style>\n" +
+                            "</head>\n" +
+                            "<body bgcolor=\"white\" text=\"black\" link=\"blue\""
+                            + " vlink=\"purple\" alink=\"red\">\n" +
+                            "<table border=\"0\" width=\"100%\" bgcolor=\""
+                    + COLOR_HEADER + "\">\n" +
+                            "<tr><td>\n" +
+                            "<h1>Summary: " + m_testFile + "</h1>\n" +
+                                    "</td></tr>\n" +
+                                    "</table>\n" +
+                                    "<table width=\"100%\" bgcolor=\"" + COLOR_INFO
+                    + "\">\n");
+            writeInfo(out, true);
+            out.print("<tr><th align=\"left\">Output:</th><td><a href=\""
+                    + m_outFileRelativeName + "\">"
+                    + m_outFileRelativeName + "</a></td></tr>\n" +
+                            "</table>\n" +
+                            "<table width=\"100%\" border=\"0\" cellpadding=\"0\""
+                            + " cellspacing=\"1\">\n" +
+                            "<colgroup>\n" +
+                            "<col width=\"12%\">\n" +
+                            "<col width=\"12%\">\n" +
+                            "<col width=\"12%\">\n" +
+                            "<col width=\"12%\">\n" +
+                            "<col width=\"12%\">\n" +
+                            "<col width=\"12%\">\n" +
+                            "<col width=\"12%\">\n" +
+                            "<col width=\"12%\">\n" +
+                            "</colgroup>\n" +
+                            "<thead align=\"center\">\n" +
+                            "<tr bgcolor=\"" + COLOR_HEADER + "\">\n" +
+                                    "<th>Tests</th>\n" +
+                                    "<th>FAIL</th>\n" +
+                                    "<th>fail</th>\n" +
+                                    "<th>PASS</th>\n" +
+                                    "<th>pass</th>\n" +
+                                    "<th>Error</th>\n" +
+                                    "<th>Time</th>\n" +
+                                    "<th>CpuTime</th>\n" +
+                                    "</tr>\n" +
+                                    "</thead>\n");
+            writeSummaryRow(out, summary, false, false);
+            out.print("</table>\n" +
+                    "<table width=\"100%\" border=\"0\" cellpadding=\"0\""
+                    + " cellspacing=\"1\">\n" +
+                    "<thead>\n" +
+                    "<tr bgcolor=\"" + COLOR_HEADER + "\">\n" +
+                            "<th>ID</th>\n" +
+                            "<th>Status</th>\n" +
+                            "<th>Command</th>\n" +
+                            "<th>Output</th>\n" +
+                            "<th>Required</th>\n" +
+                            "<th>Last SGF</th>\n" +
+                            "</tr>\n" +
+                            "</thead>\n");
+            for (int i = 0; i < m_tests.size(); ++i)
             {
-                status = "fail";
+                Test t = m_tests.get(i);
+                String rowBackground = COLOR_BG_LIGHT;
+                String statusColor = rowBackground;
+                String status = null;
+                if (t.m_fail && t.m_expectedFail)
+                {
+                    status = "fail";
+                }
+                else if (t.m_fail && ! t.m_expectedFail)
+                {
+                    statusColor = COLOR_RED;
+                    status = "FAIL";
+                }
+                else if (! t.m_fail && t.m_expectedFail)
+                {
+                    statusColor = COLOR_GREEN;
+                    status = "PASS";
+                }
+                else if (! t.m_fail && ! t.m_expectedFail)
+                {
+                    status = "pass";
+                }
+                else
+                    assert false;
+                String lastSgf = "";
+                if (t.m_lastSgf != null)
+                {
+                    lastSgf = "<a href=\"" + m_relativePath + t.m_lastSgf + "\">"
+                            + t.m_lastSgf + "</a>";
+                    if (t.m_lastSgfMove != -1)
+                        lastSgf += "&nbsp;" + t.m_lastSgfMove;
+                }
+                String command = t.m_command.replaceAll(" ", "&nbsp;");
+                out.print("<tr bgcolor=\"" + rowBackground + "\">\n" +
+                        "<td align=\"right\"><a href=\"" + m_outFileRelativeName
+                        + "#" + t.m_id + "\">" + t.m_id + "</a></td>\n" +
+                                "<td align=\"center\" bgcolor=\"" + statusColor
+                        + "\">" + status + "</td>\n" +
+                                "<td>" + command + "</td>\n" +
+                                        "<td align=\"center\">" + truncate(t.m_response)
+                        + "</td>\n" +
+                                "<td align=\"center\">" + truncate(t.m_required)
+                        + "</td>\n" +
+                                "<td>" + lastSgf + "</td>\n" +
+                                        "</tr>\n");
             }
-            else if (t.m_fail && ! t.m_expectedFail)
-            {
-                statusColor = COLOR_RED;
-                status = "FAIL";
-            }
-            else if (! t.m_fail && t.m_expectedFail)
-            {
-                statusColor = COLOR_GREEN;
-                status = "PASS";
-            }
-            else if (! t.m_fail && ! t.m_expectedFail)
-            {
-                status = "pass";
-            }
-            else
-                assert false;
-            String lastSgf = "";
-            if (t.m_lastSgf != null)
-            {
-                lastSgf = "<a href=\"" + m_relativePath + t.m_lastSgf + "\">"
-                    + t.m_lastSgf + "</a>";
-                if (t.m_lastSgfMove != -1)
-                    lastSgf += "&nbsp;" + t.m_lastSgfMove;
-            }
-            String command = t.m_command.replaceAll(" ", "&nbsp;");
-            out.print("<tr bgcolor=\"" + rowBackground + "\">\n" +
-                      "<td align=\"right\"><a href=\"" + m_outFileRelativeName
-                      + "#" + t.m_id + "\">" + t.m_id + "</a></td>\n" +
-                      "<td align=\"center\" bgcolor=\"" + statusColor
-                      + "\">" + status + "</td>\n" +
-                      "<td>" + command + "</td>\n" +
-                      "<td align=\"center\">" + truncate(t.m_response)
-                      + "</td>\n" +
-                      "<td align=\"center\">" + truncate(t.m_required)
-                      + "</td>\n" +
-                      "<td>" + lastSgf + "</td>\n" +
-                      "</tr>\n");
+            out.print("</table>\n" +
+                    HtmlUtil.getFooter("gogui-regress") +
+                    "</body>\n" +
+                            "</html>\n");
         }
-        out.print("</table>\n" +
-                  HtmlUtil.getFooter("gogui-regress") +
-                  "</body>\n" +
-                  "</html>\n");
-        out.close();
     }
 }

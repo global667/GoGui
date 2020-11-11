@@ -50,7 +50,6 @@ public final class ExportPng
                                          i18n("MSG_EXPORTPNG_INVALID_WIDTH"),
                                          i18n("MSG_EXPORTPNG_INVALID_WIDTH_2"),
                                          false);
-                continue;
             }
         }
         File file = FileDialogs.showSave(parent, i18n("TIT_EXPORTPNG_FILE"),

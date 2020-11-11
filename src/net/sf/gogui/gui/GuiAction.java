@@ -65,20 +65,23 @@ public abstract class GuiAction
             putValue(AbstractAction.SHORT_DESCRIPTION, desc);
         if (accel != null)
             putValue(AbstractAction.ACCELERATOR_KEY,
-                     getKeyStroke(accel.intValue(), modifier));
+                     getKeyStroke(accel, modifier));
         if (icon != null)
             putValue(AbstractAction.SMALL_ICON, GuiUtil.getIcon(icon, name));
         s_allActions.add(this);
     }
 
     /** Get the name of the action with the mnemonic marked with a preceeding
-        '&amp;' (like in Qt). */
+        '&amp;' (like in Qt).
+     * @return  */
     public String getNameWithMnemonic()
     {
         return m_nameWithMnemonic;
     }
 
-    /** Register the accelerator key of an action at a component. */
+    /** Register the accelerator key of an action at a component.
+     * @param component
+     * @param action */
     public static void register(JComponent component, GuiAction action)
     {
         KeyStroke keyStroke =
@@ -93,11 +96,13 @@ public abstract class GuiAction
         }
     }
 
-    /** Register the accelerator keys of all actions at a component. */
+    /** Register the accelerator keys of all actions at a component.
+     * @param component */
     public static void registerAll(JComponent component)
     {
-        for (GuiAction action : s_allActions)
+        s_allActions.forEach((action) -> {
             register(component, action);
+        });
     }
 
     public final void setDescription(String desc)
@@ -115,7 +120,7 @@ public abstract class GuiAction
 
     public void setSelected(boolean selected)
     {
-        putValue("selected", Boolean.valueOf(selected));
+        putValue("selected", selected);
     }
 
     private static final int SHORTCUT

@@ -11,7 +11,8 @@ public final class TableUtil
         @param table The table.
         @param column The column title.
         @return True, if all elements in this column are null or strings
-        containing only whitespaces. */
+        containing only whitespaces.
+     * @throws net.sf.gogui.util.Table.InvalidLocation */
     public static boolean allEmpty(Table table, String column)
         throws Table.InvalidLocation
     {
@@ -44,7 +45,8 @@ public final class TableUtil
         @param compareColumn2 The second column title.
         @param compareValue2 The required value for the second column.
         @return The row with matching values for both columns or -1,
-        if no such row exists. */
+        if no such row exists.
+     * @throws net.sf.gogui.util.Table.InvalidLocation */
     public static int findRow(Table table,
                               String compareColumn1, String compareValue1,
                               String compareColumn2, String compareValue2)
@@ -65,7 +67,7 @@ public final class TableUtil
 
     public static Table fromHistogram(Histogram histogram, String name)
     {
-        ArrayList<String> columnTitles = new ArrayList<String>(2);
+        ArrayList<String> columnTitles = new ArrayList<>(2);
         columnTitles.add(name);
         columnTitles.add("Count");
         Table result = new Table(columnTitles);
@@ -88,12 +90,16 @@ public final class TableUtil
         return result;
     }
 
-    /** Get elements of a column without null and whitespace-only elements. */
+    /** Get elements of a column without null and whitespace-only elements.
+     * @param table
+     * @param column
+     * @return
+     * @throws net.sf.gogui.util.Table.InvalidLocation  */
     public static ArrayList<String> getColumnNotEmpty(Table table,
                                                       String column)
         throws Table.InvalidLocation
     {
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         int col = table.getColumnIndex(column);
         for (int row = 0; row < table.getNumberRows(); ++row)
         {
@@ -107,7 +113,7 @@ public final class TableUtil
     public static ArrayList<String> getColumnUnique(Table table, String column)
         throws Table.InvalidLocation
     {
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         int col = table.getColumnIndex(column);
         for (int row = 0; row < table.getNumberRows(); ++row)
         {
@@ -215,7 +221,7 @@ public final class TableUtil
                                String compareValue, String selectColumn)
         throws Table.InvalidLocation
     {
-        ArrayList<String> columnTitles = new ArrayList<String>(1);
+        ArrayList<String> columnTitles = new ArrayList<>(1);
         columnTitles.add(selectColumn);
         Table result = new Table(columnTitles);
         for (int row = 0; row < table.getNumberRows(); ++row)
@@ -234,7 +240,7 @@ public final class TableUtil
                                String selectColumn2)
         throws Table.InvalidLocation
     {
-        ArrayList<String> columnTitles = new ArrayList<String>(2);
+        ArrayList<String> columnTitles = new ArrayList<>(2);
         columnTitles.add(selectColumn1);
         columnTitles.add(selectColumn2);
         Table result = new Table(columnTitles);

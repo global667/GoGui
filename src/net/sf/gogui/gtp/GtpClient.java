@@ -51,9 +51,9 @@ public final class GtpClient
     /** Callback if a timeout occured. */
     public interface TimeoutCallback
     {
-        /** Ask for continuation.
-            If this function returns true, Gtp.send will wait for another
-            timeout period, if it returns false, the program will be killed. */
+        /** *  Ask for continuation.If this function returns true, Gtp.send will wait for another
+            timeout period, if it returns false, the program will be killed.
+         * @return  */
         boolean askContinue();
     }
 
@@ -93,7 +93,8 @@ public final class GtpClient
         @param workingDirectory The working directory to run the program in or
         null for the current directory
         @param log Log input, output and error stream to standard error.
-        @param callback Callback for external display of the streams. */
+        @param callback Callback for external display of the streams.
+     * @throws net.sf.gogui.gtp.GtpClient.ExecFailed */
     public GtpClient(String program, File workingDirectory, boolean log,
                      IOCallback callback)
         throws GtpClient.ExecFailed
@@ -105,7 +106,7 @@ public final class GtpClient
         m_log = log;
         m_callback = callback;
         m_wasKilled = false;
-        if (program.indexOf("%SRAND") >= 0)
+        if (program.contains("%SRAND"))
         {
             // RAND_MAX in stdlib.h ist at least 32767
             int randMax = 32767;
@@ -149,7 +150,12 @@ public final class GtpClient
              m_process.getErrorStream());
     }
 
-    /** Constructor for given input and output streams. */
+    /** Constructor for given input and output streams.
+     * @param in
+     * @param out
+     * @param log
+     * @param callback
+     * @throws net.sf.gogui.gtp.GtpError */
     public GtpClient(InputStream in, OutputStream out, boolean log,
                      IOCallback callback)
         throws GtpError
@@ -167,6 +173,7 @@ public final class GtpClient
         connection is to send a quit command. Closing the output stream after
         a quit is not strictly necessary, but may improve compatibility with
         engines that read the input stream in a different thread */
+    @Override
     public void close()
     {
         m_out.close();
@@ -182,19 +189,22 @@ public final class GtpClient
         }
     }
 
-    /** Did the engine ever send a valid response to a command? */
+    /** Did the engine ever send a valid response to a command?
+     * @return  */
     public boolean getAnyCommandsResponded()
     {
         return m_anyCommandsResponded;
     }
 
-    /** Get response to last command sent. */
+    /** Get response to last command sent.
+     * @return  */
     public String getResponse()
     {
         return m_response;
     }
 
-    /** Get full response including status and ID and last command. */
+    /** Get full response including status and ID and last command.
+     * @return  */
     public String getFullResponse()
     {
         return m_fullResponse;
@@ -207,16 +217,20 @@ public final class GtpClient
         return m_program;
     }
 
-    /** Check if program is dead. */
+    /** Check if program is dead.
+     * @return  */
+    @Override
     public boolean isProgramDead()
     {
         return m_isProgramDead;
     }
 
     /** Send a command.
+     * @param command
         @return The response text of the successful response not including
         the status character.
         @throws GtpError containing the response if the command fails. */
+    @Override
     public String send(String command) throws GtpError
     {
         return send(command, -1, null);
@@ -277,6 +291,7 @@ public final class GtpClient
 
     /** Send comment.
         @param comment comment line (must start with '#'). */
+    @Override
     public void sendComment(String comment)
     {
         assert comment.trim().startsWith("#");
@@ -288,15 +303,16 @@ public final class GtpClient
         m_out.flush();
     }
 
-    /** Enable auto-numbering commands.
-        Every command will be prepended by an integer as defined in the GTP
-        standard, the integer is incremented after each command. */
+    /** *  Enable auto-numbering commands.Every command will be prepended by an integer as defined in the GTP
+        standard, the integer is incremented after each command.
+     * @param enable */
     public void setAutoNumber(boolean enable)
     {
         m_autoNumber = enable;
     }
 
     /** Set the callback for invalid responses.
+     * @param callback
         @see InvalidResponseCallback */
     public void setInvalidResponseCallback(InvalidResponseCallback callback)
     {
@@ -308,8 +324,8 @@ public final class GtpClient
         m_callback = callback;
     }
 
-    /** Set a prefix for logging to standard error.
-        Only used if logging was enabled in the constructor. */
+    /** *  Set a prefix for logging to standard error.Only used if logging was enabled in the constructor.
+     * @param prefix */
     public void setLogPrefix(String prefix)
     {
         synchronized (this)
@@ -319,6 +335,7 @@ public final class GtpClient
     }
 
     /** Wait until the process of the program exits. */
+    @Override
     public void waitForExit()
     {
         if (m_process == null)
@@ -335,7 +352,9 @@ public final class GtpClient
         }
     }
 
-    /** More sophisticated version of waitFor with timeout. */
+    /** More sophisticated version of waitFor with timeout.
+     * @param timeout
+     * @param timeoutCallback */
     public void waitForExit(int timeout, TimeoutCallback timeoutCallback)
     {
         if (m_process == null)
@@ -361,7 +380,8 @@ public final class GtpClient
         }
     }
 
-    /** Was program forcefully terminated by calling destroyProcess() */
+    /** Was program forcefully terminated by calling destroyProcess()
+     * @return  */
     public boolean wasKilled()
     {
         return m_wasKilled;
@@ -386,13 +406,14 @@ public final class GtpClient
             m_queue = queue;
         }
 
+        @Override
         public void run()
         {
             try
             {
                 mainLoop();
             }
-            catch (Throwable t)
+            catch (InterruptedException t)
             {
                 StringUtil.printException(t);
             }
@@ -510,6 +531,7 @@ public final class GtpClient
             m_queue = queue;
         }
 
+        @Override
         public void run()
         {
             try
@@ -584,7 +606,7 @@ public final class GtpClient
     {
         m_out = new PrintWriter(out);
         m_isProgramDead = false;
-        m_queue = new ArrayBlockingQueue<Message>(10);
+        m_queue = new ArrayBlockingQueue<>(10);
         m_inputThread = new InputThread(in, m_queue);
         if (err != null)
         {
@@ -621,7 +643,6 @@ public final class GtpClient
     private void printInterrupted()
     {
         System.err.println("GtpClient: InterruptedException");
-        Thread.dumpStack();
     }
 
     private String readResponse(long timeout) throws GtpError

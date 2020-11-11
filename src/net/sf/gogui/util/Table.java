@@ -49,12 +49,16 @@ public class Table
 
     public Table()
     {
-        m_columnTitles = new ArrayList<String>();
+        this.m_rows = new ArrayList<>();
+        this.m_properties = new TreeMap<>();
+        m_columnTitles = new ArrayList<>();
         m_numberColumns = 0;
     }
 
     public Table(ArrayList<String> columnTitles)
     {
+        this.m_rows = new ArrayList<>();
+        this.m_properties = new TreeMap<>();
         m_columnTitles = columnTitles;
         m_numberColumns = columnTitles.size();
     }
@@ -157,7 +161,8 @@ public class Table
 
     /** Get meta information.
         @param key the property key
-        @param def the default value, if this property does not exist */
+        @param def the default value, if this property does not exist
+     * @return  */
     public String getProperty(String key, String def)
     {
         if (! hasProperty(key))
@@ -178,28 +183,23 @@ public class Table
 
     public void read(Reader reader) throws IOException, InvalidFormat
     {
-        BufferedReader bufferedReader = new BufferedReader(reader);
-        m_lineNumber = 0;
-        m_propertiesRead = false;
-        String line = null;
-        while ((line = bufferedReader.readLine()) != null)
-        {
-            ++m_lineNumber;
-            handleLine(line);
+        try (BufferedReader bufferedReader = new BufferedReader(reader)) {
+            m_lineNumber = 0;
+            m_propertiesRead = false;
+            String line = null;
+            while ((line = bufferedReader.readLine()) != null)
+            {
+                ++m_lineNumber;
+                handleLine(line);
+            }
         }
-        bufferedReader.close();
     }
 
     public void save(File file) throws IOException
     {
-        FileWriter writer = new FileWriter(file);
         try
-        {
+        (FileWriter writer = new FileWriter(file)) {
             save(writer);
-        }
-        finally
-        {
-            writer.close();
         }
     }
 
@@ -252,8 +252,8 @@ public class Table
         assert m_lastRow.get(column) == null;
         // Values containing newlines and tabs are not supported by save()
         // yet
-        assert value == null || value.indexOf("\n") < 0;
-        assert value == null || value.indexOf("\t") < 0;
+        assert value == null || !value.contains("\n");
+        assert value == null || !value.contains("\t");
         m_lastRow.set(column, value);
     }
 
@@ -274,7 +274,8 @@ public class Table
 
     /** Set meta information.
         @param key the property key
-        @param value the property value */
+        @param value the property value
+     * @return  */
     public Object setProperty(String key, String value)
     {
         return m_properties.put(key, value);
@@ -282,7 +283,7 @@ public class Table
 
     public void startRow()
     {
-        ArrayList<String> row = new ArrayList<String>(m_numberColumns);
+        ArrayList<String> row = new ArrayList<>(m_numberColumns);
         for (int i = 0; i < m_numberColumns; ++i)
             row.add(null);
         m_rows.add(row);
@@ -315,15 +316,13 @@ public class Table
 
     private int m_numberColumns;
 
-    private final Map<String,String> m_properties =
-        new TreeMap<String,String>();
+    private final Map<String,String> m_properties;
 
     private final ArrayList<String> m_columnTitles;
 
     private ArrayList<String> m_lastRow;
 
-    private final ArrayList<ArrayList<String>> m_rows
-        = new ArrayList<ArrayList<String>>();
+    private final ArrayList<ArrayList<String>> m_rows;
 
     private void addColumnTitle(String columnTitle)
     {

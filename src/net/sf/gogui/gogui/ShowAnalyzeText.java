@@ -43,6 +43,7 @@ public final class ShowAnalyzeText
             m_textViewer = new TextViewer(m_owner, title, response, highlight,
                                           listener);
             m_textViewer.addWindowListener(new WindowAdapter() {
+                    @Override
                     public void windowClosing(WindowEvent e) {
                         m_textViewer = null;
                     }
@@ -66,6 +67,7 @@ public final class ShowAnalyzeText
             m_guiBoard = guiBoard;
         }
 
+        @Override
         public void textSelected(String text)
         {
             if (! m_guiBoard.isShowing())
@@ -77,9 +79,9 @@ public final class ShowAnalyzeText
         private final GuiBoard m_guiBoard;
     }
 
-    private Frame m_owner;
+    private final Frame m_owner;
 
-    private GuiBoard m_guiBoard;
+    private final GuiBoard m_guiBoard;
 
     private TextViewer m_textViewer;
 }

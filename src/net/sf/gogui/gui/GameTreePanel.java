@@ -65,6 +65,8 @@ public class GameTreePanel
                          MessageDialogs messageDialogs)
     {
         super(new SpringLayout());
+        this.m_isExpanded = new HashSet<>(200);
+        this.m_map = new HashMap<>(500, 0.8f);
         m_messageDialogs = messageDialogs;
         m_owner = owner;
         setBackground(BACKGROUND);
@@ -78,6 +80,7 @@ public class GameTreePanel
         m_listener = listener;
         m_mouseListener = new MouseAdapter()
             {
+                @Override
                 public void mouseClicked(MouseEvent event)
                 {
                     if (event.getButton() != MouseEvent.BUTTON1)
@@ -86,6 +89,7 @@ public class GameTreePanel
                     gotoNode(gameNode.getNode());
                 }
 
+                @Override
                 public void mousePressed(MouseEvent event)
                 {
                     if (event.isPopupTrigger())
@@ -98,6 +102,7 @@ public class GameTreePanel
                     }
                 }
 
+                @Override
                 public void mouseReleased(MouseEvent event)
                 {
                     if (event.isPopupTrigger())
@@ -132,11 +137,13 @@ public class GameTreePanel
         return m_nodeSize;
     }
 
+    @Override
     public Dimension getPreferredScrollableViewportSize()
     {
         return new Dimension(m_nodeFullSize * 10, m_nodeFullSize * 3);
     }
 
+    @Override
     public int getScrollableBlockIncrement(Rectangle visibleRect,
                                            int orientation, int direction)
     {
@@ -149,16 +156,19 @@ public class GameTreePanel
         return result;
     }
 
+    @Override
     public boolean getScrollableTracksViewportHeight()
     {
         return false;
     }
 
+    @Override
     public boolean getScrollableTracksViewportWidth()
     {
         return false;
     }
 
+    @Override
     public int getScrollableUnitIncrement(Rectangle visibleRect,
                                           int orientation, int direction)
     {
@@ -191,6 +201,7 @@ public class GameTreePanel
         return m_isExpanded.contains(node);
     }
 
+    @Override
     public void paintComponent(Graphics graphics)
     {
         GuiUtil.setAntiAlias(graphics);
@@ -226,10 +237,11 @@ public class GameTreePanel
         }
     }
 
-    /** Only used for a workaround on Mac Java 1.4.2,
+    /** *  Only used for a workaround on Mac Java 1.4.2,
         which causes the scrollpane to lose focus after a new layout of
-        this panel. If scrollPane is not null, a requestFocusOnWindow will
-        be called after each new layout */
+        this panel.If scrollPane is not null, a requestFocusOnWindow will
+        be called after each new layout
+     * @param scrollPane */
     public void setScrollPane(JScrollPane scrollPane)
     {
         m_scrollPane = scrollPane;
@@ -260,7 +272,8 @@ public class GameTreePanel
         }
     }
 
-    /** Faster than update if a new node was added as the first child. */
+    /** Faster than update if a new node was added as the first child.
+     * @param node */
     public void addNewSingleChild(ConstNode node)
     {
         assert ! node.hasChildren();
@@ -386,6 +399,7 @@ public class GameTreePanel
     private static class MouseMotionListener
         extends MouseMotionAdapter
     {
+        @Override
         public void mouseDragged(MouseEvent event)
         {
             int x = event.getX();
@@ -437,11 +451,9 @@ public class GameTreePanel
 
     private ConstNode m_popupNode;
 
-    private final HashMap<ConstNode,GameTreeNode> m_map =
-        new HashMap<ConstNode,GameTreeNode>(500, 0.8f);
+    private final HashMap<ConstNode,GameTreeNode> m_map;
 
-    private final HashSet<ConstNode> m_isExpanded
-        = new HashSet<ConstNode>(200);
+    private final HashSet<ConstNode> m_isExpanded;
 
     private final MouseListener m_mouseListener;
 
@@ -577,33 +589,42 @@ public class GameTreePanel
     private void createPopup()
     {
         m_popup = new JPopupMenu();
-        ActionListener listener = new ActionListener()
-            {
-                public void actionPerformed(ActionEvent event)
-                {
-                    String command = event.getActionCommand();
-                    if (command.equals("goto"))
-                        gotoNode(m_popupNode);
-                    else if (command.equals("show-variations"))
-                        showChildren(m_popupNode);
-                    else if (command.equals("show-subtree"))
-                        showSubtree(m_popupNode);
-                    else if (command.equals("hide-others"))
-                        hideOthers(m_popupNode);
-                    else if (command.equals("hide-subtree"))
-                        hideSubtree(m_popupNode);
-                    else if (command.equals("node-info"))
-                        nodeInfo(m_popupLocation, m_popupNode);
-                    else if (command.equals("scroll-to-current"))
-                        scrollTo(m_currentNode);
-                    else if (command.equals("tree-info"))
-                        treeInfo(m_popupLocation, m_popupNode);
-                    else if (command.equals("cancel"))
-                        m_popup.setVisible(false);
-                    else
-                        assert false;
-                }
-            };
+        ActionListener listener;
+        listener = (ActionEvent event) -> {
+            String command = event.getActionCommand();
+            switch (command) {
+                case "goto":
+                    gotoNode(m_popupNode);
+                    break;
+                case "show-variations":
+                    showChildren(m_popupNode);
+                    break;
+                case "show-subtree":
+                    showSubtree(m_popupNode);
+                    break;
+                case "hide-others":
+                    hideOthers(m_popupNode);
+                    break;
+                case "hide-subtree":
+                    hideSubtree(m_popupNode);
+                    break;
+                case "node-info":
+                    nodeInfo(m_popupLocation, m_popupNode);
+                    break;
+                case "scroll-to-current":
+                    scrollTo(m_currentNode);
+                    break;
+                case "tree-info":
+                    treeInfo(m_popupLocation, m_popupNode);
+                    break;
+                case "cancel":
+                    m_popup.setVisible(false);
+                    break;
+                default:
+                    assert false;
+                    break;
+            }
+        };
         JMenuItem item;
         item = new JMenuItem(i18n("MN_TREE_GOTO"));
         item.setActionCommand("goto");

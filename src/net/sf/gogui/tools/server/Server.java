@@ -30,7 +30,8 @@ public final class Server
         @param port Port number at remote host
         @param userFile file containing login information that is sent to the
         @param timeout Timeout in seconds, zero for no timeout.
-        remote host. Only used if remoteHost is set. */
+        remote host. Only used if remoteHost is set.
+     * @throws java.lang.Exception */
     public Server(boolean verbose, boolean loop, String program,
                   String remoteHost, int port, String userFile,
                   int timeout)
@@ -137,7 +138,7 @@ public final class Server
             new Server(verbose, loop, program, remoteHost, port, userFile,
                        timeout);
         }
-        catch (Throwable t)
+        catch (Exception t)
         {
             StringUtil.printException(t);
             System.exit(1);
@@ -153,9 +154,8 @@ public final class Server
         {
             System.err.println("Sending login information from file "
                                + userFile);
-            InputStream inputStream = new FileInputStream(new File(userFile));
             try
-            {
+            (InputStream inputStream = new FileInputStream(new File(userFile))) {
                 OutputStream outputStream = socket.getOutputStream();
                 byte buffer[] = new byte[1024];
                 while (true)
@@ -165,10 +165,6 @@ public final class Server
                         break;
                     outputStream.write(buffer, 0, n);
                 }
-            }
-            finally
-            {
-                inputStream.close();
             }
         }
         System.err.println("Connected");

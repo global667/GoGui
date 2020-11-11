@@ -97,7 +97,6 @@ public final class PositionStatistics
             }
             catch (NumberFormatException e)
             {
-                continue;
             }
         }
         m_histoTable = TableUtil.fromHistogram(m_histogram, command);

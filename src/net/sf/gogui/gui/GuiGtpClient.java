@@ -37,41 +37,44 @@ public class GuiGtpClient
         m_owner = owner;
         m_messageDialogs = messageDialogs;
         m_gtpSynchronizer = new GtpSynchronizer(this, listener, false);
-        Thread thread = new Thread() {
-                public void run() {
-                    synchronized (m_mutex)
+        Thread thread;
+        thread = new Thread() {
+            @Override
+            public void run() {
+                synchronized (m_mutex)
+                {
+                    boolean firstWait = true;
+                    while (true)
                     {
-                        boolean firstWait = true;
-                        while (true)
+                        try
                         {
-                            try
-                            {
-                                if (m_command == null || ! firstWait)
-                                    m_mutex.wait();
-                            }
-                            catch (InterruptedException e)
-                            {
-                                System.err.println("Interrupted");
-                            }
-                            firstWait = false;
-                            m_response = null;
-                            m_exception = null;
-                            try
-                            {
-                                m_response = m_gtp.send(m_command);
-                            }
-                            catch (GtpError e)
-                            {
-                                m_exception = e;
-                            }
-                            SwingUtilities.invokeLater(m_callback);
+                            if (m_command == null || ! firstWait)
+                                m_mutex.wait();
                         }
+                        catch (InterruptedException e)
+                        {
+                            System.err.println("Interrupted");
+                        }
+                        firstWait = false;
+                        m_response = null;
+                        m_exception = null;
+                        try
+                        {
+                            m_response = m_gtp.send(m_command);
+                        }
+                        catch (GtpError e)
+                        {
+                            m_exception = e;
+                        }
+                        SwingUtilities.invokeLater(m_callback);
                     }
                 }
-            };
+            }
+        };
         thread.start();
     }
 
+    @Override
     public void close()
     {
         if (! isProgramDead())
@@ -92,8 +95,8 @@ public class GuiGtpClient
         return m_gtp.getAnyCommandsResponded();
     }
 
-    /** Get exception of asynchronous command.
-        You must call this before you are allowed to send new a command. */
+    /** *  Get exception of asynchronous command.You must call this before you are allowed to send new a command.
+     * @return  */
     public GtpError getException()
     {
         synchronized (m_mutex)
@@ -110,8 +113,8 @@ public class GuiGtpClient
         return m_gtp.getProgramCommand();
     }
 
-    /** Get response to asynchronous command.
-        You must call getException() first. */
+    /** *  Get response to asynchronous command.You must call getException() first.
+     * @return  */
     public String getResponse()
     {
         synchronized (m_mutex)
@@ -140,13 +143,16 @@ public class GuiGtpClient
         return m_gtpSynchronizer.isOutOfSync();
     }
 
+    @Override
     public boolean isProgramDead()
     {
         assert SwingUtilities.isEventDispatchThread();
         return m_gtp.isProgramDead();
     }
 
-    /** Send asynchronous command. */
+    /** Send asynchronous command.
+     * @param command
+     * @param callback */
     public void send(String command, Runnable callback)
     {
         assert SwingUtilities.isEventDispatchThread();
@@ -160,12 +166,16 @@ public class GuiGtpClient
         }
     }
 
+    @Override
     public void sendComment(String comment)
     {
         m_gtp.sendComment(comment);
     }
 
-    /** Send command in event dispatch thread. */
+    /** Send command in event dispatch thread.
+     * @return 
+     * @throws net.sf.gogui.gtp.GtpError */
+    @Override
     public String send(String command) throws GtpError
     {
         assert SwingUtilities.isEventDispatchThread();
@@ -201,6 +211,7 @@ public class GuiGtpClient
         m_gtpSynchronizer.updateHumanMove(board, move);
     }
 
+    @Override
     public void waitForExit()
     {
         m_gtp.waitForExit();
@@ -219,6 +230,7 @@ public class GuiGtpClient
             m_command = command;
         }
 
+        @Override
         public boolean askContinue()
         {
             String mainMessage = i18n("MSG_PROGRAM_NOT_RESPONDING");

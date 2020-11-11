@@ -73,18 +73,19 @@ public final class Move
         and an uppercase string for the point (e.g. B C3, W PASS). This
         representation is also guaranteed to be compatible with the formats
         used in the Go Text Protocol. */
+    @Override
     public String toString()
     {
         return m_string;
     }
 
-    private static Move s_passBlack;
+    private static final Move s_passBlack;
 
-    private static Move s_passWhite;
+    private static final Move s_passWhite;
 
-    private static Move[][] s_movesBlack;
+    private static final Move[][] s_movesBlack;
 
-    private static Move[][] s_movesWhite;
+    private static final Move[][] s_movesWhite;
 
     private final GoColor m_color;
 
